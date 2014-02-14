@@ -1,0 +1,33 @@
+﻿<Window x:Class="WargameModInstaller.Views.Dialogs.MessageBoxView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Caption}" 
+        Height="200" Width="320"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow"
+        Icon="{Binding BarIcon}"
+        >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="1" 
+                Padding="5"
+                Background="{DynamicResource {x:Static SystemColors.MenuBarBrushKey}}">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+                <Button Content="Yes"
+                    MinWidth="80"
+                    Margin="5"/>
+                <Button Content="No"
+                    MinWidth="80"
+                    Margin="5"/>
+                <Button Content="Cancel"
+                    MinWidth="80"
+                    Margin="5"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

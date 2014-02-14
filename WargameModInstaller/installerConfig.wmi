@@ -1,0 +1,84 @@
+<?xml version='1.0'?>
+<WargameModInstallerConfig>
+
+  <Settings>
+    
+    <General>
+      <ModName>My Mod</ModName>
+      <CriticalCommands Value="True"/>
+      <InstallationBackup Value="True"/>
+    </General>
+    
+    <UI>
+      <Screens>
+        <WelcomeScreen>
+          <!--<Header Text=""/>
+          <Description Text=""/>
+          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->          
+        </WelcomeScreen>
+        <LocationScreen>
+          <!--<Header Text=""/>
+          <Description Text=""/>
+          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+        </LocationScreen>
+        <ProgressScreen>
+          <!--<Header Text=""/>
+          <Description Text=""/>
+          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+        </ProgressScreen>
+        <InstallCompletedScreen>
+          <!--<Header Text=""/>
+          <Description Text=""/>
+          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+        </InstallCompletedScreen>
+        <InstallFailedScreen>
+          <!--<Header Text=""/>
+          <Description Text=""/>
+          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+        </InstallFailedScreen>
+        <InstallCanceledScreen>
+          <!--<Header Text=""/>
+          <Description Text=""/>
+          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+        </InstallCanceledScreen>
+      </Screens>
+    </UI>
+    
+  </Settings>
+  
+  <InstallCommands>
+    <!--<ReplaceImage 
+			      sourcePath="Textures\Su27High.dds"
+            targetPath="Data\wargame\PC\2060001225\ZZ_3.dat"
+            targetContentPath="pc\texture\assets\3d\units\urss\avions\su27_flanker\tsccombds_combineddstexture01.tgv"/>
+		<ReplaceImage 
+			      sourcePath="Textures\Su27Medium.dds"
+            targetPath="Data\wargame\PC\2060001225\ZZ_3.dat"
+            targetContentPath="pc\texture\assets\3d\units\urss\avions\su27_flanker_mid\tscother_diffusetexturenoalpha01.tgv"/>	
+		<ReplaceImageTile 
+			      sourcePath="Textures\Su27Low.dds"
+			      targetPath="Data\wargame\PC\2100001397\2100001404\ZZ_3.dat"
+			      targetContentPath="pc\texture\assets\3d\units\urss\lods\tscother_diffusetexturenoalpha01.tgv"
+			      column="5"
+			      row="4"/>
+    <ReplaceImagePart
+			      sourcePath="Textures\Su27Low.dds"
+			      targetPath="Data\wargame\PC\2100001397\2100001404\ZZ_3.dat"
+			      targetContentPath="pc\texture\assets\3d\units\urss\lods\tscother_diffusetexturenoalpha01.tgv"
+			      xPos="1280"
+			      yPos="1024"/>
+    <CopyModFile 
+            sourcePath='WRTG\2100001553\2100001570\ZZ_4.dat' 
+            targetPath='Data2\Wargame\PC\2100001553\2100001570\ZZ_4.dat'
+		        priority='10'/>
+		<CopyModFile 
+            sourcePath='WRTG\2100001574\2100001576\ZZ_Win.dat' 
+            targetPath='Data2\Wargame\PC\2100001574\2100001576\ZZ_Win.dat'/>
+		<CopyModFile 
+            sourcePath='WRTG\2100001576\NDF_Win.dat' 
+            targetPath='Data2\Wargame\PC\2100001576\NDF_Win.dat'/>			 
+		<RemoveFile 
+            sourcePath='Data2\Wargame\PC\2100001576\NDF_Win.dat'/>-->
+  </InstallCommands>
+  
+</WargameModInstallerConfig>

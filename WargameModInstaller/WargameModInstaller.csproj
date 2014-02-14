@@ -1,0 +1,306 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3E1FD406-627F-4924-BBCC-932D41AAA395}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WargameModInstaller</RootNamespace>
+    <AssemblyName>WargameModInstaller</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>wmi.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Caliburn.Micro, Version=1.5.2.0, Culture=neutral, PublicKeyToken=8e5891231f2ed21f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Caliburn.Micro.1.5.2\lib\net45\Caliburn.Micro.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="Ninject">
+      <HintPath>..\packages\Ninject.3.0.1.10\lib\net45-full\Ninject.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Common\Entities\EventArgs.cs" />
+    <Compile Include="Common\Entities\IProgressProvider.cs" />
+    <Compile Include="Common\Entities\MessageChangedEventArgs.cs" />
+    <Compile Include="Common\Entities\ProgressEventArgs.cs" />
+    <Compile Include="Common\Entities\StepChangedEventArgs.cs" />
+    <Compile Include="Common\Entities\WMIPath.cs" />
+    <Compile Include="Common\Extensions\BitmapExtensions.cs" />
+    <Compile Include="Common\Extensions\CancellationTokenExtensions.cs" />
+    <Compile Include="Common\Extensions\DialogExtensions.cs" />
+    <Compile Include="Common\Extensions\EventExtensions.cs" />
+    <Compile Include="Common\Extensions\StringExtensions.cs" />
+    <Compile Include="Common\Extensions\WMIPathExtensions.cs" />
+    <Compile Include="Common\Extensions\XExtensions.cs" />
+    <Compile Include="Common\Logging\Logger.cs" />
+    <Compile Include="Common\Logging\LoggerFactory.cs" />
+    <Compile Include="Common\Utilities\CopyFileExWrapper.cs" />
+    <Compile Include="Common\Utilities\FileUtilities.cs" />
+    <Compile Include="Common\Utilities\Image\MiscImageUtilities.cs" />
+    <Compile Include="Common\Utilities\MathUtilities.cs" />
+    <Compile Include="Infrastructure\Commands\InstallCmdReader.cs" />
+    <Compile Include="Infrastructure\Commands\IInstallCmdReader.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Infrastructure\Commands\CmdEntryType.cs" />
+    <Compile Include="Infrastructure\Config\GeneralSettingEntryType.cs" />
+    <Compile Include="Infrastructure\Config\GeneralSettingReader.cs" />
+    <Compile Include="Infrastructure\Config\IGeneralSettingReader.cs" />
+    <Compile Include="Infrastructure\Config\IScreenSettingsReader.cs" />
+    <Compile Include="Infrastructure\Config\ScreenSettingsEntryType.cs" />
+    <Compile Include="Infrastructure\Config\ScreenSettingsReader.cs" />
+    <Compile Include="Infrastructure\Config\SettingEntryType.cs" />
+    <Compile Include="Infrastructure\WMIEntryType.cs" />
+    <Compile Include="Infrastructure\Edata\EdataReader.cs" />
+    <Compile Include="Infrastructure\Edata\EdataWriter.cs" />
+    <Compile Include="Infrastructure\Edata\IEdataReader.cs" />
+    <Compile Include="Infrastructure\Edata\IEdataWriter.cs" />
+    <Compile Include="Infrastructure\Image\ITgvReader.cs" />
+    <Compile Include="Infrastructure\Image\ITgvWriter.cs" />
+    <Compile Include="Infrastructure\Image\TgvDDSReader.cs" />
+    <Compile Include="Infrastructure\Image\TgvDDSWriter.cs" />
+    <Compile Include="Infrastructure\Image\TgvNoMipMapRawStreamWriter.cs" />
+    <Compile Include="Infrastructure\Image\TgvRawReader.cs" />
+    <Compile Include="Infrastructure\Image\TgvRawStreamWriter.cs" />
+    <Compile Include="Infrastructure\WMIReaderBase.cs" />
+    <Compile Include="Model\Commands\ICmdGroup.cs" />
+    <Compile Include="Model\Commands\ReplaceImagePartCmd.cs" />
+    <Compile Include="Model\Commands\SharedEdataCmdGroup.cs" />
+    <Compile Include="Model\Commands\BasicCmdGroup.cs" />
+    <Compile Include="Model\Config\GeneralSetting.cs" />
+    <Compile Include="Model\Config\ISettingsFactory.cs" />
+    <Compile Include="Model\Config\ScreenSettings.cs" />
+    <Compile Include="Model\Config\SettingsFactory.cs" />
+    <Compile Include="Model\Edata\EdataContentDirectory.cs" />
+    <Compile Include="Model\Edata\EdataContentEntity.cs" />
+    <Compile Include="Model\Edata\EdataContentFile.cs" />
+    <Compile Include="Model\Edata\EdataContentFileType.cs" />
+    <Compile Include="Model\Edata\EdataFile.cs" />
+    <Compile Include="Model\Edata\EdataHeader.cs" />
+    <Compile Include="Model\Image\TgvImage.cs" />
+    <Compile Include="Model\Image\TgvMipMap.cs" />
+    <Compile Include="Model\Commands\CopyGameFileCmd.cs" />
+    <Compile Include="Model\Commands\IHasTarget.cs" />
+    <Compile Include="Model\Commands\IHasSource.cs" />
+    <Compile Include="Model\Commands\IInstallCmd.cs" />
+    <Compile Include="Model\Commands\RemoveFileCmd.cs" />
+    <Compile Include="Model\Commands\CopyModFileCmd.cs" />
+    <Compile Include="Model\Commands\ReplaceImageCmd.cs" />
+    <Compile Include="Model\Commands\ReplaceImageTileCmd.cs" />
+    <Compile Include="Services\Commands\BasicCmdGroupExecutor.cs" />
+    <Compile Include="Services\Commands\CmdGroupExecutorBase.cs" />
+    <Compile Include="Services\Commands\CmdExecutionContext.cs" />
+    <Compile Include="Services\Commands\CmdExecutorBase.cs" />
+    <Compile Include="Services\Commands\CmdExecutionFailedException.cs" />
+    <Compile Include="Services\Commands\ReplaceImageCmdExecutorBase.cs" />
+    <Compile Include="Services\Commands\ReplaceImagePartCmdExecutor.cs" />
+    <Compile Include="Services\Commands\SharedEdataCmdExecutionContext.cs" />
+    <Compile Include="Services\Commands\SharedEdataCmdGroupExecutor.cs" />
+    <Compile Include="Services\Config\ConfigFileLocator.cs" />
+    <Compile Include="Services\Config\IConfigFileLocator.cs" />
+    <Compile Include="Services\Config\ISettingsProvider.cs" />
+    <Compile Include="Services\Config\SettingsProvider.cs" />
+    <Compile Include="Services\Install\ALBInstallDirService.cs" />
+    <Compile Include="Services\Image\IImageComposerService.cs" />
+    <Compile Include="Services\Image\ImageComposerService.cs" />
+    <Compile Include="Services\Commands\CopyGameFileCmdExecutor.cs" />
+    <Compile Include="Services\Commands\CmdExecutorFactory.cs" />
+    <Compile Include="Services\Commands\ICmdExecutorFactory.cs" />
+    <Compile Include="Services\Commands\ICmdExecutor.cs" />
+    <Compile Include="Services\Install\BackupService.cs" />
+    <Compile Include="Services\Install\IBackupService.cs" />
+    <Compile Include="Services\Install\IInstallerService.cs" />
+    <Compile Include="Services\Commands\RemoveCmdExecutor.cs" />
+    <Compile Include="Services\Commands\CopyModFileCmdExecutor.cs" />
+    <Compile Include="Services\Commands\ReplaceImageCmdExecutor.cs" />
+    <Compile Include="Services\Commands\ReplaceImageTileCmdExecutor.cs" />
+    <Compile Include="Services\Install\IWargameInstallDirService.cs" />
+    <Compile Include="Services\Utilities\DirectoryLocationService.cs" />
+    <Compile Include="Services\Utilities\IDirectoryLocationService.cs" />
+    <Compile Include="Services\Utilities\IMessageService.cs" />
+    <Compile Include="Services\Utilities\IProgressManager.cs" />
+    <Compile Include="Services\Utilities\MessageService.cs" />
+    <Compile Include="Services\Utilities\PercentageProgressManager.cs" />
+    <Compile Include="Services\Install\InstallerService.cs" />
+    <Compile Include="Common\Utilities\Compression\ICompressor.cs" />
+    <Compile Include="Common\Utilities\Compression\ZlibCompressor.cs" />
+    <Compile Include="Common\Utilities\Image\DDS\DDSFormat.cs" />
+    <Compile Include="Common\Utilities\Image\DDS\DDSHelper.cs" />
+    <Compile Include="Common\Utilities\Image\DDS\FourCC.cs" />
+    <Compile Include="Common\Utilities\Image\DDS\PixelFormats.cs" />
+    <Compile Include="Common\Utilities\Image\TGV\TgvUtilities.cs" />
+    <Compile Include="Common\Utilities\MiscUtilities.cs" />
+    <Compile Include="Common\Utilities\PathUtilities.cs" />
+    <Compile Include="ViewModels\Factories\IInstallScreenViewModelFactory.cs" />
+    <Compile Include="ViewModels\Factories\InstallScreenViewModelFactory.cs" />
+    <Compile Include="ViewModels\IInstallScreen.cs" />
+    <Compile Include="ViewModels\InstallFinishViewModel.cs" />
+    <Compile Include="ViewModels\InstallProgressViewModel.cs" />
+    <Compile Include="ViewModels\Dialogs\MessageBoxViewModel.cs" />
+    <Compile Include="ViewModels\Messages\InstallCompletedMessage.cs" />
+    <Compile Include="ViewModels\Messages\InstallFailedMessage.cs" />
+    <Compile Include="ViewModels\Messages\PreviousScreenMessage.cs" />
+    <Compile Include="ViewModels\Messages\InstallCanceledMessage.cs" />
+    <Compile Include="ViewModels\Messages\InstallClosedMessage.cs" />
+    <Compile Include="ViewModels\Messages\NextScreenMessage.cs" />
+    <Compile Include="ViewModels\InstallLocationViewModel.cs" />
+    <Compile Include="ViewModels\InstallScreenViewModelBase.cs" />
+    <Compile Include="ViewModels\Messages\Message.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
+    <Compile Include="ViewModels\InstallWelcomeViewModel.cs" />
+    <Compile Include="Views\Dialogs\MessageBoxView.xaml.cs">
+      <DependentUpon>MessageBoxView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InstallFinishView.xaml.cs">
+      <DependentUpon>InstallFinishView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InstallLocationView.xaml.cs">
+      <DependentUpon>InstallLocationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InstallProgressView.xaml.cs">
+      <DependentUpon>InstallProgressView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InstallWelcomeView.xaml.cs">
+      <DependentUpon>InstallWelcomeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ShellView.xaml.cs">
+      <DependentUpon>ShellView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="AppBootstrapper.cs" />
+    <Page Include="Views\Dialogs\MessageBoxView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InstallFinishView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InstallLocationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InstallProgressView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InstallWelcomeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ShellView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.manifest" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="KnownIssues.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\BackImage.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="installerConfig.wmi">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="wmi.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
