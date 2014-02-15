@@ -1,45 +1,72 @@
 <?xml version='1.0'?>
 <WargameModInstallerConfig>
+  <!--Green text like this, is a comment-->
+  
+  <!--This is a configuration file template. It shows and describes all elements possible to use in the configuration file.  
+  You can adjust it to your needs by removing comment tags surrounding elements which you want to use, 
+  and by setting up appropriate values for them. You can also add more elements where needed, basing on the sample ones.-->
 
   <Settings>
     
-    <General>
-      <ModName>My Mod</ModName>
+    <General>      
+      <!--Mod name displayed during the installation-->
+      <ModName>My Mod Name</ModName>
+
+      <!--Enables or disables critical commands. By enabling it, you mark all installation commands as the critical ones.
+      If a critical command fails to execute, whole installation process finishes with a failure-->
       <CriticalCommands Value="True"/>
-      <InstallationBackup Value="True"/>
+      
+      <!--Enables or disables, automatic backup of altered files for the installation time. 
+      It's highly recommended to not disable it for a release version of mod-->
+      <InstallationBackup Value="True"/>   
     </General>
     
     <UI>
       <Screens>
+        <!--This section allows to customize the appearance of selected installation screens. 
+        To customize an element, uncomment it and set your value for it.
+        Please note, that the screen background image path has to be in the relative form.-->
+        
+        <!--Allows to customize the installer's welcome screen.-->
         <WelcomeScreen>
-          <!--<Header Text=""/>
-          <Description Text=""/>
-          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->          
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->          
         </WelcomeScreen>
+
+        <!--Allows to customize the installation directory select screen.-->
         <LocationScreen>
-          <!--<Header Text=""/>
-          <Description Text=""/>
-          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
         </LocationScreen>
+
+        <!--Allows to customize the installation progress screen.-->
         <ProgressScreen>
-          <!--<Header Text=""/>
-          <Description Text=""/>
-          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
         </ProgressScreen>
+
+        <!--Allows to customize the end screen shown on installation success.-->
         <InstallCompletedScreen>
-          <!--<Header Text=""/>
-          <Description Text=""/>
-          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
         </InstallCompletedScreen>
+
+        <!--Allows to customize the end screen shown on installation failure.-->
         <InstallFailedScreen>
-          <!--<Header Text=""/>
-          <Description Text=""/>
-          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
         </InstallFailedScreen>
+
+        <!--Allows to customize the end screen shown on installation cancel.-->
         <InstallCanceledScreen>
-          <!--<Header Text=""/>
-          <Description Text=""/>
-          <BackgroundImage Path="Backgrounds\back1.jpg"/>-->
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
         </InstallCanceledScreen>
       </Screens>
     </UI>
@@ -47,38 +74,81 @@
   </Settings>
   
   <InstallCommands>
+    <!--This section is responsible for the definition of installation orders. Each sample command is preceded by a description and arguments explanation.
+    Please note that sample commented commands here, use a sample argument values, so before you can try them, you have to specify your own values.-->
+
+    <!--This is a CopyModFile command. It orders the installer to copy a specified file from the Mod directory to the Wargame directory.
+    Command arguments:
+        - sourcePath - a relative path to a file, inside the Mod directory, which has to be copied.
+        - targetPath - a relative path to a location, inside the Wargame Installation directory, where it has to be copied.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                   For CopyModFile, set to 3 by default, and can be omitted.-->
+    <!--<CopyModFile 
+            sourcePath="WRTG\2100001553\2100001570\ZZ_4.dat" 
+            targetPath="Data\Wargame\PC\2100001553\2100001570\ZZ_4.dat"/>-->
+
+    <!--This is a CopyGameFile command. It orders the installer to copy a specified file from the one Wargame directory to another.
+    Command arguments:
+        - sourcePath - a relative path to a file, inside the Wargame Installation directory, which has to be copied.
+        - targetPath - a relative path to a location, inside the Wargame Installation directory, where it has to be copied.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                   For CopyGameFile, set to 4 by default, and can be omitted.-->
+    <!--<CopyGameFile 
+            sourcePath="Data\Wargame\PC\2100001553\2100001570\ZZ_4.dat" 
+            targetPath="Backups\2100001553\2100001570\ZZ_4.dat"/>-->
+    
+    <!--This is a ReplaceImage command. It orders the installer to replace a specified image inside the specified .dat file.
+    Command arguments:
+        - sourcePath - a relative path to a DDS file which has to be used as a replacer.
+        - targetPath - a relative path to a Wargame .dat file which holds the image to be replaced.
+        - targetContentPath - a path pointing to an image inside the .dat file, which has to be replaced.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                   For ReplaceImage, set to 2 by default and can be omitted.-->
     <!--<ReplaceImage 
 			      sourcePath="Textures\Su27High.dds"
             targetPath="Data\wargame\PC\2060001225\ZZ_3.dat"
-            targetContentPath="pc\texture\assets\3d\units\urss\avions\su27_flanker\tsccombds_combineddstexture01.tgv"/>
-		<ReplaceImage 
-			      sourcePath="Textures\Su27Medium.dds"
-            targetPath="Data\wargame\PC\2060001225\ZZ_3.dat"
-            targetContentPath="pc\texture\assets\3d\units\urss\avions\su27_flanker_mid\tscother_diffusetexturenoalpha01.tgv"/>	
-		<ReplaceImageTile 
-			      sourcePath="Textures\Su27Low.dds"
-			      targetPath="Data\wargame\PC\2100001397\2100001404\ZZ_3.dat"
-			      targetContentPath="pc\texture\assets\3d\units\urss\lods\tscother_diffusetexturenoalpha01.tgv"
-			      column="5"
-			      row="4"/>
-    <ReplaceImagePart
+            targetContentPath="pc\texture\assets\3d\units\urss\avions\su27_flanker\tsccombds_combineddstexture01.tgv"/>-->
+
+    <!--This is a ReplaceImagePart command. It orders the installer to replace a specified part of an image stored inside the specified .dat file.
+    Command arguments:
+        - sourcePath - a relative path to a DDS file which has to be used as a replacer.
+        - targetPath - a relative path to a Wargame .dat file which holds the image which part has to be replaced.
+        - targetContentPath - a path pointing to an image inside the .dat file, which part has to be replaced.
+        - xPos - an X coordinate of an image where the upper-left point of a replacer image has to be placed.
+        - yPos - a Y coordinate of an image where the upper-left point of a replacer image has to be placed.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                   For ReplaceImagePart, set to 2 by default and can be omitted.-->
+    <!--<ReplaceImagePart
 			      sourcePath="Textures\Su27Low.dds"
 			      targetPath="Data\wargame\PC\2100001397\2100001404\ZZ_3.dat"
 			      targetContentPath="pc\texture\assets\3d\units\urss\lods\tscother_diffusetexturenoalpha01.tgv"
 			      xPos="1280"
-			      yPos="1024"/>
-    <CopyModFile 
-            sourcePath='WRTG\2100001553\2100001570\ZZ_4.dat' 
-            targetPath='Data2\Wargame\PC\2100001553\2100001570\ZZ_4.dat'
-		        priority='10'/>
-		<CopyModFile 
-            sourcePath='WRTG\2100001574\2100001576\ZZ_Win.dat' 
-            targetPath='Data2\Wargame\PC\2100001574\2100001576\ZZ_Win.dat'/>
-		<CopyModFile 
-            sourcePath='WRTG\2100001576\NDF_Win.dat' 
-            targetPath='Data2\Wargame\PC\2100001576\NDF_Win.dat'/>			 
-		<RemoveFile 
-            sourcePath='Data2\Wargame\PC\2100001576\NDF_Win.dat'/>-->
+			      yPos="1024"/>-->
+    
+    <!--This is a ReplaceImageTile command. It orders the installer to replace a specified image part, defined by the column and row indices, 
+    of an image stored inside the specified .dat file.
+    Command arguments:
+        - sourcePath - a relative path to a DDS file which has to be used as a replacer.
+        - targetPath - a relative path to a Wargame .dat file which holds the image which part has to be replaced.
+        - targetContentPath - a path pointing to an image inside the .dat file, which part has to be replaced.
+        - tileSize - a size of grid cells, which can be pointed as a replacement areas by specyfing the column and row indices. By default it's set to 256.
+        - column - a zero based index of a grid column where the replacement area is located.
+        - row - a zero based index of a grid row where the replacement area is located.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                   For ReplaceImageTile, set to 2 by default and can be omitted.-->
+		<!--<ReplaceImageTile 
+			      sourcePath="Textures\Su27Low.dds"
+			      targetPath="Data\wargame\PC\2100001397\2100001404\ZZ_3.dat"
+			      targetContentPath="pc\texture\assets\3d\units\urss\lods\tscother_diffusetexturenoalpha01.tgv"
+            tileSize="256"
+			      column="5"
+			      row="4"/>-->
+    
   </InstallCommands>
   
 </WargameModInstallerConfig>

@@ -89,4 +89,5 @@ namespace WargameModInstaller.Model.Edata
         }
 
     }
+
 }

@@ -7,43 +7,11 @@
              d:DesignHeight="480" d:DesignWidth="768">
 
     <UserControl.Resources>
-        <Thickness x:Key="ContentMargin"
-                   Left="20"
-                   Top="10"
-                   Right="20"
-                   Bottom="10"/>
-        <Style x:Key="NavigationButton"
-               TargetType="{x:Type Button}">
-            <Setter Property="Width" Value="80"/>
-            <Setter Property="Margin" Value="2, 0"/>
-        </Style>
-        <Style x:Key="HeaderTextBlock"
-               TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="22"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
-        <Style x:Key="ContentTextBlock"
-               TargetType="{x:Type TextBlock}">
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="Foreground" Value="Black"/>
-        </Style>
-        <Style x:Key="TextBorder"
-               TargetType="{x:Type Border}">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="Padding" Value="{StaticResource ContentMargin}"/>
-            <Setter Property="Background">
-                <Setter.Value>
-                    <SolidColorBrush Color="White" Opacity="0.75"/>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="BorderBrush" Value="{x:Null}"/>
-            <Setter Property="CornerRadius" Value="5"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Views/ScreenStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
@@ -127,10 +95,7 @@
         <TextBlock x:Name="Version"
                    Grid.Column="0"
                    Grid.Row="2"
-                   VerticalAlignment="Bottom"
-                   Margin="10, 0, 0, 10"
-                   Foreground="LightGray"
-                   FontSize="9.5"/>
+                   Style="{StaticResource VerionTextBlock}"/>
 
     </Grid>
 </UserControl>

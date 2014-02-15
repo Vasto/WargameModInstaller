@@ -183,8 +183,8 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(3);
 
-                //Any validation here is not a good idea. Commands should be left over in an invalid state, so eventually installation will fail
-                //if they are marked as critical. Now, some invalid commands are jus omitted, and their fallacy is not explicit to the config maker.
+                //Any validation here is not a good idea. Commands should be left over in an invalid state, 
+                //so eventually installation will fail if they are marked as critical.
                 var newCmd = new CopyModFileCmd();
                 newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
                 newCmd.TargetPath = new WMIPath(targetPath, WMIPathType.Relative);

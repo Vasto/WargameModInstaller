@@ -102,7 +102,7 @@ namespace WargameModInstaller.Services.Commands
                 }
                 else
                 {
-                    //Log only if command is not a critical one, otherwise, an exception will bubble
+                    //Log only if the command is not a critical one, otherwise, an exception will bubble
                     WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
                 }
             }

@@ -26,8 +26,8 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Dictionary of backups.
-        /// The orginal path to the backup file is the key, storing path is the value.
+        /// The dictionary of backups.
+        /// The orginal path to a backup file is a key, backup path is a value.
         /// </summary>
         protected Dictionary<String, String> Backups
         {
@@ -36,7 +36,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Set of the directories used for the backup.
+        /// Set of the directories used for backups.
         /// </summary>
         protected HashSet<String> BackupDirectories
         {
@@ -45,7 +45,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups a file of a given file path
+        /// Backups a file wtih a given path.
         /// </summary>
         /// <param name="file"></param>
         public void Backup(String file)
@@ -54,7 +54,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups a file of a given file path
+        /// Backups a file wtih a given path.
         /// </summary>
         /// <param name="file"></param>>
         /// <param name="token"></param>
@@ -64,7 +64,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups all files form the given collection of file paths.
+        /// Backups all files in the given collection of file paths.
         /// </summary>
         /// <param name="files"></param>
         public void Backup(IEnumerable<String> files)
@@ -73,7 +73,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups all files form the given collection of file paths.
+        /// Backups all files in the given collection of file paths.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="token"></param>
@@ -83,7 +83,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups a file of a given file path which is relative to the given source directory.
+        /// Backups a file wtih a given path which is relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="sourceDir"></param>
@@ -93,7 +93,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups a file of a given file path which is relative to the given source directory.
+        /// Backups a file wtih a given path which is relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="sourceDir"></param>
@@ -104,7 +104,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups all files in the given collection of file path which is relative to the given source directory.
+        /// Backups all files in the given collection of file paths which are relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="sourceDir"></param>
@@ -120,7 +120,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Backups all files in the given collection of file path which is relative to the given source directory.
+        /// Backups all files in the given collection of file paths which are relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="sourceDir"></param>
@@ -137,7 +137,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores a file of a given file path
+        /// Restores a file witha a given path.
         /// </summary>
         /// <param name="files"></param>
         public void Restore(String file)
@@ -146,7 +146,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores a file of a given file path
+        /// Restores a file with a given path.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="token"></param>
@@ -156,7 +156,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores files basing on the given collection of file paths.
+        /// Restores files in the given collection of file paths.
         /// </summary>
         /// <param name="files"></param>
         public void Restore(IEnumerable<String> files)
@@ -165,7 +165,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores files basing on the given collection of file paths.
+        /// Restores files in the given collection of file paths.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="token"></param>
@@ -175,7 +175,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores a file of a given file paths which is relative to the given source directory.
+        /// Restores a file with a given file paths which are relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="targetDir"></param>
@@ -185,7 +185,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores a file of a given file paths which is relative to the given source directory.
+        /// Restores a file with a given file paths which are relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="targetDir"></param>
@@ -196,7 +196,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores all files in the given collection of file path which is relative to the given source directory.
+        /// Restores all files in the given collection of file paths which are relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="targetDir"></param>
@@ -212,7 +212,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores all files in the given collection of file path which is relative to the given source directory.
+        /// Restores all files in the given collection of file paths which are relative to the given source directory.
         /// </summary>
         /// <param name="files"></param>
         /// <param name="targetDir"></param>
@@ -229,7 +229,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores all file backuped by the service to their orginal locations.
+        /// Restores all files, backuped by the service, to their orginal locations.
         /// </summary>
         public void RestoreAll()
         {
@@ -250,7 +250,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Restores all file backuped by the service to their orginal locations.
+        /// Restores all files, backuped by the service, to their orginal locations.
         /// </summary>
         /// <param name="token"></param>
         public void RestoreAll(CancellationToken token)
@@ -366,7 +366,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Computes total size in bytes of the given file.
+        /// Computes a total size in bytes of the file with a given path.
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -396,7 +396,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Tries to get the available backup directory from the known ones for the given file.
+        /// Tries to get an available backup directory from the known ones for the given file.
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
@@ -416,7 +416,7 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
-        /// Creates the backup directory for the given file basing on the free space required to backup the given file.
+        /// Creates a backup directory for the given file basing on the free space required to backup the given file.
         /// </summary>
         /// <param name="file"></param>
         /// <exception cref="System.IO.IOException"></exception>

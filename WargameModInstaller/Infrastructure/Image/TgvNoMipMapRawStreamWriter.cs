@@ -11,7 +11,7 @@ using WargameModInstaller.Utilities.Compression;
 namespace WargameModInstaller.Infrastructure.Image
 {
     /// <summary>
-    /// Writes the Tgv file in binary form to the provided Stream without any additional MipMaps. 
+    /// Writes a Tgv file in a binary form to the provided Stream without any additional MipMaps. 
     /// </summary>
     public class TgvNoMipMapRawStreamWriter : TgvRawStreamWriter
     {

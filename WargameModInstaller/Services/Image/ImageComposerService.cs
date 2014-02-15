@@ -84,7 +84,7 @@ namespace WargameModInstaller.Services.Image
         }
 
         /// <summary>
-        /// Converts the raw Tgv image stored in the linear byte array to the two dimensional byte array with byte order
+        /// Converts the raw Tgv image stored in the linear byte array to the two dimensional byte array with a byte order
         /// matching the pixel placement in the image seen as on the screen.
         /// </summary>
         /// <param name="content"></param>
@@ -95,7 +95,7 @@ namespace WargameModInstaller.Services.Image
         {
             byte[,] result = new byte[width, height];
 
-            //The Block term is used to describe a rectangular area of an image, defined by the image width and
+            //The Block term is used to describe a rectangular area of an image, defined by the image width and the
             //height equal to the amount of pixels which belongs to the one column and are stored in the byte array continuously (stride).
             uint BlockCount = (uint)Math.Ceiling(height / (double)stride);
 

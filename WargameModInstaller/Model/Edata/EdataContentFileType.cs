@@ -14,6 +14,6 @@ namespace WargameModInstaller.Model.Edata
         Package,
         Save,
         Unknown
-
     }
+
 }

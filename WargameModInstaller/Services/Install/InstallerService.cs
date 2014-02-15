@@ -160,7 +160,7 @@ namespace WargameModInstaller.Services.Install
             catch (CmdExecutionFailedException ex)
             {
                 installResult = OperationResult.Failed;
-                errorMessage = ex.InstallerMessage;
+                errorMessage = ex.InstallerMessage ?? ex.Message;
 
                 WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
             }
@@ -224,7 +224,7 @@ namespace WargameModInstaller.Services.Install
             catch (CmdExecutionFailedException ex)
             {
                 restoreResult = OperationResult.Failed;
-                errorMessage = ex.InstallerMessage;
+                errorMessage = ex.InstallerMessage ?? ex.Message;
 
                 WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
             }
@@ -288,7 +288,7 @@ namespace WargameModInstaller.Services.Install
             catch (CmdExecutionFailedException ex)
             {
                 cleanupResult = OperationResult.Failed;
-                errorMessage = ex.InstallerMessage;
+                errorMessage = ex.InstallerMessage ?? ex.Message;
 
                 WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
             }
