@@ -43,8 +43,8 @@ namespace WargameModInstaller.Services.Image
                 return;
             }
 
-            if (xPos >= destination.Height || xPos < 0 ||
-                yPos >= destination.Width || yPos < 0)
+            if (xPos >= destination.Width || xPos < 0 ||
+                yPos >= destination.Height || yPos < 0)
             {
                 return;
             }

@@ -75,6 +75,7 @@ namespace WargameModInstaller.Infrastructure.Edata
             using (FileStream fs = File.OpenRead(contentOwenr.Path))
             {
                 file.Content = ReadContent(fs, file.TotalOffset, file.Size);
+                //file.Size = file.Content.Length;
             }
         }
 
@@ -223,6 +224,7 @@ namespace WargameModInstaller.Infrastructure.Edata
                             long currentStreamPosition = fileStream.Position;
 
                             file.Content = ReadContent(fileStream, header.FileOffset + file.Offset, file.Size);
+                            //file.Size = file.Content.Length;
 
                             fileStream.Seek(currentStreamPosition, SeekOrigin.Begin);
                         }
@@ -330,6 +332,7 @@ namespace WargameModInstaller.Infrastructure.Edata
                             long currentStreamPosition = fileStream.Position;
 
                             file.Content = ReadContent(fileStream, file.TotalOffset, file.Size);
+                            //file.Size = file.Content.Length;
 
                             fileStream.Seek(currentStreamPosition, SeekOrigin.Begin);
                         }

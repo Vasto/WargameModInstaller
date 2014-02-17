@@ -219,13 +219,6 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
         }
 
-        protected void WriteContentFastInternal(IDictionary<String, byte[]> pathToContentMap, CancellationToken? token = null)
-        {
-            //Odczytywać kilka plików za jednym zamachem az odczyt osiągnie ustalony rozmiar.
-
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// To do: Zastanowić się czy nie powinno poszukać wolnego miejsca na innej partycji w razie braku...
         /// </summary>

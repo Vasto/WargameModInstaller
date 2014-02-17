@@ -13,7 +13,7 @@
       <ModName>My Mod Name</ModName>
 
       <!--Enables or disables critical commands. By enabling it, you mark all installation commands as the critical ones.
-      If a critical command fails to execute, whole installation process finishes with a failure-->
+      If one critical command fails to execute, whole installation process finishes with a failure-->
       <CriticalCommands Value="True"/>
       
       <!--Enables or disables, automatic backup of altered files for the installation time. 
