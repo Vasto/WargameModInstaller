@@ -37,7 +37,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a path to a image file which has to be used as a replacer.
         /// </summary>
-        public WMIPath SourcePath
+        public InstallEntityPath SourcePath
         {
             get;
             set;
@@ -46,7 +46,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a path to the dat file which holds the image which part has to be replaced.
         /// </summary>
-        public WMIPath TargetPath
+        public InstallEntityPath TargetPath
         {
             get;
             set;
@@ -55,7 +55,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a path to a content inside the dat file.
         /// </summary>
-        public WMIPath TargetContentPath
+        public ContentPath TargetContentPath
         {
             get;
             set;

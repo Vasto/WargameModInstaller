@@ -74,7 +74,8 @@
                 Style="{StaticResource TextBorder}"
                 Margin="5, 5, 10, 10">
             <StackPanel Orientation="Horizontal"
-                        HorizontalAlignment="Right">
+                        HorizontalAlignment="Right"
+                        FocusManager.FocusedElement="{Binding ElementName=Next}">
                 <Button x:Name="Back"
                         Content="Back"
                         Style="{StaticResource NavigationButton}"/>

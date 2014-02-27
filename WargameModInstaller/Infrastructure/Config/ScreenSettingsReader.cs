@@ -58,7 +58,7 @@ namespace WargameModInstaller.Infrastructure.Config
         {
             ScreenSettings result = null;
 
-            var screenElemet = source.Element(entryType.EntryName);
+            var screenElemet = source.Element(entryType.Name);
             if (screenElemet != null)
             {
                 result = new ScreenSettings(entryType);
@@ -84,7 +84,7 @@ namespace WargameModInstaller.Infrastructure.Config
                         imagePathElement.ValueNullSafe();
 
                     result.Background = PathUtilities.IsValidRelativePath(imagePath) ?
-                        new WMIPath(imagePath, WMIPathType.Relative) :
+                        new ResourcePath(imagePath) :
                         null;
                 }
             }

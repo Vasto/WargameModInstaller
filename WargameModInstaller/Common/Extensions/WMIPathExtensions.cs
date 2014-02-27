@@ -16,13 +16,13 @@ namespace WargameModInstaller.Common.Extensions
         /// <param name="sourceObj"></param>
         /// <param name="pathToAppend"></param>
         /// <returns></returns>
-        public static String GetAbsoluteOrAppendIfRelative(this WMIPath sourceObj, String pathToAppend)
+        public static String GetAbsoluteOrAppendIfRelative(this InstallEntityPath sourceObj, String pathToAppend)
         {
-            if (sourceObj.PathType == WMIPathType.Absolute)
+            if (sourceObj.PathType == InstallEntityPathType.Absolute)
             {
                 return sourceObj.Value;
             }
-            else if (sourceObj.PathType == WMIPathType.Relative)
+            else if (sourceObj.PathType == InstallEntityPathType.Relative)
             {
                 return Path.Combine(sourceObj.Value, pathToAppend);
             }
@@ -38,13 +38,13 @@ namespace WargameModInstaller.Common.Extensions
         /// <param name="sourceObj"></param>
         /// <param name="pathToPrepend"></param>
         /// <returns></returns>
-        public static String GetAbsoluteOrPrependIfRelative(this WMIPath sourceObj, String pathToPrepend)
+        public static String GetAbsoluteOrPrependIfRelative(this InstallEntityPath sourceObj, String pathToPrepend)
         {
-            if (sourceObj.PathType == WMIPathType.Absolute)
+            if (sourceObj.PathType == InstallEntityPathType.Absolute)
             {
                 return sourceObj.Value;
             }
-            else if (sourceObj.PathType == WMIPathType.Relative)
+            else if (sourceObj.PathType == InstallEntityPathType.Relative)
             {
                 return Path.Combine(pathToPrepend, sourceObj.Value);
             }

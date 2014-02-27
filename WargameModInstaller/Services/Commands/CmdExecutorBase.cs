@@ -26,12 +26,46 @@ namespace WargameModInstaller.Services.Commands
 
         public virtual void Execute(CmdExecutionContext context)
         {
-            ExecuteInternal(context);
+            try
+            {
+                ExecuteInternal(context);
+            }
+            catch (Exception ex)
+            {
+                if (Command.IsCritical)
+                {
+                    throw;
+                    //throw new CmdExecutionFailedException(ex.Message,
+                    //    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath),
+                    //    ex);
+                }
+                else
+                {
+                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+                }
+            }
         }
 
         public virtual void Execute(CmdExecutionContext context, CancellationToken token)
         {
-            ExecuteInternal(context, token);
+            try
+            {
+                ExecuteInternal(context, token);
+            }
+            catch (Exception ex)
+            {
+                if (Command.IsCritical)
+                {
+                    throw;
+                    //throw new CmdExecutionFailedException(ex.Message,
+                    //    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath),
+                    //    ex);
+                }
+                else
+                {
+                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+                }
+            }
         }
 
         protected abstract void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null);

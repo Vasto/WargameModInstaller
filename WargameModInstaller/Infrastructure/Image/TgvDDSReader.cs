@@ -3,37 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities;
 using WargameModInstaller.Utilities.Image.DDS;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
-    public class TgvDDSReader : ITgvReader
+    public class TgvDDSReader : ITgvFileReader
     {
-        public TgvDDSReader(String ddsFilePath)
-        {
-            this.DDSFilePath = ddsFilePath;
-        }
-
-        protected String DDSFilePath
-        {
-            get;
-            private set;
-        }
-
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="filePath"></param>
         /// <returns></returns>
         /// <remarks>
         /// Credits to enohka for this code.
         /// See more at: http://github.com/enohka/moddingSuite
         /// </remarks>
-        public virtual TgvImage Read()
+        public virtual TgvImage Read(String filePath)
         {
-            byte[] rawDDSData = File.ReadAllBytes(DDSFilePath);
+            byte[] rawDDSData = File.ReadAllBytes(filePath);
 
             int contentSize = rawDDSData.Length - Marshal.SizeOf(typeof(DDSFormat.Header)) - Marshal.SizeOf((typeof(uint)));
 
@@ -58,7 +47,7 @@ namespace WargameModInstaller.Infrastructure.Image
                 {
                     header.MipMapCount = 1;
                 }
-                else
+                else if (header.MipMapCount > 1) //When equal 1 it would make a 0 length content mipmap
                 {
                     mipSize -= contentSize / header.MipMapCount;
                 }

@@ -24,7 +24,7 @@ namespace WargameModInstaller.Model.Config
             private set;
         }
 
-        public WMIPath Background
+        public ResourcePath Background
         {
             get;
             set;

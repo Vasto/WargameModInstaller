@@ -1,15 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Infrastructure.Edata
 {
-    public interface IEdataWriter
+    public interface IEdataBinReader
     {
-        void Write(EdataFile fileToWrite);
-        void Write(EdataFile fileToWrite, CancellationToken token);
+        EdataFile Read(byte[] rawEdata);
+        EdataFile Read(byte[] rawEdata, CancellationToken token);
     }
 }

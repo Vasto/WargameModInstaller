@@ -5,31 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities;
 using WargameModInstaller.Utilities.Compression;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
     /// <summary>
-    /// Writes a Tgv file in a binary form to the provided Stream without any additional MipMaps. 
+    /// Writes a Tgv file to the byte array without any additional MipMaps. 
     /// </summary>
-    public class TgvNoMipMapRawStreamWriter : TgvRawStreamWriter
+    public class TgvNoMipMapBinWriter : TgvBinWriter
     {
-        public TgvNoMipMapRawStreamWriter(Stream stream) : base(stream)
-        {
-
-        }
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="fs"></param>
+        /// <param name="file"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// Method based on enohka's code.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        public override void Write(TgvImage file)
+        public override byte[] Write(TgvImage file)
         {
             TgvImage noMipMapsFile = new TgvImage();
             noMipMapsFile.PixelFormatString = file.PixelFormatString;
@@ -47,7 +37,7 @@ namespace WargameModInstaller.Infrastructure.Image
             noMipMapsFile.MipMaps.Add(file.MipMaps.ToArray().OrderBy(x => x.Size).Last());
             noMipMapsFile.MipMapCount = 1;
 
-            base.Write(noMipMapsFile);
+            return base.Write(noMipMapsFile);
         }
 
     }

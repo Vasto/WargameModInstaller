@@ -58,53 +58,56 @@ namespace WargameModInstaller.Model.Config
         {
             var funcs = new Dictionary<SettingEntryType, Func<object>>();
 
-            funcs.Add(GeneralSettingEntryType.InstallationBackup, () => CreateGeneralSetting(GeneralSettingEntryType.InstallationBackup, Boolean.TrueString));
+            funcs.Add(GeneralSettingEntryType.InstallationBackup, () => 
+                CreateGeneralSetting(GeneralSettingEntryType.InstallationBackup, Boolean.TrueString));
 
-            funcs.Add(GeneralSettingEntryType.ModName, () => CreateGeneralSetting(GeneralSettingEntryType.ModName, Resources.DefaultModname));
+            funcs.Add(GeneralSettingEntryType.ModName, () => 
+                CreateGeneralSetting(GeneralSettingEntryType.ModName, Resources.DefaultModname));
 
-            funcs.Add(GeneralSettingEntryType.CriticalCommands, () => CreateGeneralSetting(GeneralSettingEntryType.CriticalCommands, Boolean.FalseString));
+            funcs.Add(GeneralSettingEntryType.CriticalCommands, () => 
+                CreateGeneralSetting(GeneralSettingEntryType.CriticalCommands, Boolean.FalseString));
 
             funcs.Add(ScreenSettingsEntryType.WelcomeScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.WelcomeScreen,
                     Resources.WelcomeScreenHeader,
                     Resources.WelcomeScreenDetail,
-                    new WMIPath(backgroundResPath, WMIPathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             funcs.Add(ScreenSettingsEntryType.LocationScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.LocationScreen,
                     Resources.LocationScreenHeader,
                     Resources.LocationScreenDetail,
-                    new WMIPath(backgroundResPath, WMIPathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             funcs.Add(ScreenSettingsEntryType.ProgressScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.ProgressScreen,
                     Resources.ProgressScreenInstallingHeader,
                     Resources.ProgressScreenInstallingDetail,
-                    new WMIPath(backgroundResPath, WMIPathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             funcs.Add(ScreenSettingsEntryType.InstallCompletedScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallCompletedScreen,
                     Resources.EndScreenCompletedHeader,
                     Resources.EndScreenCompletedDetail,
-                    new WMIPath(backgroundResPath, WMIPathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             funcs.Add(ScreenSettingsEntryType.InstallCanceledScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallCanceledScreen,
                     Resources.EndScreenCanceledHeader,
                     Resources.EndScreenCanceledDetail,
-                    new WMIPath(backgroundResPath, WMIPathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             funcs.Add(ScreenSettingsEntryType.InstallFailedScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallFailedScreen,
                     Resources.EndScreenFailedHeader,
                     Resources.EndScreenFailedDetail,
-                    new WMIPath(backgroundResPath, WMIPathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             return funcs;
         }
@@ -118,7 +121,7 @@ namespace WargameModInstaller.Model.Config
             ScreenSettingsEntryType associatedEntryType,
             String header,
             String description,
-            WMIPath backgroundPath)
+            ResourcePath backgroundPath)
         {
             return new ScreenSettings(associatedEntryType)
             {

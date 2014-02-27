@@ -3,7 +3,6 @@ using Ninject;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using WargameModInstaller.Common.Logging;
 using WargameModInstaller.Infrastructure.Commands;
@@ -53,10 +52,11 @@ namespace WargameModInstaller
             kernel.Bind<IMessageService>().To<MessageService>().InSingletonScope();
             kernel.Bind<IDirectoryLocationService>().To<DirectoryLocationService>().InSingletonScope();
             kernel.Bind<IWargameInstallDirService>().To<ALBInstallDirService>().InSingletonScope();
-            kernel.Bind<IImageComposerService>().To<ImageComposerService>().InSingletonScope();
             kernel.Bind<IBackupService>().To<BackupService>().InSingletonScope();
             kernel.Bind<IProgressManager>().To<PercentageProgressManager>().InSingletonScope();
             kernel.Bind<IInstallerService>().To<InstallerService>().InSingletonScope();
+
+            kernel.Bind<IImageComposerService>().To<ImageComposerService>();
 
             kernel.Bind<IGeneralSettingReader>().To<GeneralSettingReader>();
             kernel.Bind<IScreenSettingsReader>().To<ScreenSettingsReader>();

@@ -11,8 +11,8 @@ namespace WargameModInstaller.Infrastructure.Config
     /// </summary>
     public abstract class SettingEntryType : WMIEntryType
     {
-        protected SettingEntryType(String entryName)
-            : base(entryName)
+        protected SettingEntryType(int value, String name)
+            : base(value, name)
         {
 
         }

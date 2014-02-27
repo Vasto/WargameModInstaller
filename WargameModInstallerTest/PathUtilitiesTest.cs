@@ -1,4 +1,4 @@
-﻿using WargameModInstaller.Utilities;
+﻿
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using WargameModInstaller.Common.Utilities;

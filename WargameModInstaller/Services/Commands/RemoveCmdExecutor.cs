@@ -27,49 +27,15 @@ namespace WargameModInstaller.Services.Commands
             CurrentStep = 0;
             CurrentMessage = Command.GetExecutionMessage();
 
-            try
-            {
-                token.ThrowIfCanceledAndNotNull();
+            token.ThrowIfCanceledAndNotNull();
 
-                String sourceFullPath = Path.Combine(context.InstallerTargetDirectory, Command.SourcePath);
-                if (File.Exists(sourceFullPath))
-                {
-                    File.Delete(sourceFullPath);
-                }
-
-                token.ThrowIfCanceledAndNotNull();
-
-            }
-            catch (OperationCanceledException ex)
+            String sourceFullPath = Path.Combine(context.InstallerTargetDirectory, Command.SourcePath);
+            if (File.Exists(sourceFullPath))
             {
-                throw;
-            }
-            catch (CmdExecutionFailedException ex)
-            {
-                if (Command.IsCritical)
-                {
-                    throw;
-                }
-                else
-                {
-                    //Log only if the command is not a critical one, otherwise, an exception will bubble
-                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
-                }
-            }
-            catch (Exception ex)
-            {
-                if (Command.IsCritical)
-                {
-                    throw new CmdExecutionFailedException(ex.Message,
-                        String.Format(WargameModInstaller.Properties.Resources.RemoveFileErrorParametrizedMsg, Command.SourcePath),
-                        ex);
-                }
-                else
-                {
-                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
-                }
+                File.Delete(sourceFullPath);
             }
 
+            token.ThrowIfCanceledAndNotNull();
 
             CurrentStep = TotalSteps;
         }

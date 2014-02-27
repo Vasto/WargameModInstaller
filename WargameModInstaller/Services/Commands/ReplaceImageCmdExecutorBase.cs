@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Infrastructure.Image;
 using WargameModInstaller.Model.Commands;
@@ -13,6 +12,8 @@ using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
+    //To do: reconsider method names
+
     public abstract class ReplaceImageCmdExecutorBase<T> : CmdExecutorBase<T> where T : IInstallCmd
     {
         public ReplaceImageCmdExecutorBase(T command) : base(command)
@@ -20,7 +21,7 @@ namespace WargameModInstaller.Services.Commands
 
         }
 
-        protected EdataContentFile GetEdataContentFile(EdataFile edataFile, String edataContentPath)
+        protected EdataContentFile GetEdataContentFileByPath(EdataFile edataFile, String edataContentPath)
         {
             var edataContentFile = edataFile.ContentFiles.FirstOrDefault(f => f.Path == edataContentPath);
             if (edataContentFile == null)
@@ -33,38 +34,28 @@ namespace WargameModInstaller.Services.Commands
             return edataContentFile;
         }
 
-        protected EdataContentFile LoadEdataContentFile(EdataReader edataReader, EdataContentFile edataContentFile)
-        {
-            edataReader.LoadContent(edataContentFile);
-
-            return edataContentFile;
-        }
-
         protected TgvImage GetTgvFromDDS(String sourceFullPath)
         {
-            ITgvReader tgvReader = new TgvDDSReader(sourceFullPath);
-            TgvImage newtgv = tgvReader.Read();
+            ITgvFileReader tgvReader = new TgvDDSReader();
+            TgvImage newtgv = tgvReader.Read(sourceFullPath);
 
             return newtgv;
         }
 
-        protected TgvImage GetTgvFromEdataContent(EdataContentFile edataContentFile)
+        protected TgvImage GetTgvFromContent(EdataContentFile edataContentFile)
         {
-            ITgvReader rawReader = new TgvRawReader(edataContentFile.Content);
-            TgvImage oldTgv = rawReader.Read();
+            ITgvBinReader rawReader = new TgvBinReader();
+            TgvImage oldTgv = rawReader.Read(edataContentFile.Content);
 
             return oldTgv;
         }
 
         protected byte[] ConvertTgvToBytes(TgvImage tgv)
         {
-            using (var memoryStream = new MemoryStream())
-            {
-                ITgvWriter tgvRawWriter = new TgvNoMipMapRawStreamWriter(memoryStream);
-                tgvRawWriter.Write(tgv);
+            ITgvBinWriter tgvRawWriter = new TgvNoMipMapBinWriter();
+            var bytes = tgvRawWriter.Write(tgv);
 
-                return memoryStream.ToArray();
-            }
+            return bytes;
         }
 
         protected bool CanGetEdataFromContext(CmdExecutionContext context)
@@ -90,6 +81,52 @@ namespace WargameModInstaller.Services.Commands
             else
             {
                 throw new InvalidOperationException("Cannot get Edata file from the given context");
+            }
+        }
+
+        protected IList<EdataContentFile> GetContentFilesHierarchy(EdataFile root, string[] subContetPaths)
+        {
+            var contentFilesList = new List<EdataContentFile>();
+
+            var edataBinReader = new EdataBinReader();
+            EdataFile lastContentOwner = root;
+            foreach (var path in subContetPaths)
+            {
+                EdataContentFile cf = GetEdataContentFileByPath(lastContentOwner, path);
+                contentFilesList.Add(cf);
+                if (cf.FileType == EdataContentFileType.Package)
+                {
+                    lastContentOwner = edataBinReader.Read(cf.Content);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return contentFilesList;
+        }
+
+        protected void AssignContentUpHierarchy(IEnumerable<EdataContentFile> contentFilesList, byte[] content)
+        {
+            var reversedConententFilesList = new List<EdataContentFile>(contentFilesList);
+            reversedConententFilesList.Reverse();
+
+            var edataBinWriter = new EdataBinWriter();
+            byte[] lastContent = content;
+            foreach (var cf in reversedConententFilesList)
+            {
+                cf.Content = lastContent;
+                cf.Size = lastContent.Length;
+
+                if (cf.Owner.IsVirtual)
+                {
+                    lastContent = edataBinWriter.Write(cf.Owner);
+                }
+                else
+                {
+                    break;
+                }
             }
         }
 

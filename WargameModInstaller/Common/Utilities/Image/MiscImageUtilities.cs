@@ -7,21 +7,21 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Common.Entities;
+using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Common.Utilities.Image
 {
     public static class MiscImageUtilities
     {
-        public static BitmapSource LoadBitmap(WMIPath path)
+        public static BitmapSource LoadBitmap(ResourcePath path)
         {
             if (path == null)
             {
                 throw new ArgumentNullException("path");
             }
 
-            if (path.PathType == WMIPathType.Absolute)
+            if (path.PathType == ResourcePathType.LocalAbsolute)
             {
                 var fullPath = path.Value;
                 if (File.Exists(fullPath))
@@ -33,7 +33,7 @@ namespace WargameModInstaller.Common.Utilities.Image
                     throw new IOException("File with the given path doesn't exist");
                 }
             }
-            else if (path.PathType == WMIPathType.Relative)
+            else if (path.PathType == ResourcePathType.LocalRelative)
             {
                 var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path.Value);
                 if (File.Exists(fullPath))
@@ -45,7 +45,7 @@ namespace WargameModInstaller.Common.Utilities.Image
                     throw new IOException("File with the given path doesn't exist");
                 }
             }
-            else if (path.PathType == WMIPathType.EmbeddedResource)
+            else if (path.PathType == ResourcePathType.EmbeddedResource)
             {
                 var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
                 if (resourceNames.Contains(path.Value))

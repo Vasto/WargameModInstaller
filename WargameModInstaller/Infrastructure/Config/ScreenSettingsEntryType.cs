@@ -8,15 +8,15 @@ namespace WargameModInstaller.Infrastructure.Config
 {
     public class ScreenSettingsEntryType : SettingEntryType
     {
-        public static readonly ScreenSettingsEntryType WelcomeScreen = new ScreenSettingsEntryType("WelcomeScreen");
-        public static readonly ScreenSettingsEntryType LocationScreen = new ScreenSettingsEntryType("LocationScreen");
-        public static readonly ScreenSettingsEntryType ProgressScreen = new ScreenSettingsEntryType("ProgressScreen");
-        public static readonly ScreenSettingsEntryType InstallCompletedScreen = new ScreenSettingsEntryType("InstallCompletedScreen");
-        public static readonly ScreenSettingsEntryType InstallFailedScreen = new ScreenSettingsEntryType("InstallFailedScreen");
-        public static readonly ScreenSettingsEntryType InstallCanceledScreen = new ScreenSettingsEntryType("InstallCanceledScreen");
+        public static readonly ScreenSettingsEntryType WelcomeScreen = new ScreenSettingsEntryType(1, "WelcomeScreen");
+        public static readonly ScreenSettingsEntryType LocationScreen = new ScreenSettingsEntryType(2, "LocationScreen");
+        public static readonly ScreenSettingsEntryType ProgressScreen = new ScreenSettingsEntryType(3, "ProgressScreen");
+        public static readonly ScreenSettingsEntryType InstallCompletedScreen = new ScreenSettingsEntryType(4, "InstallCompletedScreen");
+        public static readonly ScreenSettingsEntryType InstallFailedScreen = new ScreenSettingsEntryType(5, "InstallFailedScreen");
+        public static readonly ScreenSettingsEntryType InstallCanceledScreen = new ScreenSettingsEntryType(7, "InstallCanceledScreen");
 
-        protected ScreenSettingsEntryType(String entryName)
-            : base(entryName)
+        protected ScreenSettingsEntryType(int value, String entryName)
+            : base(value, entryName)
         {
 
         }

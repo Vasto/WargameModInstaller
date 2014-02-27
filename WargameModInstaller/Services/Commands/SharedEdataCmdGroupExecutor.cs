@@ -38,8 +38,8 @@ namespace WargameModInstaller.Services.Commands
 
             //should it be sorrounded with a try-catch?
 
-            EdataReader edataReader = new EdataReader();
-            EdataFile edataFile = edataReader.ReadAll(targetfullPath, false);
+            EdataFileReader edataReader = new EdataFileReader();
+            EdataFile edataFile = edataReader.Read(targetfullPath, false);
 
             var newExecutionContext = new SharedEdataCmdExecutionContext(
                 context.InstallerSourceDirectory,
@@ -58,7 +58,7 @@ namespace WargameModInstaller.Services.Commands
                 }
             }
 
-            IEdataWriter edataWriter = new EdataWriter();
+            IEdataFileWriter edataWriter = new EdataFileWriter();
             if (token.HasValue)
             {
                 edataWriter.Write(edataFile, token.Value);

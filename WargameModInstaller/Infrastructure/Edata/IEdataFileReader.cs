@@ -4,13 +4,14 @@ using System.Linq;
 using System.Text;
 using WargameModInstaller.Model.Edata;
 using WargameModInstaller.Model;
+using System.Threading;
 
 namespace WargameModInstaller.Infrastructure.Edata
 {
-    public interface IEdataReader
+    public interface IEdataFileReader
     {
-        EdataFile ReadAll(String edataFilePath, bool loadContent);
-        //EdataFile ReadWithoutContent(String edataFilePath);
+        EdataFile Read(String edataFilePath, bool loadContent);
+        EdataFile Read(String edataFilePath, bool loadContent, CancellationToken token);
         void LoadContent(EdataContentFile file);
         void LoadContent(IEnumerable<EdataContentFile> files);
     }

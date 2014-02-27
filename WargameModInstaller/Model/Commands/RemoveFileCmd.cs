@@ -37,7 +37,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a file path which has to be removed.
         /// </summary>
-        public WMIPath SourcePath
+        public InstallEntityPath SourcePath
         {
             get;
             set;

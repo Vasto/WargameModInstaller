@@ -14,7 +14,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets path inside the working directory to the command's source file.
         /// </summary>
-        WMIPath SourcePath
+        InstallEntityPath SourcePath
         {
             get;
             set;

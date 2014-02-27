@@ -7,10 +7,10 @@ using WargameModInstaller.Model.Image;
 namespace WargameModInstaller.Infrastructure.Image
 {
     /// <summary>
-    /// Interfejs zapisu pliku tgv.
+    /// 
     /// </summary>
-    public interface ITgvWriter
+    public interface ITgvFileWriter
     {
-        void Write(TgvImage file);
+        void Write(TgvImage file, String filePath);
     }
 }

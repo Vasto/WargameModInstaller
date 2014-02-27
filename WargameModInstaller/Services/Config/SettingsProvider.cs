@@ -90,7 +90,9 @@ namespace WargameModInstaller.Services.Config
                     settingsValue.Description = settingsFactory.CreateSettings<ScreenSettings>(entryType).Description;
                 }
 
-                if (settingsValue.Background == null || !IsValidPath(settingsValue.Background))
+                if (settingsValue.Background == null || 
+                    settingsValue.Background.PathType == ResourcePathType.Unknown ||
+                    !ResourceExist(settingsValue.Background))
                 {
                     settingsValue.Background = settingsFactory.CreateSettings<ScreenSettings>(entryType).Background;
                 }
@@ -104,19 +106,23 @@ namespace WargameModInstaller.Services.Config
             return settingsValue;
         }
 
-        private bool IsValidPath(WMIPath path)
+        private bool ResourceExist(ResourcePath path)
         {
             bool result = false;
 
-            if (path.PathType == WMIPathType.EmbeddedResource)
+            if (path.PathType == ResourcePathType.EmbeddedResource)
             {
                 var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
                 result = resourceNames.Contains(path);
             }
-            else if (path.PathType == WMIPathType.Absolute || path.PathType == WMIPathType.Relative)
+            else if (path.PathType == ResourcePathType.LocalAbsolute)
             {
-                var fullPath = path.GetAbsoluteOrPrependIfRelative(AppDomain.CurrentDomain.BaseDirectory);
-                result = File.Exists(fullPath);
+                result = File.Exists(path);
+            }
+            else if(path.PathType == ResourcePathType.LocalRelative)
+            {
+                var fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, path);
+                result = File.Exists(path);
             }
 
             return result;

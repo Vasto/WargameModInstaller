@@ -37,7 +37,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a path to the file which has to be copied
         /// </summary>
-        public WMIPath SourcePath
+        public InstallEntityPath SourcePath
         {
             get;
             set;
@@ -46,7 +46,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a path to a location where the file has to be copied.
         /// </summary>
-        public WMIPath TargetPath
+        public InstallEntityPath TargetPath
         {
             get;
             set;

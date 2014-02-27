@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WargameModInstaller.Utilities
+namespace WargameModInstaller.Common.Utilities
 {
     public static class MiscUtilities
     {

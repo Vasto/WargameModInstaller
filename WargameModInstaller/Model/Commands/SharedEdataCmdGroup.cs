@@ -11,13 +11,13 @@ namespace WargameModInstaller.Model.Commands
     {
         private readonly List<IInstallCmd> commands;
 
-        public SharedEdataCmdGroup(IEnumerable<IInstallCmd> commands, WMIPath edataPath)
+        public SharedEdataCmdGroup(IEnumerable<IInstallCmd> commands, InstallEntityPath edataPath)
         {
             this.commands = new List<IInstallCmd> (commands);
             this.SharedEdataPath = edataPath;
         }
 
-        public SharedEdataCmdGroup(IEnumerable<IInstallCmd> commands, WMIPath edataPath, int priority)
+        public SharedEdataCmdGroup(IEnumerable<IInstallCmd> commands, InstallEntityPath edataPath, int priority)
         {
             this.commands = new List<IInstallCmd>(commands);
             this.SharedEdataPath = edataPath;
@@ -47,7 +47,7 @@ namespace WargameModInstaller.Model.Commands
             }
         }
 
-        public WMIPath SharedEdataPath
+        public InstallEntityPath SharedEdataPath
         {
             get;
             private set;

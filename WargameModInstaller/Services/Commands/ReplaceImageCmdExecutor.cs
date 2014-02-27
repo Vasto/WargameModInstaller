@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WargameModInstaller.Common.Entities;
+using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
+using WargameModInstaller.Model.Edata;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Services.Commands
 {
@@ -28,92 +30,80 @@ namespace WargameModInstaller.Services.Commands
             CurrentStep = 0;
             CurrentMessage = Command.GetExecutionMessage();
 
-            try
+
+            //Cancel if requested;
+            token.ThrowIfCanceledAndNotNull();
+
+
+            String sourceFullPath = Command.SourcePath.GetAbsoluteOrPrependIfRelative(context.InstallerSourceDirectory);
+            String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
+            if (!File.Exists(sourceFullPath) || !File.Exists(targetfullPath))
             {
-                //Need to add here a command properties validation
-
-                //Cancel if requested;
-                token.ThrowIfCanceledAndNotNull();
-
-
-                String sourceFullPath = Command.SourcePath.GetAbsoluteOrPrependIfRelative(context.InstallerSourceDirectory);
-                String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
-
-                //if (!File.Exists(Command.SourceFullPath) ||
-                //    !File.Exists(Command.TargetFullPath))
-                //{
-
-                //}
-
-                var edataReader = new EdataReader();
-                var edataFile = CanGetEdataFromContext(context) ? 
-                    GetEdataFromContext(context) :
-                    edataReader.ReadAll(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formi metod klasy bazowej
-
-                var edataContentFile = GetEdataContentFile(edataFile, Command.TargetContentPath);
-                if (!edataContentFile.IsContentLoaded)
-                {
-                    LoadEdataContentFile(edataReader, edataContentFile);
-                }
-
-                TgvImage oldTgv = GetTgvFromEdataContent(edataContentFile);
-
-                TgvImage newtgv = GetTgvFromDDS(sourceFullPath);
-                newtgv.SourceChecksum = oldTgv.SourceChecksum;
-                newtgv.IsCompressed = oldTgv.IsCompressed;
-
-                byte[] rawNewTgv = ConvertTgvToBytes(newtgv);
-
-                CurrentStep++;
-
-                edataContentFile.Content = rawNewTgv;
-                edataContentFile.Size = rawNewTgv.Length;
-
-                if (!CanGetEdataFromContext(context))
-                {
-                    IEdataWriter edataWriter = new EdataWriter();
-                    if (token.HasValue)
-                    {
-                        edataWriter.Write(edataFile, token.Value);
-                    }
-                    else
-                    {
-                        edataWriter.Write(edataFile);
-                    }
-                }
-
-                CurrentStep++;
+                throw new CmdExecutionFailedException(
+                    "One of the command's Source or Target paths is not a valid file path.",
+                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
-            catch (OperationCanceledException ex)
+
+
+            String rootContentPath = Command.TargetContentPath.Split().FirstOrDefault();
+            if (rootContentPath == null)
             {
-                throw;
+                throw new CmdExecutionFailedException(
+                    "Invalid command's TargetContentPath value.",
+                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
-            catch (CmdExecutionFailedException ex)
+
+
+            var edataReader = new EdataFileReader();
+            var mainEdataFile = CanGetEdataFromContext(context) ?
+                GetEdataFromContext(context) :
+                edataReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowe
+
+            //First one contnet is from the edata on hdd, so needs to be loaded explicitly.
+            EdataContentFile rootContentFile = GetEdataContentFileByPath(mainEdataFile, rootContentPath);
+            if (!rootContentFile.IsContentLoaded)
             {
-                if (Command.IsCritical)
+                edataReader.LoadContent(rootContentFile);
+            }
+
+
+            //Prepare a list of nested content according to the given paths.
+            var contentFilesList = GetContentFilesHierarchy(mainEdataFile, Command.TargetContentPath.Split());
+
+
+            var imageContentFile = contentFilesList.Last();
+            if (imageContentFile.FileType != EdataContentFileType.Image)
+            {
+                throw new CmdExecutionFailedException(
+                    "Invalid command's TargetContentPath value. It doesn't point to an image content.",
+                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+            }
+
+            CurrentStep++;
+
+            TgvImage oldTgv = GetTgvFromContent(imageContentFile);
+            TgvImage newtgv = GetTgvFromDDS(sourceFullPath);
+            newtgv.SourceChecksum = oldTgv.SourceChecksum;
+            newtgv.IsCompressed = oldTgv.IsCompressed;
+
+            byte[] rawNewTgv = ConvertTgvToBytes(newtgv);
+
+
+            //Assign content changes for all packages, from bottom to top
+            AssignContentUpHierarchy(contentFilesList, rawNewTgv);
+
+            if (!CanGetEdataFromContext(context))
+            {
+                IEdataFileWriter edataWriter = new EdataFileWriter();
+                if (token.HasValue)
                 {
-                    throw;
+                    edataWriter.Write(mainEdataFile, token.Value);
                 }
                 else
                 {
-                    //Log only if the command is not a critical one, otherwise, an exception will bubble
-                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+                    edataWriter.Write(mainEdataFile);
                 }
             }
-            catch (Exception ex)
-            {
-                if (Command.IsCritical)
-                {
-                    throw new CmdExecutionFailedException(ex.Message,
-                        String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath),
-                        ex);
-                }
-                else
-                {
-                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
-                }
-            }
-
 
             CurrentStep = TotalSteps;
         }

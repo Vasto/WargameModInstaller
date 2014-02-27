@@ -8,12 +8,12 @@ namespace WargameModInstaller.Infrastructure.Config
 {
     public class GeneralSettingEntryType : SettingEntryType
     {
-        public static readonly GeneralSettingEntryType InstallationBackup = new GeneralSettingEntryType("InstallationBackup");
-        public static readonly GeneralSettingEntryType ModName = new GeneralSettingEntryType("ModName");
-        public static readonly GeneralSettingEntryType CriticalCommands = new GeneralSettingEntryType("CriticalCommands");
+        public static readonly GeneralSettingEntryType InstallationBackup = new GeneralSettingEntryType(1, "InstallationBackup");
+        public static readonly GeneralSettingEntryType ModName = new GeneralSettingEntryType(2, "ModName");
+        public static readonly GeneralSettingEntryType CriticalCommands = new GeneralSettingEntryType(3, "CriticalCommands");
 
-        protected GeneralSettingEntryType(String entryName)
-            : base(entryName)
+        protected GeneralSettingEntryType(int value, String name)
+            : base(value, name)
         {
 
         }

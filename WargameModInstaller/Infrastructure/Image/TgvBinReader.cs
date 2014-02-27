@@ -3,40 +3,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities;
 using WargameModInstaller.Utilities.Compression;
 using WargameModInstaller.Utilities.Image.TGV;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
-    public class TgvRawReader : ITgvReader
+    public class TgvBinReader : ITgvBinReader
     {
-        public TgvRawReader(byte[] rawTgvData)
-        {
-            this.RawTgvData = rawTgvData;
-        }
-
-        protected byte[] RawTgvData
-        { 
-            get;
-            private set; 
-        }
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="fs"></param>
+        /// <param name="rawTgvData"></param>
         /// <returns></returns>
         /// <remarks>
         /// Credits to enohka for this code.
         /// See more at: http://github.com/enohka/moddingSuite
         /// </remarks>
-        public virtual TgvImage Read()
+        public virtual TgvImage Read(byte[] rawTgvData)
         {
             var tgvFile = new TgvImage();
 
-            using (var ms = new MemoryStream(RawTgvData))
+            using (var ms = new MemoryStream(rawTgvData))
             {
                 var buffer = new byte[4];
 
@@ -93,7 +82,7 @@ namespace WargameModInstaller.Infrastructure.Image
 
                 for (int i = 0; i < tgvFile.MipMapCount; i++)
                 {
-                    tgvFile.MipMaps.Add(ReadMipMap(i, RawTgvData, tgvFile));
+                    tgvFile.MipMaps.Add(ReadMipMap(i, rawTgvData, tgvFile));
                 }
             }
 

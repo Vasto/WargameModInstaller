@@ -128,7 +128,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                             {
                                 var sharedEdataCmdGroup = new SharedEdataCmdGroup(
                                     replaceImageCmds,
-                                    new WMIPath(targetGroup.Key, WMIPathType.Relative),
+                                    new InstallEntityPath(targetGroup.Key),
                                     priorityGroup.Key);
 
                                 cmdGroupsList.Add(sharedEdataCmdGroup);
@@ -186,8 +186,9 @@ namespace WargameModInstaller.Infrastructure.Commands
                 //Any validation here is not a good idea. Commands should be left over in an invalid state, 
                 //so eventually installation will fail if they are marked as critical.
                 var newCmd = new CopyModFileCmd();
-                newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
-                newCmd.TargetPath = new WMIPath(targetPath, WMIPathType.Relative);
+                //We set up path type to a expected path type.
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -210,8 +211,8 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(4);
 
                 var newCmd = new CopyGameFileCmd();
-                newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
-                newCmd.TargetPath = new WMIPath(targetPath, WMIPathType.Relative);
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -233,7 +234,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(1);
 
                 var newCmd = new RemoveFileCmd();
-                newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -257,9 +258,9 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceImageCmd();
-                newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
-                newCmd.TargetPath = new WMIPath(targetPath, WMIPathType.Relative);
-                newCmd.TargetContentPath = new WMIPath(edataImagePath, WMIPathType.Relative);
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.TargetContentPath = new ContentPath(edataImagePath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -286,9 +287,9 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceImageTileCmd();
-                newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
-                newCmd.TargetPath = new WMIPath(targetPath, WMIPathType.Relative);
-                newCmd.TargetContentPath = new WMIPath(edataImagePath, WMIPathType.Relative);
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.TargetContentPath = new ContentPath(edataImagePath);
                 newCmd.Column = column;
                 newCmd.Row = row;
                 newCmd.TileSize = tileSize;
@@ -317,9 +318,9 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceImagePartCmd();
-                newCmd.SourcePath = new WMIPath(sourcePath, WMIPathType.Relative);
-                newCmd.TargetPath = new WMIPath(targetPath, WMIPathType.Relative);
-                newCmd.TargetContentPath = new WMIPath(edataImagePath, WMIPathType.Relative);
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.TargetContentPath = new ContentPath(edataImagePath);
                 newCmd.XPosition = xPos;
                 newCmd.YPosition = yPos;
                 newCmd.IsCritical = isCritical;

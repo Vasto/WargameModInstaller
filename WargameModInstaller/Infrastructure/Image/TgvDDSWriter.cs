@@ -6,21 +6,9 @@ using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
-    public class TgvDDSWriter : ITgvWriter
+    public class TgvDDSWriter : ITgvFileWriter
     {
-        public TgvDDSWriter(String ddsFilePath)
-        {
-            this.DDSFilePath = ddsFilePath;
-        }
-
-        protected String DDSFilePath
-        {
-            get;
-            private set;
-        }
-
-
-        public virtual void Write(TgvImage file)
+        public virtual void Write(TgvImage file, String filePath)
         {
             throw new NotImplementedException();
         }

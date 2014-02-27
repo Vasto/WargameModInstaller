@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Utilities;
-using WargameModInstaller.Utilities;
 
 namespace WargameModInstaller.Services.Install
 {

@@ -52,7 +52,7 @@ namespace WargameModInstaller.Infrastructure.Config
         {
             GeneralSetting result = null;
 
-            var modNameElemet = source.Element(entryType.EntryName);
+            var modNameElemet = source.Element(entryType.Name);
             if (modNameElemet != null)
             {
                 //First read the attribute, because an empty tag element value returns an empty string not null.
@@ -71,7 +71,7 @@ namespace WargameModInstaller.Infrastructure.Config
         {
             GeneralSetting result = null;
 
-            var modNameElemet = source.Element(entryType.EntryName);
+            var modNameElemet = source.Element(entryType.Name);
             if (modNameElemet != null)
             {
                 var value = modNameElemet.Attribute("Value").ValueNullSafe() ??
@@ -89,7 +89,7 @@ namespace WargameModInstaller.Infrastructure.Config
         {
             GeneralSetting result = null;
 
-            var modNameElemet = source.Element(entryType.EntryName);
+            var modNameElemet = source.Element(entryType.Name);
             if (modNameElemet != null)
             {
                 var value = modNameElemet.Attribute("Value").ValueNullSafe() ??
