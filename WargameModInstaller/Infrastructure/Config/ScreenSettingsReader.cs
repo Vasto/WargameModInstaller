@@ -9,6 +9,7 @@ using System.Xml.XPath;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Common.Utilities;
+using WargameModInstaller.Model;
 using WargameModInstaller.Model.Config;
 using WargameModInstaller.Properties;
 

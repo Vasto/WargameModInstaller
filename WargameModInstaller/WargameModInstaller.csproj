@@ -103,14 +103,14 @@
     <Compile Include="Infrastructure\Commands\IInstallCmdReader.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Infrastructure\Commands\CmdEntryType.cs" />
-    <Compile Include="Infrastructure\Config\GeneralSettingEntryType.cs" />
+    <Compile Include="Model\Commands\CmdEntryType.cs" />
+    <Compile Include="Model\Config\GeneralSettingEntryType.cs" />
     <Compile Include="Infrastructure\Config\GeneralSettingReader.cs" />
     <Compile Include="Infrastructure\Config\IGeneralSettingReader.cs" />
     <Compile Include="Infrastructure\Config\IScreenSettingsReader.cs" />
-    <Compile Include="Infrastructure\Config\ScreenSettingsEntryType.cs" />
+    <Compile Include="Model\Config\ScreenSettingsEntryType.cs" />
     <Compile Include="Infrastructure\Config\ScreenSettingsReader.cs" />
-    <Compile Include="Infrastructure\Config\SettingEntryType.cs" />
+    <Compile Include="Model\Config\SettingEntryType.cs" />
     <Compile Include="Infrastructure\Edata\EdataBinReader.cs" />
     <Compile Include="Infrastructure\Edata\EdataBinWriter.cs" />
     <Compile Include="Infrastructure\Edata\EdataReaderBase.cs" />
@@ -119,7 +119,8 @@
     <Compile Include="Infrastructure\Edata\IEdataBinWriter.cs" />
     <Compile Include="Infrastructure\Image\ITgvBinReader.cs" />
     <Compile Include="Infrastructure\Image\ITgvBinWriter.cs" />
-    <Compile Include="Infrastructure\WMIEntryType.cs" />
+    <Compile Include="Model\Config\WargameVersionType.cs" />
+    <Compile Include="Model\WMIEntryType.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileReader.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileWriter.cs" />
     <Compile Include="Infrastructure\Edata\IEdataFileReader.cs" />
@@ -166,9 +167,9 @@
     <Compile Include="Services\Commands\SharedEdataCmdExecutionContext.cs" />
     <Compile Include="Services\Commands\SharedEdataCmdGroupExecutor.cs" />
     <Compile Include="Services\Config\ConfigFileLocator.cs" />
-    <Compile Include="Services\Config\IConfigFileLocator.cs" />
     <Compile Include="Services\Config\ISettingsProvider.cs" />
     <Compile Include="Services\Config\SettingsProvider.cs" />
+    <Compile Include="Services\Config\WargameVersionProvider.cs" />
     <Compile Include="Services\Install\ALBInstallDirService.cs" />
     <Compile Include="Services\Image\IImageComposerService.cs" />
     <Compile Include="Services\Image\ImageComposerService.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="Services\Commands\ReplaceImageCmdExecutor.cs" />
     <Compile Include="Services\Commands\ReplaceImageTileCmdExecutor.cs" />
     <Compile Include="Services\Install\IWargameInstallDirService.cs" />
+    <Compile Include="Services\Install\RDInstallDirService.cs" />
     <Compile Include="Services\Utilities\DirectoryLocationService.cs" />
     <Compile Include="Services\Utilities\IDirectoryLocationService.cs" />
     <Compile Include="Services\Utilities\IMessageService.cs" />

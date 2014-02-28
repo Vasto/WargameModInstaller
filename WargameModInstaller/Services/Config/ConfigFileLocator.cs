@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Services.Config
 {
-    public class ConfigFileLocator : IConfigFileLocator
+    public static class ConfigFileLocator
     {
-        public bool ConfigFileExists()
+        public static bool ConfigFileExists()
         {
             var workingDir = new System.IO.DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             var configFiles = workingDir.GetFiles("*.wmi");
@@ -22,7 +22,7 @@ namespace WargameModInstaller.Services.Config
         /// </summary>
         /// <returns>Installer config file path or null if not found.</returns>
         /// <exception cref="System.IO.FileNotFoundException">Throws an exception if unable to find any configuration file.</exception>
-        public String GetConfigFilePath()
+        public static String GetConfigFilePath()
         {
             var workingDir = new System.IO.DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             var configFiles = workingDir.GetFiles("*.wmi");

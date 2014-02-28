@@ -10,9 +10,7 @@ namespace WargameModInstaller.Services.Config
 {
     public interface ISettingsProvider
     {
-        //bool AreGeneralSettingsAvailable(GeneralSettingsEntry entryType);
         GeneralSetting GetGeneralSettings(GeneralSettingEntryType entryType);
-        //bool AreScreenSettingsAvailable(ScreenSettingsEntry entryType);
         ScreenSettings GetScreenSettings(ScreenSettingsEntryType entryType);
     }
 }

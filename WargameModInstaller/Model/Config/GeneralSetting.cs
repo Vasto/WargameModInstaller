@@ -9,11 +9,6 @@ namespace WargameModInstaller.Model.Config
 {
     public class GeneralSetting : IEquatable<GeneralSetting>
     {
-        //public GeneralSetting(String settingValue)
-        //{
-        //    this.Value = settingValue;
-        //}
-
         public GeneralSetting(GeneralSettingEntryType associatedEntryType, String settingValue)
         {
             this.Type = associatedEntryType;

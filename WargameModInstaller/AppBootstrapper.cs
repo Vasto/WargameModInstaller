@@ -39,33 +39,57 @@ namespace WargameModInstaller
         protected override void Configure()
         {
             kernel = new StandardKernel();
-
             kernel.Load(AppDomain.CurrentDomain.GetAssemblies());
+
             kernel.Bind<IEventAggregator>().To<EventAggregator>().InSingletonScope();
             kernel.Bind<IWindowManager>().To<WindowManager>().InSingletonScope();
 
             kernel.Bind<IInstallScreenViewModelFactory>().To<InstallScreenViewModelFactory>().InSingletonScope();
-            kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
-
-            kernel.Bind<IInstallCmdReader>().To<InstallCmdReader>();
-
             kernel.Bind<IMessageService>().To<MessageService>().InSingletonScope();
             kernel.Bind<IDirectoryLocationService>().To<DirectoryLocationService>().InSingletonScope();
-            kernel.Bind<IWargameInstallDirService>().To<ALBInstallDirService>().InSingletonScope();
+
             kernel.Bind<IBackupService>().To<BackupService>().InSingletonScope();
             kernel.Bind<IProgressManager>().To<PercentageProgressManager>().InSingletonScope();
             kernel.Bind<IInstallerService>().To<InstallerService>().InSingletonScope();
-
-            kernel.Bind<IImageComposerService>().To<ImageComposerService>();
 
             kernel.Bind<IGeneralSettingReader>().To<GeneralSettingReader>();
             kernel.Bind<IScreenSettingsReader>().To<ScreenSettingsReader>();
             kernel.Bind<ISettingsProvider>().To<SettingsProvider>().InSingletonScope();
             kernel.Bind<ISettingsFactory>().To<SettingsFactory>().InSingletonScope();
-            kernel.Bind<IConfigFileLocator>().To<ConfigFileLocator>().InSingletonScope();
+
+            String versionName = WargameVersionProvider.GetVersion();
+            if (!WargameVersionType.IsKnownVersion(versionName))
+            {
+                versionName = WargameVersionType.GetDefault().Name;
+            }
+
+            if (versionName == WargameVersionType.AirLandBattle.Name)
+            {
+                ConfigureForALB(kernel);
+            }
+            else if (versionName == WargameVersionType.RedDragon.Name)
+            {
+                ConfigureForRD(kernel);
+            }
         }
 
-        protected override object GetInstance(Type service, string key)
+        protected virtual void ConfigureForALB(IKernel kernel)
+        {
+            kernel.Bind<IInstallCmdReader>().To<InstallCmdReader>();
+            kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
+            kernel.Bind<IWargameInstallDirService>().To<ALBInstallDirService>().InSingletonScope();
+            kernel.Bind<IImageComposerService>().To<ImageComposerService>();
+        }
+
+        protected virtual void ConfigureForRD(IKernel kernel)
+        {
+            kernel.Bind<IInstallCmdReader>().To<InstallCmdReader>();
+            kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
+            kernel.Bind<IWargameInstallDirService>().To<RDInstallDirService>().InSingletonScope();
+            kernel.Bind<IImageComposerService>().To<ImageComposerService>();
+        }
+
+        protected override object GetInstance(Type service, String key)
         {
             return kernel.Get(service, key);
         }
@@ -121,8 +145,7 @@ namespace WargameModInstaller
 
         private bool ConfigFileExists()
         {
-            var configFileLocator = kernel.Get<IConfigFileLocator>();
-            if (!configFileLocator.ConfigFileExists())
+            if (!ConfigFileLocator.ConfigFileExists())
             {
                 var msgService = kernel.Get<IMessageService>();
                 msgService.Show(
@@ -141,8 +164,7 @@ namespace WargameModInstaller
 
         private bool IsConfigFileWellFormed()
         {
-            var configFileLocator = kernel.Get<IConfigFileLocator>();
-            var configFilePath = configFileLocator.GetConfigFilePath();
+            var configFilePath = ConfigFileLocator.GetConfigFilePath();
             try
             {
                 System.Xml.Linq.XDocument configFile = System.Xml.Linq.XDocument.Load(configFilePath);

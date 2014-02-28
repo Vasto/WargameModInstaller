@@ -26,7 +26,6 @@ namespace WargameModInstaller.Services.Install
         private readonly IBackupService backupService;
         private readonly IProgressManager progressManager;
         private readonly ISettingsProvider settingsProvider;
-        private readonly IConfigFileLocator configFileLocator;
 
         private CancellationTokenSource cancellationTokenSource;
         private List<IProgressProvider> registeredProgressProviders;
@@ -52,8 +51,7 @@ namespace WargameModInstaller.Services.Install
             ICmdExecutorFactory cmdExecutorFactory,
             IBackupService backupService,
             IProgressManager progressManager,
-            ISettingsProvider settingsProvider,
-            IConfigFileLocator configFileLocator)
+            ISettingsProvider settingsProvider)
         {
             this.installCommandsReader = installCommandsReader;
             this.cmdExecutorFactory = cmdExecutorFactory;
@@ -61,12 +59,11 @@ namespace WargameModInstaller.Services.Install
             this.progressManager = progressManager;
             this.progressManager.Register(this);
             this.settingsProvider = settingsProvider;
-            this.configFileLocator = configFileLocator;
 
             this.registeredProgressProviders = new List<IProgressProvider>();
             this.backupedFiles = new HashSet<String>();
             this.isBackupEnabled = settingsProvider
-                .GetGeneralSettings(Infrastructure.Config.GeneralSettingEntryType.InstallationBackup)
+                .GetGeneralSettings(Model.Config.GeneralSettingEntryType.InstallationBackup)
                 .Value
                 .ToOr<bool>(true);
         }
@@ -343,7 +340,7 @@ namespace WargameModInstaller.Services.Install
                 //Czy to powinno byæ w task, czy wy¿ej...
                 PathUtilities.CreateDirectoryIfNotExist(InstallLocation);
 
-                var configFilePath = configFileLocator.GetConfigFilePath();
+                var configFilePath = ConfigFileLocator.GetConfigFilePath();
 
                 var commandGroups = installCommandsReader.ReadGroups(configFilePath);
                 var commandGroupsExecutors = CreateCommandGroupsExecutors(commandGroups);

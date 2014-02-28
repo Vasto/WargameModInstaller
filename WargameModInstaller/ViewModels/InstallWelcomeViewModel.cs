@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities.Image;
-using WargameModInstaller.Infrastructure.Config;
+using WargameModInstaller.Model.Config;
 using WargameModInstaller.Services.Config;
 using WargameModInstaller.Services.Utilities;
 

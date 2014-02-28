@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WargameModInstaller.Model;
 
-namespace WargameModInstaller.Infrastructure.Config
+namespace WargameModInstaller.Model.Commands
 {
     public class CmdEntryType : WMIEntryType
     {

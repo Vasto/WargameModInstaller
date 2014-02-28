@@ -10,6 +10,7 @@ using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Infrastructure.Config;
+using WargameModInstaller.Model;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Config;
 using WargameModInstaller.Services.Config;

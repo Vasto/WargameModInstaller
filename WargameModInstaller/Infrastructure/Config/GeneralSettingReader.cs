@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using WargameModInstaller.Common.Extensions;
+using WargameModInstaller.Model;
 using WargameModInstaller.Model.Config;
 
 namespace WargameModInstaller.Infrastructure.Config
@@ -41,67 +42,113 @@ namespace WargameModInstaller.Infrastructure.Config
         protected override Dictionary<WMIEntryType, Func<XElement, GeneralSetting>> CreateReadingQueries()
         {
             var result = new Dictionary<WMIEntryType, Func<XElement, GeneralSetting>>();
-            result.Add(GeneralSettingEntryType.ModName, (source) => ReadModName(source,GeneralSettingEntryType.ModName));
-            result.Add(GeneralSettingEntryType.InstallationBackup, (source) => ReadDisableBackup(source, GeneralSettingEntryType.InstallationBackup));
-            result.Add(GeneralSettingEntryType.CriticalCommands, (source) => ReadCriticalCommands(source, GeneralSettingEntryType.CriticalCommands));
+
+            result.Add(GeneralSettingEntryType.ModName, (source) => 
+                ReadSetting(source, GeneralSettingEntryType.ModName, "Name"));
+
+            result.Add(GeneralSettingEntryType.InstallationBackup, (source) => 
+                ReadSetting(source, GeneralSettingEntryType.InstallationBackup, "Value"));
+
+            result.Add(GeneralSettingEntryType.CriticalCommands, (source) => 
+                ReadSetting(source, GeneralSettingEntryType.CriticalCommands, "Value"));
+
+            result.Add(GeneralSettingEntryType.WargameVersion, (source) => 
+                ReadSetting(source, GeneralSettingEntryType.WargameVersion, "Version"));
 
             return result;
         }
 
-        private GeneralSetting ReadModName(XElement source, GeneralSettingEntryType entryType)
+        private GeneralSetting ReadSetting(XElement source, GeneralSettingEntryType entry, String attribute)
         {
             GeneralSetting result = null;
 
-            var modNameElemet = source.Element(entryType.Name);
-            if (modNameElemet != null)
+            var element = source.Element(entry.Name);
+            if (element != null)
             {
                 //First read the attribute, because an empty tag element value returns an empty string not null.
-                var value = modNameElemet.Attribute("Name").ValueNullSafe() ??
-                    modNameElemet.ValueNullSafe();
+                var value = element.Attribute(attribute).ValueNullSafe() ??
+                    element.ValueNullSafe();
                 if (value != null)
                 {
-                    result = new GeneralSetting(entryType, value);
+                    result = new GeneralSetting(entry, value);
                 }
             }
 
             return result;
         }
 
-        private GeneralSetting ReadDisableBackup(XElement source, GeneralSettingEntryType entryType)
-        {
-            GeneralSetting result = null;
+        //private GeneralSetting ReadModName(XElement source, GeneralSettingEntryType entryType)
+        //{
+        //    GeneralSetting result = null;
 
-            var modNameElemet = source.Element(entryType.Name);
-            if (modNameElemet != null)
-            {
-                var value = modNameElemet.Attribute("Value").ValueNullSafe() ??
-                    modNameElemet.ValueNullSafe();
-                if (value != null)
-                {
-                    result = new GeneralSetting(entryType, value);
-                }
-            }
+        //    var modNameElemet = source.Element(entryType.Name);
+        //    if (modNameElemet != null)
+        //    {
+        //        //First read the attribute, because an empty tag element value returns an empty string not null.
+        //        var value = modNameElemet.Attribute("Name").ValueNullSafe() ??
+        //            modNameElemet.ValueNullSafe();
+        //        if (value != null)
+        //        {
+        //            result = new GeneralSetting(entryType, value);
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        private GeneralSetting ReadCriticalCommands(XElement source, GeneralSettingEntryType entryType)
-        {
-            GeneralSetting result = null;
+        //private GeneralSetting ReadDisableBackup(XElement source, GeneralSettingEntryType entryType)
+        //{
+        //    GeneralSetting result = null;
 
-            var modNameElemet = source.Element(entryType.Name);
-            if (modNameElemet != null)
-            {
-                var value = modNameElemet.Attribute("Value").ValueNullSafe() ??
-                    modNameElemet.ValueNullSafe();
-                if (value != null)
-                {
-                    result = new GeneralSetting(entryType, value);
-                }
-            }
+        //    var modNameElemet = source.Element(entryType.Name);
+        //    if (modNameElemet != null)
+        //    {
+        //        var value = modNameElemet.Attribute("Value").ValueNullSafe() ??
+        //            modNameElemet.ValueNullSafe();
+        //        if (value != null)
+        //        {
+        //            result = new GeneralSetting(entryType, value);
+        //        }
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
+
+        //private GeneralSetting ReadCriticalCommands(XElement source, GeneralSettingEntryType entryType)
+        //{
+        //    GeneralSetting result = null;
+
+        //    var modNameElemet = source.Element(entryType.Name);
+        //    if (modNameElemet != null)
+        //    {
+        //        var value = modNameElemet.Attribute("Value").ValueNullSafe() ??
+        //            modNameElemet.ValueNullSafe();
+        //        if (value != null)
+        //        {
+        //            result = new GeneralSetting(entryType, value);
+        //        }
+        //    }
+
+        //    return result;
+        //}
+
+        //private GeneralSetting ReadWargameVersion(XElement source, GeneralSettingEntryType entryType)
+        //{
+        //    GeneralSetting result = null;
+
+        //    var wargameVerElement = source.Element(entryType.Name);
+        //    if (wargameVerElement != null)
+        //    {
+        //        var value = wargameVerElement.Attribute("Version").ValueNullSafe() ??
+        //            wargameVerElement.ValueNullSafe();
+        //        if (value != null)
+        //        {
+        //            result = new GeneralSetting(entryType, value);
+        //        }
+        //    }
+
+        //    return result;
+        //}
 
     }
 

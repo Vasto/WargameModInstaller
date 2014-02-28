@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WargameModInstaller.Infrastructure.Config;
+using WargameModInstaller.Model.Config;
 using WargameModInstaller.Services.Config;
 using WargameModInstaller.Services.Utilities;
 using WargameModInstaller.ViewModels.Factories;

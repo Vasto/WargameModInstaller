@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 
-namespace WargameModInstaller.Infrastructure.Config
+namespace WargameModInstaller.Model
 {
     //Add a textual name of an element in the config file.
 

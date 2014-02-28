@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WargameModInstaller.Infrastructure.Config
+namespace WargameModInstaller.Model.Config
 {
     public class ScreenSettingsEntryType : SettingEntryType
     {

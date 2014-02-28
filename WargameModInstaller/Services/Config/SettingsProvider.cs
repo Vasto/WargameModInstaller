@@ -17,7 +17,6 @@ namespace WargameModInstaller.Services.Config
         private readonly IGeneralSettingReader generalSettingsReader;
         private readonly IScreenSettingsReader screenSettingsReader;
         private readonly ISettingsFactory settingsFactory;
-        private readonly IConfigFileLocator configFileLocator;
 
         private String configFilePath;
 
@@ -26,14 +25,12 @@ namespace WargameModInstaller.Services.Config
         public SettingsProvider(
             IGeneralSettingReader generalSettingsReader, 
             IScreenSettingsReader screenSettingsReader,
-            ISettingsFactory settingsFactory,
-            IConfigFileLocator configFileLocator)
+            ISettingsFactory settingsFactory)
         {
             this.generalSettingsReader = generalSettingsReader;
             this.screenSettingsReader = screenSettingsReader;
             this.settingsFactory = settingsFactory;
-            this.configFileLocator = configFileLocator;
-            this.configFilePath = configFileLocator.GetConfigFilePath();
+            this.configFilePath = ConfigFileLocator.GetConfigFilePath();
             this.placeholderReplacingFuncs = CreatePlaceholderReplacingFuncs();
             this.ReplacePlaceholdersInDefaultScreenText = true;
         }

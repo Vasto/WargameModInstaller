@@ -8,7 +8,11 @@
 
   <Settings>
     
-    <General>      
+    <General>
+      <!--Specifies the Wargame version for which the Installer should be configured.
+          Specify ALB for the Wargame AirLandBattle or RD for the Wargame Red Dragon.-->
+      <WargameVersion Version="ALB"/>
+
       <!--Mod name displayed during the installation-->
       <ModName>My Mod Name</ModName>
 
@@ -111,6 +115,15 @@
 			      sourcePath="Textures\Su27High.dds"
             targetPath="Data\wargame\PC\2060001225\ZZ_3.dat"
             targetContentPath="pc\texture\assets\3d\units\urss\avions\su27_flanker\tsccombds_combineddstexture01.tgv"/>-->
+    
+        <!--This is the same ReplaceImage command as the above one, though this time used in a different way. 
+            Note that targetContentPath is consisting of two different paths. First one points to package file (.ppk), 
+            while the second one specifies a path to an image residing inside the specified package file. This allows to replace image in nested packages. 
+            Each next path should be appended to the previous one with use of the “|+”. -->
+    <!--<ReplaceImage 
+			      sourcePath="Icons\su27_flanker_icon.dds"
+            targetPath="Data\wargame\PC\2060001225\ZZ_$.dat"
+            targetContentPath="pc\texture\pack\commoninterface.ppk|+pc\texture\assets\2d\interface\common\unitsicons\pact\su27_flanker.tgv/>-->
 
     <!--This is a ReplaceImagePart command. It orders the installer to replace a specified part of an image stored inside the specified .dat file.
     Command arguments:
