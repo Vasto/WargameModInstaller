@@ -76,6 +76,7 @@ namespace WargameModInstaller.Utilities.Image.TGV
                     return PixelFormats.BC1_UNORM;
                 case "DXT1_SRGB":
                     return PixelFormats.BC1_UNORM_SRGB;
+                   // return PixelFormats.BC1_UNORM;
                 case "DXT2":
                 case "DXT3":
                 case "DXT3_LIN":
@@ -141,7 +142,15 @@ namespace WargameModInstaller.Utilities.Image.TGV
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fs"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Credits to enohka for this code.
+        /// See more at: http://github.com/enohka/moddingSuite
+        /// </remarks>
         public static string GetTgvFromPixelFormat(PixelFormats pixelFormat)
         {
             switch (pixelFormat)
@@ -186,6 +195,7 @@ namespace WargameModInstaller.Utilities.Image.TGV
                     return "DXT1";
                 case PixelFormats.BC1_UNORM_SRGB:
                     return "DXT1_SRGB";
+                    //return "DXT1";
                 case PixelFormats.BC2_UNORM:
                     return "DXT3";
                 case PixelFormats.BC2_UNORM_SRGB:

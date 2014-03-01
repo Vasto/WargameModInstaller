@@ -124,7 +124,8 @@ namespace WargameModInstaller.Utilities.Image.DDS
 
         private static readonly LegacyMap[] LegacyMaps = new[]
         {
-            new LegacyMap(PixelFormats.BC1_UNORM_SRGB, ConversionFlags.None, DDSFormat.PixelFormat.DXT1), // D3DFMT_DXT1
+            //new LegacyMap(PixelFormats.BC1_UNORM_SRGB, ConversionFlags.None, DDSFormat.PixelFormat.DXT1), // D3DFMT_DXT1
+            new LegacyMap(PixelFormats.BC1_UNORM, ConversionFlags.None, DDSFormat.PixelFormat.DXT1), // D3DFMT_DXT1
             new LegacyMap(PixelFormats.BC2_UNORM_SRGB, ConversionFlags.None, DDSFormat.PixelFormat.DXT3), // D3DFMT_DXT3
             new LegacyMap(PixelFormats.BC3_UNORM_SRGB, ConversionFlags.None, DDSFormat.PixelFormat.DXT5), // D3DFMT_DXT5
 

@@ -70,7 +70,7 @@ namespace WargameModInstaller.Infrastructure.Image
                 file.MipMapCount = (ushort)header.MipMapCount;
 
                 DDSHelper.ConversionFlags conversionFlags;
-                file.Format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags); //PixelFormats.BC3_UNORM_SRGB;
+                file.Format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags);
             }
 
             return file;
