@@ -5,21 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Extensions;
+using WargameModInstaller.Infrastructure.Content;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
-using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ReplaceImageCmdExecutor : ReplaceCmdExecutorBase<ReplaceImageCmd>
+    public class ReplaceContentCmdExecutor : ReplaceCmdExecutorBase<ReplaceContentCmd>
     {
-        public ReplaceImageCmdExecutor(ReplaceImageCmd command)
+        public ReplaceContentCmdExecutor(ReplaceContentCmd command)
             : base(command)
         {
             this.TotalSteps = 2;
@@ -30,10 +26,8 @@ namespace WargameModInstaller.Services.Commands
             CurrentStep = 0;
             CurrentMessage = Command.GetExecutionMessage();
 
-
             //Cancel if requested;
             token.ThrowIfCanceledAndNotNull();
-
 
             String sourceFullPath = Command.SourcePath.GetAbsoluteOrPrependIfRelative(context.InstallerSourceDirectory);
             String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
@@ -53,7 +47,6 @@ namespace WargameModInstaller.Services.Commands
                     String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
-
             var edataReader = new EdataFileReader();
             var mainEdataFile = CanGetEdataFromContext(context) ?
                 GetEdataFromContext(context) :
@@ -70,27 +63,14 @@ namespace WargameModInstaller.Services.Commands
             //Prepare a list of nested content according to the given paths.
             var contentFilesList = GetContentFilesHierarchy(mainEdataFile, Command.TargetContentPath.Split());
 
-
-            var imageContentFile = contentFilesList.Last();
-            if (imageContentFile.FileType != EdataContentFileType.Image)
-            {
-                throw new CmdExecutionFailedException(
-                    "Invalid command's TargetContentPath value. It doesn't point to an image content.",
-                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
-            }
-
             CurrentStep++;
 
-            TgvImage oldTgv = GetTgvFromContent(imageContentFile);
-            TgvImage newtgv = GetTgvFromDDS(sourceFullPath);
-            newtgv.SourceChecksum = oldTgv.SourceChecksum;
-            newtgv.IsCompressed = oldTgv.IsCompressed;
-
-            byte[] rawNewTgv = ConvertTgvToBytes(newtgv);
+            var contentFileReader = new ContentFileReader();
+            byte[] newContent = contentFileReader.Read(sourceFullPath);
 
 
             //Assign content changes for all packages, from bottom to top
-            AssignContentUpHierarchy(contentFilesList, rawNewTgv);
+            AssignContentUpHierarchy(contentFilesList, newContent);
 
             if (!CanGetEdataFromContext(context))
             {

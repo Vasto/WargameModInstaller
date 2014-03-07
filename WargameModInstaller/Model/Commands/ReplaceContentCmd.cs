@@ -1,14 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
-using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class ReplaceImageCmd : IInstallCmd, IHasSource, IHasTarget
+    public class ReplaceContentCmd : IInstallCmd, IHasSource, IHasTarget
     {
         /// <summary>
         /// Gets or sets a command ID.
@@ -71,7 +70,5 @@ namespace WargameModInstaller.Model.Commands
             return String.Format(WargameModInstaller.Properties.Resources.Copying + " {0}...",
                 SourcePath);
         }
-
     }
-
 }

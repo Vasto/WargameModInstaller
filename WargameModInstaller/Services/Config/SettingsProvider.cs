@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
-using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Infrastructure.Config;
 using WargameModInstaller.Model.Config;
 
@@ -20,7 +19,7 @@ namespace WargameModInstaller.Services.Config
 
         private String configFilePath;
 
-        private Dictionary<String, Func<GeneralSetting>> placeholderReplacingFuncs;
+        private Dictionary<String, Func<String>> placeholderReplacingFuncs;
 
         public SettingsProvider(
             IGeneralSettingReader generalSettingsReader, 
@@ -31,7 +30,7 @@ namespace WargameModInstaller.Services.Config
             this.screenSettingsReader = screenSettingsReader;
             this.settingsFactory = settingsFactory;
             this.configFilePath = ConfigFileLocator.GetConfigFilePath();
-            this.placeholderReplacingFuncs = CreatePlaceholderReplacingFuncs();
+            this.placeholderReplacingFuncs = CreateTextPlaceholderReplacingFuncs();
             this.ReplacePlaceholdersInDefaultScreenText = true;
         }
 
@@ -132,15 +131,20 @@ namespace WargameModInstaller.Services.Config
             {
                 var replacement = placeholderReplacingFuncs[placeholder]();
 
-                settingsValue.Header = settingsValue.Header.Replace(placeholder, replacement.Value);
-                settingsValue.Description = settingsValue.Description.Replace(placeholder, replacement.Value);
+                settingsValue.Header = settingsValue.Header.Replace(placeholder, replacement);
+                settingsValue.Description = settingsValue.Description.Replace(placeholder, replacement);
             }
         }
 
-        private Dictionary<String, Func<GeneralSetting>> CreatePlaceholderReplacingFuncs()
+        private Dictionary<String, Func<String>> CreateTextPlaceholderReplacingFuncs()
         {
-            var result = new Dictionary<String, Func<GeneralSetting>>();
-            result.Add("$ModName", () => GetGeneralSettings(GeneralSettingEntryType.ModName));
+            var result = new Dictionary<String, Func<String>>();
+
+            result.Add("$ModName", () => GetGeneralSettings(GeneralSettingEntryType.ModName).Value);
+
+            result.Add("$WargameVersion", () => {
+                return WargameVersionType.GetByName(GetGeneralSettings(GeneralSettingEntryType.WargameVersion).Value).FullName;
+            });
 
             return result;
         }

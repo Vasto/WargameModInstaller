@@ -14,7 +14,7 @@ using WargameModInstaller.Services.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceImagePartCmdExecutor : ReplaceImageCmdExecutorBase<ReplaceImagePartCmd>
+    public class ReplaceImagePartCmdExecutor : ReplaceCmdExecutorBase<ReplaceImagePartCmd>
     {
         public ReplaceImagePartCmdExecutor(IImageComposerService imageComposer, ReplaceImagePartCmd command)
             : base(command)

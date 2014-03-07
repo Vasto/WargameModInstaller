@@ -55,7 +55,7 @@ namespace WargameModInstaller
             kernel.Bind<IGeneralSettingReader>().To<GeneralSettingReader>();
             kernel.Bind<IScreenSettingsReader>().To<ScreenSettingsReader>();
             kernel.Bind<ISettingsProvider>().To<SettingsProvider>().InSingletonScope();
-            kernel.Bind<ISettingsFactory>().To<SettingsFactory>().InSingletonScope();
+            kernel.Bind<ISettingsFactory>().To<ALBSettingsFactory>().InSingletonScope();
 
             String versionName = WargameVersionProvider.GetVersion();
             if (!WargameVersionType.IsKnownVersion(versionName))
@@ -77,7 +77,7 @@ namespace WargameModInstaller
         {
             kernel.Bind<IInstallCmdReader>().To<InstallCmdReader>();
             kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
-            kernel.Bind<IWargameInstallDirService>().To<ALBInstallDirService>().InSingletonScope();
+            kernel.Bind<IWargameInstallDirService>().To<ALBInstallDirProvider>().InSingletonScope();
             kernel.Bind<IImageComposerService>().To<ImageComposerService>();
         }
 
@@ -85,7 +85,7 @@ namespace WargameModInstaller
         {
             kernel.Bind<IInstallCmdReader>().To<InstallCmdReader>();
             kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
-            kernel.Bind<IWargameInstallDirService>().To<RDInstallDirService>().InSingletonScope();
+            kernel.Bind<IWargameInstallDirService>().To<RDInstallDirProvider>().InSingletonScope();
             kernel.Bind<IImageComposerService>().To<ImageComposerService>();
         }
 

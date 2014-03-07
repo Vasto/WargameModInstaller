@@ -9,9 +9,9 @@ namespace WargameModInstaller.Model.Config
 {
     public class WargameVersionType : Enumeration
     {
-        public static readonly WargameVersionType RedDragon = new WargameVersionType(1, "RD");
-        public static readonly WargameVersionType AirLandBattle = new WargameVersionType(2, "ALB");
-        public static readonly WargameVersionType EuropeanEscalation = new WargameVersionType(3, "EE");
+        public static readonly WargameVersionType RedDragon = new WargameVersionType(1, "RD", "Wargame: Red Dragon");
+        public static readonly WargameVersionType AirLandBattle = new WargameVersionType(2, "ALB", "Wargame: AirLand Battle");
+        public static readonly WargameVersionType EuropeanEscalation = new WargameVersionType(3, "EE", "Wargame: European Escalation");
 
         protected static HashSet<WargameVersionType> knownVersions;
 
@@ -28,15 +28,26 @@ namespace WargameModInstaller.Model.Config
             return knownVersions.Any(v => v.Name == versionName);
         }
 
+        public static WargameVersionType GetByName(String versionName)
+        {
+            return knownVersions.Single(v => v.Name == versionName);
+        }
+
         public static WargameVersionType GetDefault()
         {
             return AirLandBattle;
         }
 
-        protected WargameVersionType(int value, String name)
+        protected WargameVersionType(int value, String name, String fullName)
             : base(value, name)
         {
+            this.FullName = fullName;
+        }
 
+        public String FullName
+        {
+            get;
+            protected set;
         }
 
     }

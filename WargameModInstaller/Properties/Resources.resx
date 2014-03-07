@@ -163,7 +163,7 @@ To close the installer click Finish.</value>
 
 To close the installer click Finish.</value>
   </data>
-  <data name="EndScreenFailedHeader" xml:space="preserve">
+  <data name="ALBEndScreenFailedHeader" xml:space="preserve">
     <value>Installation Failed</value>
   </data>
   <data name="Installing" xml:space="preserve">
@@ -182,9 +182,9 @@ To close the installer click Finish.</value>
     <value>It looks like the specified location is not a valid Wargame AirLand Battle installation directory. Do you still wish to continute?</value>
   </data>
   <data name="LocationScreenDetail" xml:space="preserve">
-    <value>Setup will install the $ModName in your Wargame AirLand Battle folder.
+    <value>Setup will install the $ModName in your $WargameVersion folder.
 
-If the following location is not your Wargame AirLand Battle installation directory, please specify a correct one by clicking Browse.
+If the following location is not your $WargameVersion installation directory, please specify a correct one by clicking Browse.
 
 Click Install to start the installation.</value>
   </data>
@@ -258,5 +258,8 @@ Click Next to continue.</value>
   </data>
   <data name="LoadEdataErrorMsg" xml:space="preserve">
     <value>The installer was unable to load the edata content</value>
+  </data>
+  <data name="ContentFileNotFoundParametrizedMsg" xml:space="preserve">
+    <value>The installer was unable to find the following content file "{0}"</value>
   </data>
 </root>

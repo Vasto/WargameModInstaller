@@ -14,9 +14,9 @@ namespace WargameModInstaller.Services.Commands
 {
     //To do: reconsider method names
 
-    public abstract class ReplaceImageCmdExecutorBase<T> : CmdExecutorBase<T> where T : IInstallCmd
+    public abstract class ReplaceCmdExecutorBase<T> : CmdExecutorBase<T> where T : IInstallCmd
     {
-        public ReplaceImageCmdExecutorBase(T command) : base(command)
+        public ReplaceCmdExecutorBase(T command) : base(command)
         {
 
         }
@@ -28,7 +28,7 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     String.Format("Cannot load \"{0}\"", edataContentPath),
-                    WargameModInstaller.Properties.Resources.LoadEdataErrorMsg);
+                    String.Format(WargameModInstaller.Properties.Resources.ContentFileNotFoundParametrizedMsg, edataContentPath));
             }
 
             return edataContentFile;

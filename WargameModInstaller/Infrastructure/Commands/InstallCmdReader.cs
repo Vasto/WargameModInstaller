@@ -125,6 +125,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                             replaceImageCmds.AddRange(targetGroup.OfType<ReplaceImageCmd>());
                             replaceImageCmds.AddRange(targetGroup.OfType<ReplaceImagePartCmd>());
                             replaceImageCmds.AddRange(targetGroup.OfType<ReplaceImageTileCmd>());
+                            replaceImageCmds.AddRange(targetGroup.OfType<ReplaceContentCmd>());
                             if (replaceImageCmds.Count > 0)
                             {
                                 var sharedEdataCmdGroup = new SharedEdataCmdGroup(
@@ -168,6 +169,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             result.Add(CmdEntryType.ReplaceImage, ReadReplaceImageCmds);
             result.Add(CmdEntryType.ReplaceImagePart, ReadReplaceImageTileCmds);
             result.Add(CmdEntryType.ReplaceImageTile, ReadReplaceImagePartCmds);
+            result.Add(CmdEntryType.ReplaceContent, ReadReplaceContentCmds);
 
             return result;
         }
@@ -176,7 +178,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<CopyModFileCmd>();
 
-            var cmdElementsCollection = source.Elements("CopyModFile");//zastapić to przez entry name 
+            var cmdElementsCollection = source.Elements(CmdEntryType.CopyModFile.Name);//zastapić to przez entry name 
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
@@ -203,7 +205,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<CopyGameFileCmd>();
 
-            var cmdElementsCollection = source.Elements("CopyGameFile");
+            var cmdElementsCollection = source.Elements(CmdEntryType.CopyGameFile.Name);
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
@@ -227,7 +229,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<RemoveFileCmd>();
 
-            var cmdElementsCollection = source.Elements("RemoveFile");
+            var cmdElementsCollection = source.Elements(CmdEntryType.RemoveFile.Name);
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
@@ -249,7 +251,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<ReplaceImageCmd>();
 
-            var cmdElementsCollection = source.Elements("ReplaceImage");
+            var cmdElementsCollection = source.Elements(CmdEntryType.ReplaceImage.Name);
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
@@ -275,7 +277,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<ReplaceImageTileCmd>();
 
-            var cmdElementsCollection = source.Elements("ReplaceImageTile"); //Change name to replaceImagePart
+            var cmdElementsCollection = source.Elements(CmdEntryType.ReplaceImageTile.Name);
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
@@ -307,7 +309,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<ReplaceImagePartCmd>();
 
-            var cmdElementsCollection = source.Elements("ReplaceImagePart"); 
+            var cmdElementsCollection = source.Elements(CmdEntryType.ReplaceImagePart.Name); 
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
@@ -324,6 +326,32 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.TargetContentPath = new ContentPath(edataImagePath);
                 newCmd.XPosition = xPos;
                 newCmd.YPosition = yPos;
+                newCmd.IsCritical = isCritical;
+                newCmd.Priority = priority;
+
+                result.Add(newCmd);
+            }
+
+            return result;
+        }
+
+        private IEnumerable<ReplaceContentCmd> ReadReplaceContentCmds(XElement source)
+        {
+            var result = new List<ReplaceContentCmd>();
+
+            var cmdElementsCollection = source.Elements(CmdEntryType.ReplaceContent.Name);
+            foreach (var cmdElement in cmdElementsCollection)
+            {
+                var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
+                var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
+                var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
+
+                var newCmd = new ReplaceContentCmd();
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.TargetContentPath = new ContentPath(edataImagePath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

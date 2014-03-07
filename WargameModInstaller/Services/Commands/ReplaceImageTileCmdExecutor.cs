@@ -13,7 +13,7 @@ using WargameModInstaller.Services.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceImageTileCmdExecutor : ReplaceImageCmdExecutorBase<ReplaceImageTileCmd>
+    public class ReplaceImageTileCmdExecutor : ReplaceCmdExecutorBase<ReplaceImageTileCmd>
     {
         public ReplaceImageTileCmdExecutor(IImageComposerService imageComposer, ReplaceImageTileCmd command)
             : base(command)

@@ -61,6 +61,15 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installation Failed.
+        /// </summary>
+        internal static string ALBEndScreenFailedHeader {
+            get {
+                return ResourceManager.GetString("ALBEndScreenFailedHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wargame Mod Installer.
         /// </summary>
         internal static string AppName {
@@ -121,6 +130,15 @@ namespace WargameModInstaller.Properties {
         internal static string ConfigFileNotFoundErrorMsg {
             get {
                 return ResourceManager.GetString("ConfigFileNotFoundErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The installer was unable to find the following content file &quot;{0}&quot;.
+        /// </summary>
+        internal static string ContentFileNotFoundParametrizedMsg {
+            get {
+                return ResourceManager.GetString("ContentFileNotFoundParametrizedMsg", resourceCulture);
             }
         }
         
@@ -199,15 +217,6 @@ namespace WargameModInstaller.Properties {
         internal static string EndScreenFailedDetail {
             get {
                 return ResourceManager.GetString("EndScreenFailedDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Installation Failed.
-        /// </summary>
-        internal static string EndScreenFailedHeader {
-            get {
-                return ResourceManager.GetString("EndScreenFailedHeader", resourceCulture);
             }
         }
         
@@ -311,9 +320,9 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Setup will install the $ModName in your Wargame AirLand Battle folder.
+        ///   Looks up a localized string similar to Setup will install the $ModName in your $WargameVersion folder.
         ///
-        ///If the following location is not your Wargame AirLand Battle installation directory, please specify a correct one by clicking Browse.
+        ///If the following location is not your $WargameVersion installation directory, please specify a correct one by clicking Browse.
         ///
         ///Click Install to start the installation..
         /// </summary>
