@@ -55,7 +55,7 @@ namespace WargameModInstaller
             kernel.Bind<IGeneralSettingReader>().To<GeneralSettingReader>();
             kernel.Bind<IScreenSettingsReader>().To<ScreenSettingsReader>();
             kernel.Bind<ISettingsProvider>().To<SettingsProvider>().InSingletonScope();
-            kernel.Bind<ISettingsFactory>().To<ALBSettingsFactory>().InSingletonScope();
+            kernel.Bind<ISettingsFactory>().To<SettingsFactory>().InSingletonScope();
 
             String versionName = WargameVersionProvider.GetVersion();
             if (!WargameVersionType.IsKnownVersion(versionName))

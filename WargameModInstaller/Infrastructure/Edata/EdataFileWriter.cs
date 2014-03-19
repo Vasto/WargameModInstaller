@@ -2,12 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using WargameModInstaller.Common.Extensions;
-using WargameModInstaller.Common.Utilities;
-using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Infrastructure.Edata
@@ -53,7 +50,18 @@ namespace WargameModInstaller.Infrastructure.Edata
             //Cancel if requested;
             token.ThrowIfCanceledAndNotNull();
 
-            String temporaryEdataPath = GetTemporaryEdataPath(edataFile.Path);
+            //Try in the current dir to avoid double file moving
+            String temporaryEdataPath = GetTemporaryEdataPathInCurrentLocation(edataFile.Path);
+            if ((new FileInfo(edataFile.Path).Length > (new DriveInfo(temporaryEdataPath).AvailableFreeSpace)))
+            {
+                temporaryEdataPath = TryGetTemporaryEdataPathWhereFree(edataFile.Path);
+                if (temporaryEdataPath == null)
+                {
+                    throw new IOException("Not enough disk space for rebuilding edata.");
+                }
+            }
+
+            //To avoid nested try catches.
             FileStream sourceEdata = null;
             FileStream newEdata = null;
             try
@@ -71,7 +79,6 @@ namespace WargameModInstaller.Infrastructure.Edata
                 CloseEdataFilesStreams(sourceEdata, newEdata);
 
                 //Replace temporary file
-                //Assuming that temporary file is placed next to the orginal file, lets just delete orginal one and rename temporary.
                 File.Delete(edataFile.Path);
                 File.Move(temporaryEdataPath, edataFile.Path);
             }
@@ -88,17 +95,43 @@ namespace WargameModInstaller.Infrastructure.Edata
         }
 
         /// <summary>
-        /// To do: Zastanowić się czy nie powinno poszukać wolnego miejsca na innej partycji w razie braku...
+        /// 
         /// </summary>
         /// <returns></returns>
-        protected String GetTemporaryEdataPath(String edataPath)
+        protected String GetTemporaryEdataPathInCurrentLocation(String oldeEdataPath)
         {
-            var currentEdataFileInfo = new FileInfo(edataPath);
+            var oldEdataFileInfo = new FileInfo(oldeEdataPath);
             var temporaryEdataPath = Path.Combine(
-                currentEdataFileInfo.DirectoryName,
-                Path.GetFileNameWithoutExtension(currentEdataFileInfo.Name) + ".tmp");
+                oldEdataFileInfo.DirectoryName,
+                Path.GetFileNameWithoutExtension(oldEdataFileInfo.Name) + ".tmp");
 
             return temporaryEdataPath;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="oldEdataPath"></param>
+        /// <returns></returns>
+        protected String TryGetTemporaryEdataPathWhereFree(String oldEdataPath)
+        {
+            var oldEdataFileInfo = new FileInfo(oldEdataPath);
+
+            var fixedDrives = DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed);
+            foreach (var drive in fixedDrives)
+            {
+                if (drive.AvailableFreeSpace > oldEdataFileInfo.Length)
+                {
+                    var tempFileName = Path.GetFileNameWithoutExtension(oldEdataFileInfo.Name) + ".tmp";
+                    var temporaryEdataPath = Path.Combine(drive.Name, tempFileName);
+                    //Create path if not exist
+                    //PathUtilities.CreateDirectoryIfNotExist(temporaryEdataPath);
+
+                    return temporaryEdataPath;
+                }
+            }
+
+            return null;
         }
 
         private void CloseEdataFilesStreams(FileStream sourceEdata, FileStream newEdata)

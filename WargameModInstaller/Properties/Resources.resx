@@ -163,7 +163,7 @@ To close the installer click Finish.</value>
 
 To close the installer click Finish.</value>
   </data>
-  <data name="ALBEndScreenFailedHeader" xml:space="preserve">
+  <data name="EndScreenFailedHeader" xml:space="preserve">
     <value>Installation Failed</value>
   </data>
   <data name="Installing" xml:space="preserve">

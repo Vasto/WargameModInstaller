@@ -61,15 +61,6 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Installation Failed.
-        /// </summary>
-        internal static string ALBEndScreenFailedHeader {
-            get {
-                return ResourceManager.GetString("ALBEndScreenFailedHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Wargame Mod Installer.
         /// </summary>
         internal static string AppName {
@@ -217,6 +208,15 @@ namespace WargameModInstaller.Properties {
         internal static string EndScreenFailedDetail {
             get {
                 return ResourceManager.GetString("EndScreenFailedDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Installation Failed.
+        /// </summary>
+        internal static string EndScreenFailedHeader {
+            get {
+                return ResourceManager.GetString("EndScreenFailedHeader", resourceCulture);
             }
         }
         

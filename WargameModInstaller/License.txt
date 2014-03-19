@@ -1,4 +1,4 @@
-	Wargame Mod Installer is an software used for ease of distribution 
+	Wargame Mod Installer is a software used for ease of distribution 
 	and installation of the modded Wargame files.    
 	Copyright (C) 2014 Vasto 
 

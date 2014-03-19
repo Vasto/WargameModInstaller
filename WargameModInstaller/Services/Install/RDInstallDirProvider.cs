@@ -10,60 +10,6 @@ namespace WargameModInstaller.Services.Install
 {
     public class RDInstallDirProvider : InstallDirProviderBase
     {
-        //public bool IsCorrectInstallDirectory(String installDirPath)
-        //{
-        //    if (!Directory.Exists(installDirPath))
-        //    {
-        //        return false;
-        //    }
-
-        //    var rdExecutableName = "WarGame3.exe";
-        //    var rdFolderName = "Wargame Red Dragon";
-        //    if (installDirPath.Contains(rdFolderName))
-        //    {
-        //        var rdDirectoryPath = installDirPath.Substring(0, installDirPath.IndexOf(rdFolderName) + rdFolderName.Length);
-        //        var exeFiles = Directory.GetFiles(rdDirectoryPath, "*.exe", SearchOption.AllDirectories);
-        //        if (exeFiles.Any(file => file.Contains(rdExecutableName)))
-        //        {
-        //            return true;
-        //        }
-        //    }
-
-        //    return false;
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <returns></returns>
-        //public String TryGetInstallDirectory()
-        //{
-        //    var installDirsPaths = GetPotentialInstallDirectoryPaths();
-        //    foreach (var dirPath in installDirsPaths)
-        //    {
-        //        if (Directory.Exists(dirPath))
-        //        {
-        //            return dirPath;
-        //        }
-        //    }
-
-        //    var installRegistryKeys = GetPotentialInstallRegistryKeys();
-        //    foreach (var key in installRegistryKeys)
-        //    {
-        //        var installLocation = Registry.GetValue(key, "InstallLocation", null) as String;
-        //        if (installLocation != null)
-        //        {
-        //            if (Directory.Exists(installLocation))
-        //            {
-        //                return installLocation;
-        //            }
-        //        }
-        //    }
-
-        //    return String.Empty;
-        //}
-
-
         protected override String GetWargameName()
         {
             return "WarGame3.exe";

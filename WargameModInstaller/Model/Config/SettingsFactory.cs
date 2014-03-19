@@ -9,7 +9,7 @@ using WargameModInstaller.Properties;
 
 namespace WargameModInstaller.Model.Config
 {
-    public class ALBSettingsFactory : ISettingsFactory
+    public class SettingsFactory : ISettingsFactory
     {
         private readonly string backgroundResPath = "WargameModInstaller.Resources.BackImage.jpg";
 
@@ -108,7 +108,7 @@ namespace WargameModInstaller.Model.Config
             funcs.Add(ScreenSettingsEntryType.InstallFailedScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallFailedScreen,
-                    Resources.ALBEndScreenFailedHeader,
+                    Resources.EndScreenFailedHeader,
                     Resources.EndScreenFailedDetail,
                     new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
