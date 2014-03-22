@@ -7,13 +7,8 @@ using WargameModInstaller.Common.Entities;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class ReplaceImagePartCmd : IInstallCmd, IHasSource, IHasTarget
+    public class ReplaceImagePartCmd : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
     {
-        public ReplaceImagePartCmd()
-        {
-
-        }
-
         /// <summary>
         /// Gets or sets a command ID.
         /// </summary>

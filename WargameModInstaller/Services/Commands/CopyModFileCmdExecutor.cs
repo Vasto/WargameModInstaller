@@ -33,7 +33,7 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     "One of the command's Source or Target paths is not a valid file path.",
-                    String.Format(WargameModInstaller.Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
             }
 
             PathUtilities.CreateDirectoryIfNotExist(Path.GetDirectoryName(targetfullPath));

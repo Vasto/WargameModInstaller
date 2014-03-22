@@ -15,25 +15,66 @@ namespace WargameModInstaller.Common.Entities
         public ContentPath(String pathValue)
             : base(pathValue)
         {
-
+            this.Parts = Split();
+            this.PreLastPart = CreatePreLastPart();
         }
 
         public ContentPath(String pathValue, ContentPathType pathType)
             : base(pathValue, pathType)
         {
+            this.Parts = Split();
         }
 
         /// <summary>
-        /// Splits the path into sub paths if available.
+        /// Gets all sub paths of complex content path.
         /// </summary>
-        /// <returns></returns>
-        public string[] Split()
+        public String[] Parts
         {
-            var subPaths = Array.ConvertAll(
-                Value.Split(new[] { "|+" }, StringSplitOptions.RemoveEmptyEntries), 
-                p => p.Trim());
+            get;
+            protected set;
+        }
 
-            return subPaths;
+        /// <summary>
+        /// Gets the last sub path.
+        /// </summary>
+        public String LastPart
+        {
+            get { return Parts.Last(); }
+        }
+
+        /// <summary>
+        /// Gets all path parts except last one.
+        /// When the cuurent path doesn't contain any additional sub paths it retruns null.
+        /// </summary>
+        public String PreLastPart
+        {
+            get;
+            protected set;
+        }
+
+        protected String CreatePreLastPart()
+        {
+            if (Parts.Length > 1)
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < Parts.Length - 1; ++i)
+                {
+                    sb.Append(Parts[i]);
+                }
+
+                return sb.ToString();
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        protected String[] Split()
+        {
+            return Array.ConvertAll(
+                Value.Split(new[] { "|+" }, StringSplitOptions.RemoveEmptyEntries),
+                p => p.Trim());
         }
 
         protected override IEnumerable<PathTypeResolveRule> CreateResolveRules()

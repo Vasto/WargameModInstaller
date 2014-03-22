@@ -405,6 +405,15 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rebuilding {0}....
+        /// </summary>
+        internal static string RebuildingParametrizedMsg {
+            get {
+                return ResourceManager.GetString("RebuildingParametrizedMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The installer was unable to remove the file &quot;{0}&quot;.
         /// </summary>
         internal static string RemoveFileErrorParametrizedMsg {

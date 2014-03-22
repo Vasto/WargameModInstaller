@@ -21,6 +21,8 @@ namespace WargameModInstaller.Model.Edata
             this.PostHeaderData = postHeaderData;
             this.ContentFiles = contentFiles;
             this.IsVirtual = true;
+
+            AssignOwnership(this.ContentFiles);
         }
 
         /// <summary>
@@ -40,6 +42,8 @@ namespace WargameModInstaller.Model.Edata
             this.PostHeaderData = postHeaderData;
             this.ContentFiles = contentFiles;
             this.IsVirtual = false;
+
+            AssignOwnership(this.ContentFiles);
         }
 
         /// <summary>
@@ -87,6 +91,14 @@ namespace WargameModInstaller.Model.Edata
         {
             get;
             private set;
+        }
+
+        protected void AssignOwnership(IEnumerable<EdataContentFile> contentFiles)
+        {
+            foreach (var cf in contentFiles)
+            {
+                cf.Owner = this;
+            }
         }
 
     }

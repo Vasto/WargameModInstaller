@@ -8,13 +8,8 @@ using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class ReplaceImageTileCmd : IInstallCmd, IHasSource, IHasTarget
+    public class ReplaceImageTileCmd : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
     {
-        public ReplaceImageTileCmd()
-        {
-
-        }
-
         /// <summary>
         /// Gets or sets a command ID.
         /// </summary>

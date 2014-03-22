@@ -7,20 +7,20 @@ using WargameModInstaller.Common.Entities;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class SharedEdataCmdGroup : ICmdGroup
+    public class EdataCmdGroup : ICmdGroup
     {
         private readonly List<IInstallCmd> commands;
 
-        public SharedEdataCmdGroup(IEnumerable<IInstallCmd> commands, InstallEntityPath edataPath)
+        public EdataCmdGroup(IEnumerable<IInstallCmd> commands, InstallEntityPath edataPath)
         {
             this.commands = new List<IInstallCmd> (commands);
-            this.SharedEdataPath = edataPath;
+            this.CommonEdataPath = edataPath;
         }
 
-        public SharedEdataCmdGroup(IEnumerable<IInstallCmd> commands, InstallEntityPath edataPath, int priority)
+        public EdataCmdGroup(IEnumerable<IInstallCmd> commands, InstallEntityPath edataPath, int priority)
         {
             this.commands = new List<IInstallCmd>(commands);
-            this.SharedEdataPath = edataPath;
+            this.CommonEdataPath = edataPath;
             this.Priority = priority;
         }
 
@@ -47,7 +47,7 @@ namespace WargameModInstaller.Model.Commands
             }
         }
 
-        public InstallEntityPath SharedEdataPath
+        public InstallEntityPath CommonEdataPath
         {
             get;
             private set;

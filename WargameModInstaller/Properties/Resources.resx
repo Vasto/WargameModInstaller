@@ -262,4 +262,7 @@ Click Next to continue.</value>
   <data name="ContentFileNotFoundParametrizedMsg" xml:space="preserve">
     <value>The installer was unable to find the following content file "{0}"</value>
   </data>
+  <data name="RebuildingParametrizedMsg" xml:space="preserve">
+    <value>Rebuilding {0}...</value>
+  </data>
 </root>

@@ -9,13 +9,12 @@ using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
-using WargameModInstaller.Services.Commands;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class SharedEdataCmdGroupExecutor : CmdGroupExecutorBase<SharedEdataCmdGroup>
+    public class EdataCmdGroupExecutor : CmdGroupExecutorBase<EdataCmdGroup>
     {
-        public SharedEdataCmdGroupExecutor(SharedEdataCmdGroup cmdGroup, ICmdExecutorFactory executorsFactory)
+        public EdataCmdGroupExecutor(EdataCmdGroup cmdGroup, ICmdExecutorFactory executorsFactory)
             : base(cmdGroup, executorsFactory)
         {
             this.TotalSteps++;
@@ -26,20 +25,20 @@ namespace WargameModInstaller.Services.Commands
             //Ta metoda bez bloków łapania wyjątków, w przypadku ewentualnego wyjątku pochodzącego z kodu z poza execute, spowoduje 
             //wykrzaczenie się całej instalacji. Może trzeba zaimplementować IsCritical także dla CmdGroup...
 
-            String targetfullPath = CommandGroup.SharedEdataPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
+            String targetfullPath = CommandGroup.CommonEdataPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
             if (!File.Exists(targetfullPath))
             {
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
                 throw new CmdExecutionFailedException("Specified Edata file doesn't exist",
-                    String.Format(WargameModInstaller.Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
+                    String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
             }
 
             CurrentStep = 0;
 
             //should it be sorrounded with a try-catch?
 
-            EdataFileReader edataReader = new EdataFileReader();
-            EdataFile edataFile = edataReader.Read(targetfullPath, false);
+            EdataFileReader edataFileReader = new EdataFileReader();
+            EdataFile edataFile = edataFileReader.Read(targetfullPath, false);
 
             var newExecutionContext = new SharedEdataCmdExecutionContext(
                 context.InstallerSourceDirectory,
@@ -48,25 +47,13 @@ namespace WargameModInstaller.Services.Commands
 
             foreach (var executor in CommandExecutors)
             {
-                if (token.HasValue)
-                {
-                    executor.Execute(newExecutionContext, token.Value);
-                }
-                else
-                {
-                    executor.Execute(newExecutionContext);
-                }
+                executor.Execute(newExecutionContext, token.Value);
             }
 
+            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.CommonEdataPath);
+
             IEdataFileWriter edataWriter = new EdataFileWriter();
-            if (token.HasValue)
-            {
-                edataWriter.Write(edataFile, token.Value);
-            }
-            else
-            {
-                edataWriter.Write(edataFile);
-            }
+            edataWriter.Write(edataFile, token.Value);
 
             //Set max, completed
             CurrentStep = TotalSteps;

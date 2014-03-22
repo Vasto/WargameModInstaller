@@ -35,53 +35,46 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     "One of the command's Source or Target paths is not a valid file path.",
-                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
 
-            String rootContentPath = Command.TargetContentPath.Split().FirstOrDefault();
-            if (rootContentPath == null)
+            String contentPath = Command.TargetContentPath.LastPart;
+            if (contentPath == null)
             {
                 throw new CmdExecutionFailedException(
                     "Invalid command's TargetContentPath value.",
-                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
-            var edataReader = new EdataFileReader();
-            var mainEdataFile = CanGetEdataFromContext(context) ?
+            var edataFileReader = new EdataFileReader();
+            var contentOwningEdata = CanGetEdataFromContext(context) ?
                 GetEdataFromContext(context) :
-                edataReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowe
+                edataFileReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowe
 
             //First one contnet is from the edata on hdd, so needs to be loaded explicitly.
-            EdataContentFile rootContentFile = GetEdataContentFileByPath(mainEdataFile, rootContentPath);
-            if (!rootContentFile.IsContentLoaded)
+            EdataContentFile contentFile = GetEdataContentFileByPath(contentOwningEdata, contentPath);
+            if (!contentFile.IsContentLoaded)
             {
-                edataReader.LoadContent(rootContentFile);
+                edataFileReader.LoadContent(contentFile);
             }
-
-
-            //Prepare a list of nested content according to the given paths.
-            var contentFilesList = GetContentFilesHierarchy(mainEdataFile, Command.TargetContentPath.Split());
 
             CurrentStep++;
 
             var contentFileReader = new ContentFileReader();
             byte[] newContent = contentFileReader.Read(sourceFullPath);
-
-
-            //Assign content changes for all packages, from bottom to top
-            AssignContentUpHierarchy(contentFilesList, newContent);
+            contentFile.Content = newContent;
 
             if (!CanGetEdataFromContext(context))
             {
                 IEdataFileWriter edataWriter = new EdataFileWriter();
                 if (token.HasValue)
                 {
-                    edataWriter.Write(mainEdataFile, token.Value);
+                    edataWriter.Write(contentOwningEdata, token.Value);
                 }
                 else
                 {
-                    edataWriter.Write(mainEdataFile);
+                    edataWriter.Write(contentOwningEdata);
                 }
             }
 

@@ -249,7 +249,7 @@ namespace WargameModInstaller.Infrastructure.Edata
                         long currentStreamPosition = stream.Position;
 
                         file.Content = ReadContent(stream, file.TotalOffset, file.Size);
-                        //file.Size = file.Content.Length;
+                        file.Size = file.Content.Length; ////dodane
 
                         stream.Seek(currentStreamPosition, SeekOrigin.Begin);
                     }

@@ -7,7 +7,7 @@ using WargameModInstaller.Common.Entities;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class ReplaceContentCmd : IInstallCmd, IHasSource, IHasTarget
+    public class ReplaceContentCmd : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
     {
         /// <summary>
         /// Gets or sets a command ID.

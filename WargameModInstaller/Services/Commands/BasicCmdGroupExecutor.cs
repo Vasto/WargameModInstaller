@@ -23,14 +23,7 @@ namespace WargameModInstaller.Services.Commands
 
             foreach (var executor in CommandExecutors)
             {
-                if (token.HasValue)
-                {
-                    executor.Execute(context, token.Value);
-                }
-                else
-                {
-                    executor.Execute(context);
-                }
+                executor.Execute(context, token.Value);
             }
 
             CurrentStep = TotalSteps;

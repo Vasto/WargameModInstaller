@@ -8,8 +8,6 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Extensions;
-using WargameModInstaller.Common.Utilities;
-using WargameModInstaller.Infrastructure.Config;
 using WargameModInstaller.Model;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Config;
@@ -17,7 +15,7 @@ using WargameModInstaller.Services.Config;
 
 namespace WargameModInstaller.Infrastructure.Commands
 {
-    //To do: Make this independant of any high level services like the ISettingsProvider.
+    //To do: Make this unaware of any high level services like the ISettingsProvider.
     //There should be a some high level command providing service which would use this reader, 
     //and eventually use other services to adjust the commands values.
 
@@ -37,6 +35,13 @@ namespace WargameModInstaller.Infrastructure.Commands
                 .GetGeneralSettings(GeneralSettingEntryType.CriticalCommands)
                 .Value
                 .ToOrDefault<bool>();
+            this.GroupProductionRules = CreateGroupProductionRules().OrderByDescending(x => x.Priority);
+        }
+
+        protected IEnumerable<GroupProductionRule> GroupProductionRules
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -98,6 +103,8 @@ namespace WargameModInstaller.Infrastructure.Commands
                 XElement rootElement = configFile.XPathSelectElement(installCommandsElementPath);
                 if (rootElement != null)
                 {
+                    var cd = new HashSet<IInstallCmd>();
+
                     var cmds = new List<IInstallCmd>();
                     foreach (var cmdQuery in ReadingQueries.Values)
                     {
@@ -108,43 +115,15 @@ namespace WargameModInstaller.Infrastructure.Commands
                     int id = 0;
                     cmds.ForEach(cmd => cmd.Id = id++);
 
-                    //Make a more generic way to produce groups and define something like the group production rules.
-                    //At this point, below part neeeds to be totaly redone...
-
-                    var cmdPriorityGroups = cmds.GroupBy(cmd => cmd.Priority);
-                    foreach (var priorityGroup in cmdPriorityGroups)
+                    foreach (var rule in GroupProductionRules)
                     {
-                        //Create groups with the same priority and target
-                        var cmdTargetGroups = priorityGroup
-                            .OfType<IHasTarget>()
-                            .GroupBy(cmd => cmd.TargetPath);
-                        foreach (var targetGroup in cmdTargetGroups)
+                        var group = rule.ProduceGroup(cmds);
+                        foreach (var grp in group)
                         {
-                            //Assign appropriate command types, with the same edata target to the shared Edata cmds group.
-                            var replaceImageCmds = new List<IInstallCmd>();
-                            replaceImageCmds.AddRange(targetGroup.OfType<ReplaceImageCmd>());
-                            replaceImageCmds.AddRange(targetGroup.OfType<ReplaceImagePartCmd>());
-                            replaceImageCmds.AddRange(targetGroup.OfType<ReplaceImageTileCmd>());
-                            replaceImageCmds.AddRange(targetGroup.OfType<ReplaceContentCmd>());
-                            if (replaceImageCmds.Count > 0)
-                            {
-                                var sharedEdataCmdGroup = new SharedEdataCmdGroup(
-                                    replaceImageCmds,
-                                    new InstallEntityPath(targetGroup.Key),
-                                    priorityGroup.Key);
-
-                                cmdGroupsList.Add(sharedEdataCmdGroup);
-                            }
+                            cmds.RemoveAll(cmd => grp.Commands.Contains(cmd)); // Do zastąpienia przez hasz set
                         }
 
-                        //Assign remaining commands to the normal group
-                        var samePriorityCmds = priorityGroup.Except(cmdGroupsList.SelectMany(group => group.Commands));
-                        if (samePriorityCmds.Count() > 0)
-                        {
-                            var samePriorityCmdsGroup = new BasicCmdGroup(samePriorityCmds, priorityGroup.Key);
-
-                            cmdGroupsList.Add(samePriorityCmdsGroup);
-                        }
+                        cmdGroupsList.AddRange(group);
                     }
 
                     cmdGroupsList.OrderByDescending(group => group.Priority);
@@ -162,17 +141,104 @@ namespace WargameModInstaller.Infrastructure.Commands
 
         protected override Dictionary<WMIEntryType, Func<XElement, IEnumerable<IInstallCmd>>> CreateReadingQueries()
         {
-            var result = new Dictionary<WMIEntryType, Func<XElement, IEnumerable<IInstallCmd>>>();
-            result.Add(CmdEntryType.CopyGameFile, ReadCopyModFileCmds);
-            result.Add(CmdEntryType.CopyModFile, ReadCopyGameFileCmds);
-            result.Add(CmdEntryType.RemoveFile, ReadRemoveFileCmds);
-            result.Add(CmdEntryType.ReplaceImage, ReadReplaceImageCmds);
-            result.Add(CmdEntryType.ReplaceImagePart, ReadReplaceImageTileCmds);
-            result.Add(CmdEntryType.ReplaceImageTile, ReadReplaceImagePartCmds);
-            result.Add(CmdEntryType.ReplaceContent, ReadReplaceContentCmds);
+            var queries = new Dictionary<WMIEntryType, Func<XElement, IEnumerable<IInstallCmd>>>();
+            queries.Add(CmdEntryType.CopyGameFile, ReadCopyModFileCmds);
+            queries.Add(CmdEntryType.CopyModFile, ReadCopyGameFileCmds);
+            queries.Add(CmdEntryType.RemoveFile, ReadRemoveFileCmds);
+            queries.Add(CmdEntryType.ReplaceImage, ReadReplaceImageCmds);
+            queries.Add(CmdEntryType.ReplaceImagePart, ReadReplaceImageTileCmds);
+            queries.Add(CmdEntryType.ReplaceImageTile, ReadReplaceImagePartCmds);
+            queries.Add(CmdEntryType.ReplaceContent, ReadReplaceContentCmds);
 
-            return result;
+            return queries;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>Higher priority number means higher priority rule.</remarks>
+        protected virtual IEnumerable<GroupProductionRule> CreateGroupProductionRules()
+        {
+            var rules = new List<GroupProductionRule>();
+            rules.Add(new GroupProductionRule(3, MultiLevelCmdGroupProductionRule));
+            rules.Add(new GroupProductionRule(2, EdataCmdGroupProductionRule));
+            rules.Add(new GroupProductionRule(1, BasicCmdGroupProductionRule));
+
+            return rules;
+        }
+
+        private IEnumerable<ICmdGroup> BasicCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
+        {
+            var resultGroups = new List<BasicCmdGroup>();
+
+            var samePriorityGroups = cmds.GroupBy(cmd => cmd.Priority);
+            foreach (var group in samePriorityGroups)
+            {
+                var newBasicGroup = new BasicCmdGroup(group, group.Key);
+                resultGroups.Add(newBasicGroup);
+            }
+
+            return resultGroups;
+        }
+
+        private IEnumerable<ICmdGroup> EdataCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
+        {
+            var edataCmds = new List<IInstallCmd>();
+            edataCmds.AddRange(cmds.OfType<ReplaceImageCmd>());
+            edataCmds.AddRange(cmds.OfType<ReplaceImagePartCmd>());
+            edataCmds.AddRange(cmds.OfType<ReplaceImageTileCmd>());
+            edataCmds.AddRange(cmds.OfType<ReplaceContentCmd>());
+
+            var groups = from cmd in edataCmds
+                         group cmd by new { ((IHasTarget)cmd).TargetPath, cmd.Priority };
+
+
+            var resultGroups = new List<EdataCmdGroup>();
+            foreach (var group in groups)
+            {
+                var newGroup = new EdataCmdGroup(group, group.Key.TargetPath, group.Key.Priority);
+                resultGroups.Add(newGroup);
+            }
+
+            return resultGroups;
+        }
+
+        private IEnumerable<ICmdGroup> MultiLevelCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
+        {
+            var multiLevelCmds = cmds
+                .OfType<IHasTargetContent>()
+                .Where(cmd => cmd.TargetContentPath.PathType == ContentPathType.EdataNestedContent);
+
+            var multiLevelEdataCmds = new List<IInstallCmd>();
+            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImageCmd>());
+            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImagePartCmd>());
+            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImageTileCmd>());
+            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceContentCmd>());
+
+            var groups = from cmd in multiLevelEdataCmds
+                         group cmd by new { 
+                             cmd.Priority,
+                             ((IHasTarget)cmd).TargetPath, 
+                             ((IHasTargetContent)cmd).TargetContentPath.PreLastPart 
+                         };
+
+
+            var resultGroups = new List<MultiLevelEdataCmdGroup>();
+            foreach (var group in groups)
+            {
+                var multilevelContentPath = new ContentPath(group.Key.PreLastPart);
+                var newGroup = new MultiLevelEdataCmdGroup(
+                    group, 
+                    group.Key.TargetPath,
+                    multilevelContentPath,
+                    group.Key.Priority);
+                resultGroups.Add(newGroup);
+            }
+
+            return resultGroups;
+        }
+
 
         private IEnumerable<CopyModFileCmd> ReadCopyModFileCmds(XElement source)
         {
@@ -360,6 +426,23 @@ namespace WargameModInstaller.Infrastructure.Commands
 
             return result;
         }
+
+        #region Nested Class GroupProductionRule
+
+        protected class GroupProductionRule
+        {
+            public GroupProductionRule(int priority,
+                Func<IEnumerable<IInstallCmd>, IEnumerable<ICmdGroup>> productionRule)
+            {
+                this.Priority = priority;
+                this.ProduceGroup = productionRule;
+            }
+
+            public int Priority { get; private set; }
+            public Func<IEnumerable<IInstallCmd>, IEnumerable<ICmdGroup>> ProduceGroup { get; private set; }
+        }
+
+        #endregion //Nested Class GroupProductionRule
 
     }
 

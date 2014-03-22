@@ -18,19 +18,20 @@ namespace WargameModInstaller.Infrastructure.Edata
 
         public EdataFile Read(String edataFilePath, bool loadContent = false)
         {
-            return ReadInternal(edataFilePath, loadContent);
+            return ReadEdata(edataFilePath, loadContent);
         }
 
         public EdataFile Read(String edataFilePath, bool loadContent, CancellationToken token)
         {
-            return ReadInternal(edataFilePath, loadContent, token);
+            return ReadEdata(edataFilePath, loadContent, token);
         }
 
         /// <summary>
-        /// 
+        /// Reads content described by the given content file, but doesn't assing it to that Content File.
         /// </summary>
         /// <param name="file"></param>
-        public void LoadContent(EdataContentFile file)
+        /// <returns></returns>
+        public byte[] ReadContent(EdataContentFile file)
         {
             if (file.Owner == null)
             {
@@ -44,9 +45,18 @@ namespace WargameModInstaller.Infrastructure.Edata
 
             using (FileStream stream = File.OpenRead(contentOwenr.Path))
             {
-                file.Content = ReadContent(stream, file.TotalOffset, file.Size);
-                //file.Size = file.Content.Length;
+                return ReadContent(stream, file.TotalOffset, file.Size);   
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="file"></param>
+        public void LoadContent(EdataContentFile file)
+        {
+            file.Content = ReadContent(file);
+            //file.Size = file.Content.Length;
         }
 
         /// <summary>
@@ -61,11 +71,30 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
         }
 
+        public void LoadNotLoadedContent(EdataFile edataFile)
+        {
+            if (!File.Exists(edataFile.Path))
+            {
+                throw new IOException(String.Format("Edata file '{0}' doesn't exist.", edataFile.Path));
+            }
+
+            using (FileStream stream = File.OpenRead(edataFile.Path))
+            {
+                foreach (var cf in edataFile.ContentFiles)
+                {
+                    if (!cf.IsContentLoaded)
+                    {
+                        cf.Content = ReadContent(stream, cf.TotalOffset, cf.Size);
+                    }
+                }
+            }
+        }
+
         /// <remarks>
         /// Method based on enohka's code.
         /// See more at: http://github.com/enohka/moddingSuite
         /// </remarks>
-        protected EdataFile ReadInternal(String edataFilePath, bool loadContent, CancellationToken? token = null)
+        protected EdataFile ReadEdata(String edataFilePath, bool loadContent, CancellationToken? token = null)
         {
             //Cancel if requested;
             token.ThrowIfCanceledAndNotNull();
@@ -94,7 +123,7 @@ namespace WargameModInstaller.Infrastructure.Edata
                 }
                 else
                 {
-                    throw new NotSupportedException(string.Format("Edata Version {0} is currently not supported", header.Version));
+                    throw new NotSupportedException(String.Format("Edata Version {0} is currently not supported", header.Version));
                 }
             }
 

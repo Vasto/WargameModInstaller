@@ -17,8 +17,6 @@ namespace WargameModInstaller.Common.Entities
             return path.Value;
         }
 
-        private IEnumerable<PathTypeResolveRule> resolveRules;
-
         /// <summary>
         /// Creates a path representation based on the given path and type.
         /// </summary>

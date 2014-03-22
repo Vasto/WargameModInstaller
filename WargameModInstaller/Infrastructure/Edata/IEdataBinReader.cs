@@ -10,7 +10,7 @@ namespace WargameModInstaller.Infrastructure.Edata
 {
     public interface IEdataBinReader
     {
-        EdataFile Read(byte[] rawEdata);
-        EdataFile Read(byte[] rawEdata, CancellationToken token);
+        EdataFile Read(byte[] rawEdata, bool loadContent);
+        EdataFile Read(byte[] rawEdata, bool loadContent, CancellationToken token);
     }
 }

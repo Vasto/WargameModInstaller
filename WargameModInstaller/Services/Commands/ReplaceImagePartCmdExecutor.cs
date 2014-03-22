@@ -44,64 +44,57 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     "One of the command's Source or Target paths is not a valid file path.",
-                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
-            String rootContentPath = Command.TargetContentPath.Split().FirstOrDefault();
-            if (rootContentPath == null)
+            String contentPath = Command.TargetContentPath.LastPart;
+            if (contentPath == null)
             {
                 throw new CmdExecutionFailedException(
                     "Invalid command's TargetContentPath value.",
-                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
-            var edataReader = new EdataFileReader();
-            var mainEdataFile = CanGetEdataFromContext(context) ?
+            var edataFileReader = new EdataFileReader();
+            var contentOwningEdata = CanGetEdataFromContext(context) ?
                 GetEdataFromContext(context) :
-                edataReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowej
+                edataFileReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowej
 
             //First one is directly from edata file, so needs to be loaded explicitly.
-            EdataContentFile rootContentFile = GetEdataContentFileByPath(mainEdataFile, rootContentPath);
-            if (!rootContentFile.IsContentLoaded)
+            EdataContentFile contentFile = GetEdataContentFileByPath(contentOwningEdata, contentPath);
+            if (!contentFile.IsContentLoaded)
             {
-                edataReader.LoadContent(rootContentFile);
+                edataFileReader.LoadContent(contentFile);
             }
 
-
-            //Prepare a list of nested content according to the given paths.
-            var contentFilesList = GetContentFilesHierarchy(mainEdataFile, Command.TargetContentPath.Split());
-
-
-            var imageContentFile = contentFilesList.Last();
-            if (imageContentFile.FileType != EdataContentFileType.Image)
+            if (contentFile.FileType != EdataContentFileType.Image)
             {
                 throw new CmdExecutionFailedException(
                     "Invalid command's TargetContentPath value. It doesn't point to an image content.",
-                    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
             CurrentStep++;
 
-            TgvImage oldTgv = GetTgvFromContent(imageContentFile);
+            TgvImage oldTgv = GetTgvFromContent(contentFile);
             TgvImage newtgv = GetTgvFromDDS(sourceFullPath);
 
             ImageComposerService.ReplaceImagePart(oldTgv, newtgv, (uint)Command.XPosition.Value, (uint)Command.YPosition.Value);
 
             byte[] rawOldTgv = ConvertTgvToBytes(oldTgv);
+            contentFile.Content = rawOldTgv;
 
-            //Assign content changes for all packages, from bottom to top
-            AssignContentUpHierarchy(contentFilesList, rawOldTgv);
 
             if (!CanGetEdataFromContext(context))
             {
                 IEdataFileWriter edataWriter = new EdataFileWriter();
                 if (token.HasValue)
                 {
-                    edataWriter.Write(mainEdataFile, token.Value);
+                    edataWriter.Write(contentOwningEdata, token.Value);
                 }
                 else
                 {
-                    edataWriter.Write(mainEdataFile);
+                    edataWriter.Write(contentOwningEdata);
                 }
             }
 
