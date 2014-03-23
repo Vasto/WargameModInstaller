@@ -65,12 +65,13 @@ namespace WargameModInstaller.Services.Commands
             }
 
             CurrentStep++;
-            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.CommonEdataPath);
+            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.CommonEdataPath);
 
             RollEdatas(edataHierarchy, token);
 
             foreach (var tmpEdata in temporaryCreatedEdatas)
             {
+                //To do: W przypadku wyjątku nie jest zapewnionie, że te pliki zostane usuniętę;
                 File.Delete(tmpEdata);
             }
 

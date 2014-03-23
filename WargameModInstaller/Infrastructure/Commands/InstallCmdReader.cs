@@ -103,8 +103,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 XElement rootElement = configFile.XPathSelectElement(installCommandsElementPath);
                 if (rootElement != null)
                 {
-                    var cd = new HashSet<IInstallCmd>();
-
                     var cmds = new List<IInstallCmd>();
                     foreach (var cmdQuery in ReadingQueries.Values)
                     {

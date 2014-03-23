@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-
 namespace WargameModInstaller.Model.Edata
 {
     /// <summary>
@@ -23,7 +22,19 @@ namespace WargameModInstaller.Model.Edata
     /// </remarks>
     public class EdataContentFile : EdataContentEntity
     {
-        public string Path
+        private byte[] content;
+
+        /// <summary>
+        /// Occurs when the content is loaded
+        /// </summary>
+        public event EventHandler ContentLoaded;
+
+        /// <summary>
+        /// Occurs when the content is unloaded
+        /// </summary>
+        public event EventHandler ContentUnloaded;
+
+        public String Path
         {
             get;
             set; 
@@ -48,7 +59,9 @@ namespace WargameModInstaller.Model.Edata
             set; 
         }
 
-        //Update w przypadku zmiany contentu
+        /// <summary>
+        /// Rozmiar pierwotny, odczytany, modyfikowane kiedy nastepuje powrotny zapis.
+        /// </summary>
         public long Size
         {
             get;
@@ -75,16 +88,56 @@ namespace WargameModInstaller.Model.Edata
 
         public byte[] Content
         {
-            get;
-            set;
+            get
+            {
+                return content;
+            }
+            set
+            {
+                content = value;
+                if (content != null)
+                {
+                    IsContentLoaded = true;
+                    NotifyContentLoaded();
+                }
+                else
+                {
+                    IsContentLoaded = false;
+                    NotifyContentUnloaded();
+                }
+            }
+        }
+
+        public long ContentSize
+        {
+            get
+            {
+                return IsContentLoaded ? Content.Length : 0;
+            }
         }
 
         //Zastanowić się nad tym jak to powinno być ustalane
         public bool IsContentLoaded
         {
-            get
+            get;
+            private set;
+        }
+
+        private void NotifyContentLoaded()
+        {
+            var handler = ContentLoaded;
+            if (handler != null)
             {
-                return Content != null;
+                handler(this, new EventArgs());
+            }
+        }
+
+        private void NotifyContentUnloaded()
+        {
+            var handler = ContentUnloaded;
+            if (handler != null)
+            {
+                handler(this, new EventArgs());
             }
         }
 

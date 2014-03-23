@@ -179,6 +179,7 @@
     <Compile Include="Services\Config\ISettingsProvider.cs" />
     <Compile Include="Services\Config\SettingsProvider.cs" />
     <Compile Include="Services\Config\WargameVersionProvider.cs" />
+    <Compile Include="Services\Edata\EdataContentManager.cs" />
     <Compile Include="Services\Install\ALBInstallDirProvider.cs" />
     <Compile Include="Services\Image\IImageComposerService.cs" />
     <Compile Include="Services\Image\ImageComposerService.cs" />

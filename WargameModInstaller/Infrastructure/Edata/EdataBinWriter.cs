@@ -33,15 +33,24 @@ namespace WargameModInstaller.Infrastructure.Edata
             //Cancel if requested;
             token.ThrowIfCanceledAndNotNull();
 
-            using (MemoryStream newEdataStream = new MemoryStream())
+            using (MemoryStream edataStream = new MemoryStream())
             {
-                WriteHeader(newEdataStream, edataFile, token);
+                WriteHeader(edataStream, edataFile, token);
 
-                WriteLoadedContent(newEdataStream, edataFile, token);
+                if (CanUseReplacementWrite(edataFile))
+                {
+                    //Wydaję się że w tym wypadku to nigdy nie będzie miało miejsca, bo załadoway content oryginale
+                    //(któy w tym przypadku powinien być załadowany zawsze w całości) zawsze będzie równy max dostępnej przestrzeni replacement.
+                    ReplaceLoadedContent(edataStream, edataFile, token);
+                }
+                else
+                {
+                    WriteLoadedContent(edataStream, edataFile, token);
+                }
 
-                WriteDictionary(newEdataStream, edataFile, token);
+                WriteDictionary(edataStream, edataFile, token);
 
-                return newEdataStream.ToArray();
+                return edataStream.ToArray();
             }
         }
 

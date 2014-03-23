@@ -50,46 +50,60 @@ namespace WargameModInstaller.Infrastructure.Edata
             //Cancel if requested;
             token.ThrowIfCanceledAndNotNull();
 
-            //Try in the current dir to avoid double file moving
-            String temporaryEdataPath = GetTemporaryEdataPathInCurrentLocation(edataFile.Path);
-            if ((new FileInfo(edataFile.Path).Length > (new DriveInfo(temporaryEdataPath).AvailableFreeSpace)))
+            if (CanUseReplacementWrite(edataFile))
             {
-                temporaryEdataPath = TryGetTemporaryEdataPathWhereFree(edataFile.Path);
-                if (temporaryEdataPath == null)
+                using(var sourceEdata = new FileStream(edataFile.Path, FileMode.Open))
                 {
-                    throw new IOException("Not enough disk space for rebuilding edata.");
+                    WriteHeader(sourceEdata, edataFile, token);
+
+                    ReplaceLoadedContent(sourceEdata, edataFile, token);
+
+                    WriteDictionary(sourceEdata, edataFile, token);
                 }
             }
-
-            //To avoid nested try catches.
-            FileStream sourceEdata = null;
-            FileStream newEdata = null;
-            try
+            else
             {
-                sourceEdata = new FileStream(edataFile.Path, FileMode.Open);
-                newEdata = new FileStream(temporaryEdataPath, FileMode.Create);
-
-                WriteHeader(newEdata, edataFile, token);
-
-                WriteNotLoadedContent(sourceEdata, newEdata, edataFile, token);
-
-                WriteDictionary(newEdata, edataFile, token);
-
-                //Free file handles before the file move and delete
-                CloseEdataFilesStreams(sourceEdata, newEdata);
-
-                //Replace temporary file
-                File.Delete(edataFile.Path);
-                File.Move(temporaryEdataPath, edataFile.Path);
-            }
-            finally
-            {
-                //Spr czy zostały już zwolnione...?
-                CloseEdataFilesStreams(sourceEdata, newEdata);
-
-                if (File.Exists(temporaryEdataPath))
+                //Try in the current dir to avoid double file moving
+                String temporaryEdataPath = GetTemporaryEdataPathInCurrentLocation(edataFile.Path);
+                if ((new FileInfo(edataFile.Path).Length > (new DriveInfo(temporaryEdataPath).AvailableFreeSpace)))
                 {
-                    File.Delete(temporaryEdataPath);
+                    temporaryEdataPath = TryGetTemporaryEdataPathWhereFree(edataFile.Path);
+                    if (temporaryEdataPath == null)
+                    {
+                        throw new IOException("Not enough disk space for rebuilding edata.");
+                    }
+                }
+
+                //To avoid nested try catches.
+                FileStream sourceEdata = null;
+                FileStream newEdata = null;
+                try
+                {
+                    sourceEdata = new FileStream(edataFile.Path, FileMode.Open);
+                    newEdata = new FileStream(temporaryEdataPath, FileMode.Create);
+
+                    WriteHeader(newEdata, edataFile, token);
+
+                    WriteNotLoadedContent(sourceEdata, newEdata, edataFile, token);
+
+                    WriteDictionary(newEdata, edataFile, token);
+
+                    //Free file handles before the file move and delete
+                    CloseEdataFilesStreams(sourceEdata, newEdata);
+
+                    //Replace temporary file
+                    File.Delete(edataFile.Path);
+                    File.Move(temporaryEdataPath, edataFile.Path);
+                }
+                finally
+                {
+                    //Spr czy zostały już zwolnione...?
+                    CloseEdataFilesStreams(sourceEdata, newEdata);
+
+                    if (File.Exists(temporaryEdataPath))
+                    {
+                        File.Delete(temporaryEdataPath);
+                    }
                 }
             }
         }

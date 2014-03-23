@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Model.Commands;
-using WargameModInstaller.Services.Commands;
 
 namespace WargameModInstaller.Services.Commands
 {
@@ -24,7 +23,6 @@ namespace WargameModInstaller.Services.Commands
 
             this.InitializeProgressProviding();
         }
-
 
         public T CommandGroup
         {
