@@ -47,7 +47,7 @@ namespace WargameModInstaller.Model.Edata
         public uint DictOffset;
         public uint DictLength;
         public uint FileOffset;
-        public uint FileLengh;
+        public uint FileLenght;
 
         public readonly uint Unkown_1;
         public uint Padding;

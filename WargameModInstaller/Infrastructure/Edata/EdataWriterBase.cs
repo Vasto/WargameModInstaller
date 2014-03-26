@@ -14,6 +14,11 @@ namespace WargameModInstaller.Infrastructure.Edata
 {
     //To do: wyglada na to że trzeba pomyśleć nad tymi wolnymi przestrzeniami. Bo te 100 bajtów to tak naprawde zaden bufor w przypadku zmiany rozmiaru obrazka..
     //a trzeb mieć na uwadze, że kazdy kto juz przebudował plik .dat przy pomocy instalatora ma już te min 200 bajtów odstepu...
+    //chyba trzeba wrpowadzić jakieś proporcjonalne rozmiary w zaelznosci od rozmiaru pliku, wiadomo ze mały plik nie wzrośnie wielec wiecej w stosunku do swego rzmiaru
+    //ale trzeb też mieć ograniczenia Max, z drugiej strony nie wiadomo jak to wpłynie na gre (wyglada na to ze max przestrzeń domyślan w ZZ_3 to ok 8000B)
+    
+    //Przy takim buforze proporcjonalnym trzeba mieć na uwadze ze podanie mniejszej wartości niż określona przez MinBytes spowoduje niemożliwość 
+    //użycia replaceContent kiedykolwiek (warunek spr czy można użyć).
 
     /// <summary>
     /// 
@@ -22,12 +27,12 @@ namespace WargameModInstaller.Infrastructure.Edata
     {
         protected long MaxBytesBetweenFiles
         {
-            get { return 400; }
+            get { return 8192; }
         }
 
         protected long MinBytesBetweenFiles
         {
-            get { return 200; }
+            get { return 256; }
         }
 
         /// <remarks>
@@ -61,7 +66,7 @@ namespace WargameModInstaller.Infrastructure.Edata
         /// </remarks>
         protected virtual void WriteLoadedContent(Stream target, EdataFile edataFile, CancellationToken? token = null)
         {
-            var reserveBuffer = new byte[MaxBytesBetweenFiles];
+            byte[] spaceBuffer = null;
             var sourceEdataHeader = edataFile.Header;
 
             uint filesContentLength = 0;
@@ -81,13 +86,13 @@ namespace WargameModInstaller.Infrastructure.Edata
                 file.Size = file.Content.Length; // To przenieść do klasy tak aby było ustawiane przy zmianie contnetu
                 file.Checksum = MD5.Create().ComputeHash(fileBuffer);
 
-                //Zastanowić się nad tym, czy by nie uzupełniać róznicy miedzy starym a nowym plikiem pustymi danymi, 
-                //tak jak robi to reserveBuffer, tylko o odpowiedniej wielkości - miało by to być w celu sprawdzenia czy rzekomy
-                //tak naprawde nie wiadomo czym do końca spowodowany problem nie ładowania modeli w amory przestałby istnieć.
-                target.Write(fileBuffer, 0, fileBuffer.Length);
-                target.Write(reserveBuffer, 0, reserveBuffer.Length);
+                long spaceSize = GetSpaceSizeForFile(file);
+                spaceBuffer = GetNewBufferIfNeeded(spaceBuffer, spaceSize);
 
-                filesContentLength += (uint)fileBuffer.Length + (uint)reserveBuffer.Length;
+                target.Write(fileBuffer, 0, fileBuffer.Length);
+                target.Write(spaceBuffer, 0, (int)spaceSize);
+
+                filesContentLength += (uint)fileBuffer.Length + (uint)spaceSize;
             }
 
             target.Seek(0x25, SeekOrigin.Begin);
@@ -107,7 +112,7 @@ namespace WargameModInstaller.Infrastructure.Edata
         /// </remarks>
         protected virtual void WriteNotLoadedContent(Stream source, Stream target, EdataFile edataFile, CancellationToken? token = null)
         {
-            var reserveBuffer = new byte[MaxBytesBetweenFiles];
+            byte[] spaceBuffer = null;
             var sourceEdataHeader = edataFile.Header;
 
             source.Seek(sourceEdataHeader.FileOffset, SeekOrigin.Begin);
@@ -138,10 +143,13 @@ namespace WargameModInstaller.Infrastructure.Edata
                     source.Read(fileBuffer, 0, fileBuffer.Length);
                 }
 
-                target.Write(fileBuffer, 0, fileBuffer.Length);
-                target.Write(reserveBuffer, 0, reserveBuffer.Length);
+                long spaceSize = GetSpaceSizeForFile(file);
+                spaceBuffer = GetNewBufferIfNeeded(spaceBuffer, spaceSize);
 
-                filesContentLength += (uint)fileBuffer.Length + (uint)reserveBuffer.Length;
+                target.Write(fileBuffer, 0, fileBuffer.Length);
+                target.Write(spaceBuffer, 0, (int)spaceSize);
+
+                filesContentLength += (uint)fileBuffer.Length + (uint)spaceSize;
             }
 
             target.Seek(0x25, SeekOrigin.Begin);
@@ -156,26 +164,46 @@ namespace WargameModInstaller.Infrastructure.Edata
         /// <param name="token"></param>
         protected virtual void ReplaceLoadedContent(Stream source, EdataFile edataFile, CancellationToken? token = null)
         {
-            //Nie można wiecej niż min bo sprawdzanie nastepuje w oparciu o min, wiec mogło by nastąpic nadpisanie nastepnego plku gdyby było max.
-            var reserveBuffer = new byte[MinBytesBetweenFiles];
+            byte[] spaceBuffer = null;
 
-            foreach (EdataContentFile file in edataFile.ContentFiles)
+            var contentFiles = edataFile.ContentFiles.ToArray();
+            for (int i = 0; i < contentFiles.Length; ++i)
             {
-                //Cancel if requested;
                 token.ThrowIfCanceledAndNotNull();
 
-                if (file.IsContentLoaded)
+                var currentFile = contentFiles[i];
+                if (!currentFile.IsContentLoaded)
                 {
-                    byte[] fileBuffer;
-                    fileBuffer = file.Content;
-                    file.Size = file.Content.Length; // To przenieść do klasy tak aby było ustawiane przy zmianie contnetu
-                    file.Checksum = MD5.Create().ComputeHash(fileBuffer); //To przyszło z dołu
-
-                    source.Seek(file.TotalOffset, SeekOrigin.Begin);
-                    source.Write(fileBuffer, 0, fileBuffer.Length);
-                    //W przypadku takim jak tu czyli zastępowania wiekszego pliku mniejszy, lepiej jednak tam wciś te 0 na koniec.
-                    source.Write(reserveBuffer, 0, reserveBuffer.Length);
+                    continue;
                 }
+
+                long orginalContentSize = currentFile.Size;
+
+                byte[] fileBuffer = currentFile.Content;
+                currentFile.Size = fileBuffer.Length;
+                currentFile.Checksum = MD5.Create().ComputeHash(fileBuffer);
+
+                source.Seek(currentFile.TotalOffset, SeekOrigin.Begin);
+                source.Write(fileBuffer, 0, fileBuffer.Length);
+
+                long contentSizeDffierence = orginalContentSize - currentFile.ContentSize;
+                if (contentSizeDffierence > 0)
+                {
+                    spaceBuffer = GetNewBufferIfNeeded(spaceBuffer, contentSizeDffierence);
+                    source.Write(spaceBuffer, 0, (int)contentSizeDffierence);
+                }
+
+                //Overwriting whole space, up to the next file:
+                //var nextFile = (i + 1 < contentFiles.Length) ? contentFiles[i + 1] : null;
+                //long fileSectionLength = edataFile.Header.FileOffset + edataFile.Header.FileLenght;
+                //long spaceBetweenFiles = ((nextFile != null) ? nextFile.TotalOffset : fileSectionLength) - 
+                //    (currentFile.TotalOffset + currentFile.ContentSize);
+
+                //spaceBuffer = (spaceBuffer == null) ?
+                //    new byte[spaceBetweenFiles] : ((spaceBetweenFiles > spaceBuffer.Length) ?
+                //    new byte[spaceBetweenFiles] : spaceBuffer);
+
+                //source.Write(spaceBuffer, 0, (int)spaceBetweenFiles);
             }
         }
 
@@ -186,12 +214,13 @@ namespace WargameModInstaller.Infrastructure.Edata
         protected virtual void WriteDictionary(Stream target, EdataFile edataFile, CancellationToken? token = null)
         {
             var sourceEdataHeader = edataFile.Header;
+            var contentFilesDict = edataFile.ContentFiles.ToDictionary(x => x.Id);
 
             target.Seek(sourceEdataHeader.DictOffset, SeekOrigin.Begin);
             long dictEnd = sourceEdataHeader.DictOffset + sourceEdataHeader.DictLength;
             uint id = 0;
 
-            //Odtworzenie słownika?
+            //Odtworzenie słownika
             while (target.Position < dictEnd)
             {
                 //Cancel if requested;
@@ -204,8 +233,7 @@ namespace WargameModInstaller.Infrastructure.Edata
 
                 if (fileGroupId == 0)
                 {
-                    EdataContentFile curFile = edataFile.ContentFiles
-                        .Single(x => x.Id == id);
+                    EdataContentFile curFile = contentFilesDict[id];
 
                     // FileEntrySize
                     target.Seek(4, SeekOrigin.Current);
@@ -250,12 +278,33 @@ namespace WargameModInstaller.Infrastructure.Edata
             target.Write(dirCheckSum, 0, dirCheckSum.Length);
         }
 
+        protected long GetSpaceSizeForFile(EdataContentFile file)
+        {
+            long contentSize = file.IsContentLoaded ? file.ContentSize : file.Size;
+
+            long contentSizeSupplTo16 = MathUtilities.SupplementTo(contentSize, 16);
+
+            double spaceToSizeCoeff = 0.002;
+
+            long spaceSize = (long)(contentSize * spaceToSizeCoeff);
+            spaceSize = MathUtilities.RoundUpToMultiple(spaceSize, 16);
+            spaceSize = MathUtilities.Clamp(spaceSize, MinBytesBetweenFiles, MaxBytesBetweenFiles);
+            //If space size + contentSizeSupplement is bigger than Max, subtracting 16 is enough, bcos
+            //contentSizeSupplement wont be never bigger than 16.
+            spaceSize = (spaceSize + contentSizeSupplTo16 > MaxBytesBetweenFiles) ?
+                spaceSize + contentSizeSupplTo16 - 16 :
+                spaceSize + contentSizeSupplTo16;
+
+            return spaceSize;
+        }
+
         protected bool CanUseReplacementWrite(EdataFile file)
         {
             //long minDistance = GetMinDistanceBetweenFiles(file);
             //long maxDistance = GetMaxDistanceBetweenFiles(file);
             //double averageDistance = GetAverageDistanceBetweenFiles(file);
             //double meanRelativeDistance = GetAverageDistanceRelativeToSizeBetweenFiles(file);
+            //bool areOffsets16Based = AreOffsets16Based(file);
 
             //chyba zbedne to sotrtowaie...
             var contentFiles = file.ContentFiles
@@ -282,7 +331,7 @@ namespace WargameModInstaller.Infrastructure.Edata
                 else
                 {
                     if ((currentFile.TotalOffset + currentFile.ContentSize + MinBytesBetweenFiles) >= 
-                        (file.Header.FileOffset + file.Header.FileLengh))
+                        (file.Header.FileOffset + file.Header.FileLenght))
                     {
                         return false;
                     }
@@ -292,7 +341,37 @@ namespace WargameModInstaller.Infrastructure.Edata
             return true;
         }
 
+        private byte[] GetNewBufferIfNeeded(byte[] orginalBuffer, long newSize)
+        {
+            bool needNewBuffer = (orginalBuffer == null) || (newSize > orginalBuffer.Length);
+            if (needNewBuffer)
+            {
+                return new byte[newSize];
+            }
+            else
+            {
+                return orginalBuffer;
+            }
+        }
+
         #region Temp Helpers
+
+        private bool AreOffsets16Based(EdataFile ef)
+        {
+            var contentFiles = ef.ContentFiles.ToArray();
+
+            for (int i = 0; i < contentFiles.Length; ++i)
+            {
+                var currentFile = contentFiles[i];
+                if ((currentFile.TotalOffset % 16) != 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         private long GetMinDistanceBetweenFiles(EdataFile ef)
         {
             var contentFiles = ef.ContentFiles.ToArray();

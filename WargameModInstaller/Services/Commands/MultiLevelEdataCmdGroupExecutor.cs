@@ -10,6 +10,7 @@ using WargameModInstaller.Infrastructure.Content;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Services.Edata;
 
 namespace WargameModInstaller.Services.Commands
 {
@@ -37,42 +38,55 @@ namespace WargameModInstaller.Services.Commands
             String rootContentPath = CommandGroup.CommonMultiLevelEdataPath.Parts.FirstOrDefault();
             if (rootContentPath == null)
             {
-                throw new CmdExecutionFailedException("Invalid command's TargetContentPath value.");
+                throw new CmdExecutionFailedException("Command's TargetContentPath doesn't contain any proper content path part.");
             }
 
             CurrentStep = 0;
 
-            //Update, wszyskite laduja na dysku, tak bedzie najbezpieczniej jednak.
-            //Teraz tylko wyzwolić pojedyncze command executory od tego całęgo bajzlu, zagniezdzonymi pakietami, 
-            //poprostu wrócić do sytuacji z przed dodania tego, maja świadomośc tylko ostaniego edata i chu ich obchodzi reszta.
-
-            //Pozatym wypadało by zoragnizować jakąś liste może tych edata odczytanych w ten poniższy spsoób, zeby nie robić teog pozniej 2 raz.
-            //Wazne zeby kazdy znich miał czysty content, nie był wirtualny a odnosił sie do konkretnego pliku na dysku.
-
-            List<String> temporaryCreatedEdatas;
-            Stack<EdataHierarchyEntity> edataHierarchy;
-
-            UnrollEdatas(targetfullPath, out temporaryCreatedEdatas, out edataHierarchy);
-
-            var newExecutionContext = new SharedEdataCmdExecutionContext(
-                context.InstallerSourceDirectory,
-                context.InstallerTargetDirectory,
-                edataHierarchy.Peek().EdataFile);
-
-            foreach (var executor in CommandExecutors)
+            List<String> temporaryCreatedEdatas = null;
+            try
             {
-                executor.Execute(newExecutionContext, token.Value);
+                Stack<EdataHierarchyEntity> edataHierarchy = null;
+
+                //Tu wciąż brak komunikatu co się dzieje, tak więc wciąz jest wyświetlany poprzedni
+                //czyli backup lub initialization jeśli ta komenda jest pierwszą.
+                UnrollEdatas(targetfullPath, out temporaryCreatedEdatas, out edataHierarchy);
+
+                var lastEdataFile = edataHierarchy.Peek().EdataFile;
+
+                var newExecutionContext = new SharedEdataCmdExecutionContext(
+                    context.InstallerSourceDirectory,
+                    context.InstallerTargetDirectory,
+                    lastEdataFile);
+
+                //Interesuje nas tylko ostatni, bo to jego content bedzie ładowany, reszta jest tylko rozwinieta na dysk
+                //ale nia ma załadowane wiecej jak jeden plik
+                EdataContentManager edataContentManager = new EdataContentManager(lastEdataFile);
+                edataContentManager.MaxLoadedContentReached += (sender, args) =>
+                {
+                    SaveEdataChanges(lastEdataFile, token);
+                    edataContentManager.FreeLoadedContent();
+                };
+
+                foreach (var executor in CommandExecutors)
+                {
+                    executor.Execute(newExecutionContext, token.Value);
+                }
+
+                CurrentStep++;
+                CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.CommonEdataPath);
+
+                RollEdatas(edataHierarchy, token);
             }
-
-            CurrentStep++;
-            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.CommonEdataPath);
-
-            RollEdatas(edataHierarchy, token);
-
-            foreach (var tmpEdata in temporaryCreatedEdatas)
+            finally
             {
-                //To do: W przypadku wyjątku nie jest zapewnionie, że te pliki zostane usuniętę;
-                File.Delete(tmpEdata);
+                if (temporaryCreatedEdatas != null)
+                {
+                    foreach (var tmpEdata in temporaryCreatedEdatas)
+                    {
+                        File.Delete(tmpEdata);
+                    }
+                }
             }
 
             //Set max, completed
@@ -96,7 +110,8 @@ namespace WargameModInstaller.Services.Commands
 
             foreach (var edataPath in CommandGroup.CommonMultiLevelEdataPath.Parts)
             {
-                var contentFile = GetEdataContentFileByPath(edataHierarchy.Peek().EdataFile, edataPath);
+                var edataFile = edataHierarchy.Peek().EdataFile;
+                var contentFile = edataFile.GetContentFileByPath(edataPath);
                 if (contentFile.FileType == EdataContentFileType.Package)
                 {
                     var content = edataFileReader.ReadContent(contentFile);
@@ -128,24 +143,34 @@ namespace WargameModInstaller.Services.Commands
                 edataFileWriter.Write(currentEntity.EdataFile, token.Value);
                 if (parentEntity != null)
                 {
-                    var holdingFileOfParentEdata = GetEdataContentFileByPath(parentEntity.EdataFile, currentEntity.OwnerPath);
+                    //var holdingFileOfParentEdata = GetEdataContentFileByPath(parentEntity.EdataFile, currentEntity.OwnerPath);
+
+                    var holdingFileOfParentEdata = parentEntity.EdataFile.GetContentFileByPath(currentEntity.OwnerPath);
                     holdingFileOfParentEdata.Content = contentFileReader.Read(currentEntity.EdataFile.Path);
                 }
             }
         }
 
-        protected EdataContentFile GetEdataContentFileByPath(EdataFile edataFile, String edataContentPath)
+        private void SaveEdataChanges(EdataFile edataFile, CancellationToken? token = null)
         {
-            var edataContentFile = edataFile.ContentFiles.FirstOrDefault(f => f.Path == edataContentPath);
-            if (edataContentFile == null)
-            {
-                throw new CmdExecutionFailedException(
-                    String.Format("Cannot load \"{0}\"", edataContentPath),
-                    String.Format(Properties.Resources.ContentFileNotFoundParametrizedMsg, edataContentPath));
-            }
+            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.CommonEdataPath);
 
-            return edataContentFile;
+            IEdataFileWriter edataWriter = new EdataFileWriter();
+            edataWriter.Write(edataFile, token.Value);
         }
+
+        //protected EdataContentFile GetEdataContentFileByPath(EdataFile edataFile, String edataContentPath)
+        //{
+        //    var edataContentFile = edataFile.ContentFiles.FirstOrDefault(f => f.Path == edataContentPath);
+        //    if (edataContentFile == null)
+        //    {
+        //        throw new CmdExecutionFailedException(
+        //            String.Format("Cannot load \"{0}\"", edataContentPath),
+        //            String.Format(Properties.Resources.ContentFileNotFoundParametrizedMsg, edataContentPath));
+        //    }
+
+        //    return edataContentFile;
+        //}
 
         #region Nested Class EdataHierarchyEntity
 

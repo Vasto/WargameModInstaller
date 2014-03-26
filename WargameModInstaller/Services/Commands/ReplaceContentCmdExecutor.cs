@@ -52,8 +52,7 @@ namespace WargameModInstaller.Services.Commands
                 GetEdataFromContext(context) :
                 edataFileReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowe
 
-            //First one contnet is from the edata on hdd, so needs to be loaded explicitly.
-            EdataContentFile contentFile = GetEdataContentFileByPath(contentOwningEdata, contentPath);
+            EdataContentFile contentFile = contentOwningEdata.GetContentFileByPath(contentPath);
             if (!contentFile.IsContentLoaded)
             {
                 edataFileReader.LoadContent(contentFile);

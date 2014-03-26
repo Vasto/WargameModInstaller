@@ -15,6 +15,5 @@ namespace WargameModInstaller.Infrastructure.Edata
         byte[] ReadContent(EdataContentFile file);
         void LoadContent(EdataContentFile file);
         void LoadContent(IEnumerable<EdataContentFile> files);
-        void LoadNotLoadedContent(EdataFile edataFile);
     }
 }

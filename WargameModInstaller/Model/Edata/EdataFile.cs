@@ -7,6 +7,8 @@ namespace WargameModInstaller.Model.Edata
 {
     public class EdataFile
     {
+        private IDictionary<String, EdataContentFile> contentFilesDictionary;
+
         /// <summary>
         /// Creates an instance of EdataFile which doesn't reefer to any physical Edata file.
         /// </summary>
@@ -19,7 +21,7 @@ namespace WargameModInstaller.Model.Edata
         {
             this.Header = header;
             this.PostHeaderData = postHeaderData;
-            this.ContentFiles = contentFiles;
+            this.contentFilesDictionary = contentFiles.ToDictionary(x => x.Path);
             this.IsVirtual = true;
 
             AssignOwnership(this.ContentFiles);
@@ -40,7 +42,7 @@ namespace WargameModInstaller.Model.Edata
             this.Path = path;
             this.Header = header;
             this.PostHeaderData = postHeaderData;
-            this.ContentFiles = contentFiles;
+            this.contentFilesDictionary = contentFiles.ToDictionary(x => x.Path);
             this.IsVirtual = false;
 
             AssignOwnership(this.ContentFiles);
@@ -89,8 +91,24 @@ namespace WargameModInstaller.Model.Edata
 
         public IEnumerable<EdataContentFile> ContentFiles
         {
-            get;
-            private set;
+            get
+            {
+                return contentFilesDictionary.Values;
+            }
+        }
+
+        public EdataContentFile GetContentFileByPath(String contentPath)
+        {
+            EdataContentFile result;
+            if (contentFilesDictionary.TryGetValue(contentPath, out result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new InvalidOperationException(
+                    String.Format(Properties.Resources.ContentFileNotFoundParametrizedMsg, contentPath));
+            }
         }
 
         protected void AssignOwnership(IEnumerable<EdataContentFile> contentFiles)

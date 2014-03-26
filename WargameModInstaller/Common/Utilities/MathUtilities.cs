@@ -18,9 +18,33 @@ namespace WargameModInstaller.Common.Utilities
         /// <returns>Wartośc przycięta do przedziału.</returns>
         public static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
         {
-            if (value.CompareTo(min) < 0) return min;
-            else if (value.CompareTo(max) > 0) return max;
-            else return value;
+            if (value.CompareTo(min) < 0) 
+                return min;
+            else if (value.CompareTo(max) > 0) 
+                return max;
+            else 
+                return value;
         }
+
+        public static long SupplementTo(long value, long supplement)
+        {
+            return (supplement - (value % supplement));
+        }
+
+        public static int SupplementTo(int value, int supplement)
+        {
+            return (supplement - (value % supplement));
+        }
+
+        public static long RoundUpToMultiple(long value, long multiple)
+        {
+            return (multiple - (value % multiple)) + value;
+        }
+
+        public static int RoundUpToMultiple(int value, int multiple)
+        {
+            return (multiple - (value % multiple)) + value;
+        }
+
     }
 }

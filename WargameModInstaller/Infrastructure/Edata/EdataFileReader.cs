@@ -71,25 +71,6 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
         }
 
-        public void LoadNotLoadedContent(EdataFile edataFile)
-        {
-            if (!File.Exists(edataFile.Path))
-            {
-                throw new IOException(String.Format("Edata file '{0}' doesn't exist.", edataFile.Path));
-            }
-
-            using (FileStream stream = File.OpenRead(edataFile.Path))
-            {
-                foreach (var cf in edataFile.ContentFiles)
-                {
-                    if (!cf.IsContentLoaded)
-                    {
-                        cf.Content = ReadContent(stream, cf.TotalOffset, cf.Size);
-                    }
-                }
-            }
-        }
-
         /// <remarks>
         /// Method based on enohka's code.
         /// See more at: http://github.com/enohka/moddingSuite

@@ -7,28 +7,41 @@ using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Services.Edata
 {
-    //Dodać jeszcze jakiąś funkcjonalnośc odpowiadajaca ze ocene czy plik nadaje sie do monitorowanie.
-    //coś typu minimlany wyamgany rozmiar aby zacząć go monitorować
     public class EdataContentManager
     {
-        public EdataContentManager(EdataFile file) : this(file, 0)
+        public EdataContentManager(IEnumerable<EdataContentFile> contentFiles)
+            : this(contentFiles, 838860800) //800MB
         {
         }
 
-        public EdataContentManager(EdataFile file, long maxLoadedContentBytes)
+        public EdataContentManager(EdataFile edataFile)
+            : this(edataFile.ContentFiles)
         {
-            this.MenagedFile = file;
+        }
+
+        public EdataContentManager(IEnumerable<EdataContentFile> contentFiles, long maxLoadedContentBytes)
+        {
+            this.MenagedFiles = contentFiles;
             this.MaxLoadedContentBytes = maxLoadedContentBytes;
 
-            if(true /*if is total size of content files can be bigger then maxLoadedContentBytes */)
+            //This is not an ideal solution, because the total siez of loaded content can change
+            //when assigning a bigger new content, not just loading old one... Though it only can cause problems on borderline situations
+            //where the possilbe max size of loaded content is quite close to the maxLoadedContentBytes.
+            long possilbeTotalSizeOfLoadedContent = DeterminePossibleTotalSize(contentFiles);
+            if (possilbeTotalSizeOfLoadedContent > maxLoadedContentBytes)
             {
-                RegisterForContentLoadedEvent(file.ContentFiles);
+                RegisterForContentLoadedEvent(contentFiles);
             }
+        }
+
+        public EdataContentManager(EdataFile edataFile, long maxLoadedContentBytes)
+            : this (edataFile.ContentFiles, maxLoadedContentBytes)
+        {
         }
 
         public event EventHandler MaxLoadedContentReached;
 
-        public EdataFile MenagedFile
+        public IEnumerable<EdataContentFile> MenagedFiles
         {
             get;
             private set;
@@ -43,7 +56,7 @@ namespace WargameModInstaller.Services.Edata
         public bool IsMaxLoadedContentReached()
         {
             long totalLoadedContentBytes = 0;
-            foreach (var cf in MenagedFile.ContentFiles)
+            foreach (var cf in MenagedFiles)
             {
                 if (cf.IsContentLoaded)
                 {
@@ -61,7 +74,7 @@ namespace WargameModInstaller.Services.Edata
 
         public void FreeLoadedContent()
         {
-            foreach (var cf in MenagedFile.ContentFiles)
+            foreach (var cf in MenagedFiles)
             {
                 if (cf.IsContentLoaded)
                 {
@@ -79,9 +92,42 @@ namespace WargameModInstaller.Services.Edata
             }
         }
 
+        /// <summary>
+        /// Determines a possible total size of a content in the given content files collectin.
+        /// </summary>
+        /// <param name="contentFiles"></param>
+        /// <returns></returns>
+        private long DeterminePossibleTotalSize(IEnumerable<EdataContentFile> contentFiles)
+        {
+            long totalSize = 0;
+            foreach (var cf in contentFiles)
+            {
+                totalSize += (cf.IsContentLoaded ? cf.ContentSize : cf.Size);
+            }
+
+            return totalSize;
+        }
+
         private void RegisterForContentLoadedEvent(IEnumerable<EdataContentFile> contentFiles)
         {
+            foreach (var cf in contentFiles)
+            {
+                cf.ContentLoaded += ContentFileContentLoadedHandler;
+            }
         }
+
+        private void ContentFileContentLoadedHandler(object sender, EventArgs e)
+        {
+            if(IsMaxLoadedContentReached())
+            {
+                var handler = MaxLoadedContentReached;
+                if (handler != null)
+                {
+                    handler(this, new EventArgs());
+                }
+            }
+        }
+
 
     }
 }

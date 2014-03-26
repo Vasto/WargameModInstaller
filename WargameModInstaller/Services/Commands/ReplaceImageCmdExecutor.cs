@@ -58,7 +58,7 @@ namespace WargameModInstaller.Services.Commands
                 GetEdataFromContext(context) :
                 edataFileReader.Read(targetfullPath, false);
 
-            EdataContentFile contentFile = GetEdataContentFileByPath(contentOwningEdata, contentPath);
+            EdataContentFile contentFile = contentOwningEdata.GetContentFileByPath(contentPath);
             if (!contentFile.IsContentLoaded)
             {
                 edataFileReader.LoadContent(contentFile);

@@ -20,19 +20,6 @@ namespace WargameModInstaller.Services.Commands
 
         }
 
-        protected EdataContentFile GetEdataContentFileByPath(EdataFile edataFile, String edataContentPath)
-        {
-            var edataContentFile = edataFile.ContentFiles.FirstOrDefault(f => f.Path == edataContentPath);
-            if (edataContentFile == null)
-            {
-                throw new CmdExecutionFailedException(
-                    String.Format("Cannot load \"{0}\"", edataContentPath),
-                    String.Format(WargameModInstaller.Properties.Resources.ContentFileNotFoundParametrizedMsg, edataContentPath));
-            }
-
-            return edataContentFile;
-        }
-
         protected TgvImage GetTgvFromDDS(String sourceFullPath)
         {
             ITgvFileReader tgvReader = new TgvDDSReader();
