@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +16,13 @@ using System.Windows.Shapes;
 namespace WargameModInstaller.Views
 {
     /// <summary>
-    /// Interaction logic for InstallWelcomeView.xaml
+    /// Interaction logic for InstallComponentScreenView.xaml
     /// </summary>
-    public partial class InstallWelcomeView : UserControl
+    public partial class InstallComponentScreenView : UserControl
     {
-        public InstallWelcomeView()
+        public InstallComponentScreenView()
         {
             InitializeComponent();
         }
-
     }
 }

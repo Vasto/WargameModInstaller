@@ -14,6 +14,7 @@ namespace WargameModInstaller.Model.Config
         public static readonly ScreenSettingsEntryType InstallCompletedScreen = new ScreenSettingsEntryType(4, "InstallCompletedScreen");
         public static readonly ScreenSettingsEntryType InstallFailedScreen = new ScreenSettingsEntryType(5, "InstallFailedScreen");
         public static readonly ScreenSettingsEntryType InstallCanceledScreen = new ScreenSettingsEntryType(7, "InstallCanceledScreen");
+        public static readonly ScreenSettingsEntryType ComponentSelectionScreen = new ScreenSettingsEntryType(8, "ComponentSelectionScreen");
 
         protected ScreenSettingsEntryType(int value, String entryName)
             : base(value, entryName)

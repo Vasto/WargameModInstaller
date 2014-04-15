@@ -56,17 +56,19 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 XDocument configFile = XDocument.Load(filePath);
                 XElement rootElement = configFile.XPathSelectElement(installCommandsElementPath);
-                if (rootElement != null)
+                if (rootElement == null)
                 {
-                    foreach (var cmdQuery in ReadingQueries.Values)
-                    {
-                        var queryResult = cmdQuery(rootElement);
-                        cmds.AddRange(queryResult);
-                    }
-
-                    int id = 0;
-                    cmds.ForEach(cmd => cmd.Id = id++);
+                    return cmds;
                 }
+
+                foreach (var cmdQuery in ReadingQueries.Values)
+                {
+                    var queryResult = cmdQuery(rootElement);
+                    cmds.AddRange(queryResult);
+                }
+
+                int id = 0;
+                cmds.ForEach(cmd => cmd.Id = id++);
             }
             catch (XmlException ex)
             {
@@ -79,13 +81,54 @@ namespace WargameModInstaller.Infrastructure.Commands
         }
 
         /// <summary>
-        /// Reads install command entires of a specified type.
+        /// Reads all install command entires.
         /// </summary>
         /// <param name="filePath"></param>
+        /// <param name="components"></param>
         /// <returns></returns>
-        public virtual IEnumerable<IInstallCmd> Read(String file, CmdEntryType entryType)
+        public IEnumerable<IInstallCmd> ReadAll(String filePath, IEnumerable<String> components)
         {
-            throw new NotImplementedException();
+            var cmds = new List<IInstallCmd>();
+            try
+            {
+                XDocument configFile = XDocument.Load(filePath);
+                XElement rootElement = configFile.XPathSelectElement(installCommandsElementPath);
+                if (rootElement == null)
+                {
+                    return cmds;
+                }
+
+                var cmdParentElements = new List<XElement>();
+                var componentsNames = new HashSet<String>(components);
+                foreach (var name in componentsNames)
+                {
+                    var element = rootElement.XPathSelectElement(String.Format("//*[@name=\"{0}\"]", name));
+                    if (element != null)
+                    {
+                        cmdParentElements.Add(element);
+                    }
+                }
+
+                foreach (var element in cmdParentElements)
+                {
+                    foreach (var cmdQuery in ReadingQueries.Values)
+                    {
+                        var queryResult = cmdQuery(element);
+                        cmds.AddRange(queryResult);
+                    }
+                }
+
+                int id = 0;
+                cmds.ForEach(cmd => cmd.Id = id++);
+            }
+            catch (XmlException ex)
+            {
+                WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+
+                throw;
+            }
+
+            return cmds;
         }
 
         /// <summary>
@@ -96,42 +139,64 @@ namespace WargameModInstaller.Infrastructure.Commands
         public virtual IEnumerable<ICmdGroup> ReadGroups(String filePath)
         {
             var cmdGroupsList = new List<ICmdGroup>();
+            var cmdsList = ReadAll(filePath).ToList();
 
             try
             {
-                XDocument configFile = XDocument.Load(filePath);
-                XElement rootElement = configFile.XPathSelectElement(installCommandsElementPath);
-                if (rootElement != null)
-                {
-                    var cmds = new List<IInstallCmd>();
-                    foreach (var cmdQuery in ReadingQueries.Values)
-                    {
-                        var queryResult = cmdQuery(rootElement);
-                        cmds.AddRange(queryResult);
-                    }
+                cmdGroupsList = CreateCommandGroups(cmdsList);
 
-                    int id = 0;
-                    cmds.ForEach(cmd => cmd.Id = id++);
-
-                    foreach (var rule in GroupProductionRules)
-                    {
-                        var group = rule.ProduceGroup(cmds);
-                        foreach (var grp in group)
-                        {
-                            cmds.RemoveAll(cmd => grp.Commands.Contains(cmd)); // Do zastąpienia przez hasz set
-                        }
-
-                        cmdGroupsList.AddRange(group);
-                    }
-
-                    cmdGroupsList.OrderByDescending(group => group.Priority);
-                }
+                cmdGroupsList.OrderByDescending(group => group.Priority);
             }
             catch (XmlException ex)
             {
                 WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
 
                 throw;
+            }
+
+            return cmdGroupsList;
+        }
+
+        /// <summary>
+        /// Reads all install comand entries and groups them if possible.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="components"></param>
+        /// <returns></returns>
+        public IEnumerable<ICmdGroup> ReadGroups(String filePath, IEnumerable<String> components)
+        {
+            var cmdGroupsList = new List<ICmdGroup>();
+            var cmdsList = ReadAll(filePath, components).ToList();
+
+            try
+            {
+                cmdGroupsList = CreateCommandGroups(cmdsList);
+
+                cmdGroupsList.OrderByDescending(group => group.Priority);
+            }
+            catch (XmlException ex)
+            {
+                WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+
+                throw;
+            }
+
+            return cmdGroupsList;
+        }
+
+        protected List<ICmdGroup> CreateCommandGroups(List<IInstallCmd> cmdsList)
+        {
+            var cmdGroupsList = new List<ICmdGroup>();
+
+            foreach (var rule in GroupProductionRules)
+            {
+                var group = rule.ProduceGroup(cmdsList);
+                foreach (var grp in group)
+                {
+                    cmdsList.RemoveAll(cmd => grp.Commands.Contains(cmd)); // Do zastąpienia przez hasz set
+                }
+
+                cmdGroupsList.AddRange(group);
             }
 
             return cmdGroupsList;
@@ -242,7 +307,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         {
             var result = new List<CopyModFileCmd>();
 
-            var cmdElementsCollection = source.Elements(CmdEntryType.CopyModFile.Name);//zastapić to przez entry name 
+            var cmdElementsCollection = source.Elements(CmdEntryType.CopyModFile.Name);
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();

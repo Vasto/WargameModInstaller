@@ -324,7 +324,7 @@ namespace WargameModInstaller.Properties {
         ///
         ///If the following location is not your $WargameVersion installation directory, please specify a correct one by clicking Browse.
         ///
-        ///Click Install to start the installation..
+        /// Click Next when you are ready to continue..
         /// </summary>
         internal static string LocationScreenDetail {
             get {
@@ -338,6 +338,42 @@ namespace WargameModInstaller.Properties {
         internal static string LocationScreenHeader {
             get {
                 return ResourceManager.GetString("LocationScreenHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the components you want to install. Click Install to start the installation..
+        /// </summary>
+        internal static string ModuleScreenDetail {
+            get {
+                return ResourceManager.GetString("ModuleScreenDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Components.
+        /// </summary>
+        internal static string ModuleScreenHeader {
+            get {
+                return ResourceManager.GetString("ModuleScreenHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no components selected for installation. There has to be at least one component selected to proceed..
+        /// </summary>
+        internal static string NoComponentsSelectedDetail {
+            get {
+                return ResourceManager.GetString("NoComponentsSelectedDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No components selected.
+        /// </summary>
+        internal static string NoComponentsSelectedHeader {
+            get {
+                return ResourceManager.GetString("NoComponentsSelectedHeader", resourceCulture);
             }
         }
         

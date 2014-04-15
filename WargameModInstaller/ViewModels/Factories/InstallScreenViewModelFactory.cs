@@ -30,18 +30,20 @@ namespace WargameModInstaller.ViewModels.Factories
             this.kernel = kernel;
         }
 
-        public InstallScreenViewModelBase Create(Type screenType)
+        public IInstallScreen Create(Type screenType)
         {
-            return (InstallScreenViewModelBase)kernel.Get(screenType);
+            return (IInstallScreen)kernel.Get(screenType);
         }
 
-        public T Create<T>() where T : InstallScreenViewModelBase
+        public T Create<T>() where T : IInstallScreen
         {
             return kernel.Get<T>();
         }
 
-        public InstallScreenViewModelBase Create(Type screenType, String header, String description)
+        public IInstallScreen Create(Type screenType, String header, String description)
         {
+            //Now since changed to IInstallScreen, there is no guarantee that the header, description params constructor exists,
+            //So the following code isn't the most appropriate  one.
             var construcotor = screenType.GetConstructor(new[] { typeof(string), typeof(string) });
             if (construcotor != null)
             {
@@ -50,7 +52,7 @@ namespace WargameModInstaller.ViewModels.Factories
                     .Where(p => (p.Name == "header") || (p.Name == "description"))
                     .Count() == 2)
                 {
-                    return (InstallScreenViewModelBase)kernel.Get(
+                    return (IInstallScreen)kernel.Get(
                         screenType,
                         new ConstructorArgument("header", header),
                         new ConstructorArgument("description", description));
@@ -64,7 +66,7 @@ namespace WargameModInstaller.ViewModels.Factories
             return newInstallScreen;
         }
 
-        public T Create<T>(String header, String description) where T : InstallScreenViewModelBase
+        public T Create<T>(String header, String description) where T : IInstallScreen
         {
             Type type = typeof(T);
             var construcotor = type.GetConstructor(new[] { typeof(string), typeof(string) });

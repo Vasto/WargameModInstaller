@@ -45,6 +45,13 @@
           <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
         </LocationScreen>
 
+        <!--Allows to customize the installation component selection screen.-->
+        <ComponentSelectionScreen>
+          <!--<Header Text="Here goes your text"/>-->
+          <!--<Description Text="Here goes your text"/>-->
+          <!--<BackgroundImage Path="MyBackgroundDirectory\MyBackgroundFile.jpg"/>-->
+        </ComponentSelectionScreen>
+        
         <!--Allows to customize the installation progress screen.-->
         <ProgressScreen>
           <!--<Header Text="Here goes your text"/>-->

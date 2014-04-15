@@ -58,18 +58,23 @@ namespace WargameModInstaller.ViewModels
             var locationScreen = installScreenFactory.Create<InstallLocationViewModel>();
             this.Items.Add(locationScreen);
 
+            var moduleScreen = installScreenFactory.Create<InstallComponentScreenViewModel>();
+            this.Items.Add(moduleScreen);
+
             var progressScreen = installScreenFactory.Create<InstallProgressViewModel>();
             this.Items.Add(progressScreen);
 
             welcomeScreen.NextScreen = locationScreen;
             locationScreen.PreviousScreen = welcomeScreen;
-            locationScreen.NextScreen = progressScreen;
-            progressScreen.PreviousScreen = locationScreen;
+            locationScreen.NextScreen = moduleScreen;
+            moduleScreen.PreviousScreen = locationScreen;
+            moduleScreen.NextScreen = progressScreen;
+            progressScreen.PreviousScreen = moduleScreen;
         }
 
         public void Handle(NextScreenMessage message)
         {
-            var sender = message.Source as InstallScreenViewModelBase;
+            var sender = message.Source as IInstallScreen;
             if (sender != null)
             {
                 if (sender.NextScreen != null)
@@ -81,7 +86,7 @@ namespace WargameModInstaller.ViewModels
 
         public void Handle(PreviousScreenMessage message)
         {
-            var sender = message.Source as InstallScreenViewModelBase;
+            var sender = message.Source as IInstallScreen;
             if (sender != null)
             {
                 if (sender.PreviousScreen != null)

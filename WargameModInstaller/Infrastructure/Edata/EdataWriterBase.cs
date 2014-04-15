@@ -300,11 +300,11 @@ namespace WargameModInstaller.Infrastructure.Edata
 
         protected bool CanUseReplacementWrite(EdataFile file)
         {
-            //long minDistance = GetMinDistanceBetweenFiles(file);
-            //long maxDistance = GetMaxDistanceBetweenFiles(file);
-            //double averageDistance = GetAverageDistanceBetweenFiles(file);
-            //double meanRelativeDistance = GetAverageDistanceRelativeToSizeBetweenFiles(file);
-            //bool areOffsets16Based = AreOffsets16Based(file);
+            long minDistance = GetMinDistanceBetweenFiles(file);
+            long maxDistance = GetMaxDistanceBetweenFiles(file);
+            double averageDistance = GetAverageDistanceBetweenFiles(file);
+            double meanRelativeDistance = GetAverageDistanceRelativeToSizeBetweenFiles(file);
+            bool areOffsets16Based = AreOffsets16Based(file);
 
             //chyba zbedne to sotrtowaie...
             var contentFiles = file.ContentFiles

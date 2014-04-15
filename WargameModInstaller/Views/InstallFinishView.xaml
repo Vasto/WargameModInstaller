@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:attached="clr-namespace:WargameModInstaller.Views.Attached"
              mc:Ignorable="d" 
              d:DesignHeight="480" d:DesignWidth="768">
 
@@ -67,6 +68,7 @@
                         Style="{StaticResource NavigationButton}"/>
                 <Button x:Name="Finish"
                         Content="Finish"
+                        attached:FrameworkElementAttachedBehavior.FocusWhenLoaded="True"
                         Margin="10, 0, 0, 0"
                         Style="{StaticResource NavigationButton}"/>
             </StackPanel>

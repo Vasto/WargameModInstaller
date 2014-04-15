@@ -116,7 +116,7 @@ namespace WargameModInstaller.ViewModels
 
             EventAggregator.Publish(new NextScreenMessage(this));
 
-            installer.InstallAsync();
+            //installer.InstallAsync();
         }
 
     }

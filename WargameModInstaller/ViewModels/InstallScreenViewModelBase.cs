@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Services.Config;
 using WargameModInstaller.Services.Utilities;
 using WargameModInstaller.ViewModels.Messages;
@@ -22,7 +23,6 @@ namespace WargameModInstaller.ViewModels
         private bool canNext;
         private bool canBack;
         private bool canCancel;
-        private String version;
 
         /// <summary>
         /// 
@@ -38,8 +38,6 @@ namespace WargameModInstaller.ViewModels
             this.EventAggregator = eventAggeregator;
             this.MessageService = messageService;
             this.SettingsProvider = settingsProvider;
-
-            this.version = GetVerison();
         }
 
 
@@ -159,7 +157,7 @@ namespace WargameModInstaller.ViewModels
         {
             get
             {
-                return version;
+                return MiscUtilities.GetAssemblyVerison();
             }
         }
 
@@ -214,17 +212,7 @@ namespace WargameModInstaller.ViewModels
             CanNext = NextScreen != null;
         }
 
-        private String GetVerison()
-        {
-            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-            String versionString = "Version: " +
-                version.Major.ToString() + "." +
-                version.Minor.ToString() + "." +
-                version.Build.ToString() + "." +
-                version.Revision.ToString();
 
-            return versionString;
-        }
 
         ///// <summary>
         ///// Called when the setup is canceling.

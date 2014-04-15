@@ -2,7 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:attached="clr-namespace:WargameModInstaller.Views.Attached"
              mc:Ignorable="d" 
              d:DesignHeight="480" d:DesignWidth="768">
 
@@ -84,7 +85,8 @@
                         Content="Back"
                         Style="{StaticResource NavigationButton}"/>
                 <Button x:Name="Next"
-                        Content="Install"
+                        Content="Next"
+                        attached:FrameworkElementAttachedBehavior.FocusWhenLoaded="True"
                         Style="{StaticResource NavigationButton}"/>
                 <Button x:Name="Cancel"
                         Content="Cancel"

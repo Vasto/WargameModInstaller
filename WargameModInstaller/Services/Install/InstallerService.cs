@@ -123,6 +123,16 @@ namespace WargameModInstaller.Services.Install
         }
 
         /// <summary>
+        /// Gets or sets the list of names of compomenent which are going to be installed, 
+        /// during the isntalltion run.
+        /// </summary>
+        public IEnumerable<String> ComponentsToInstall
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Starts the installation process.
         /// </summary>
         public async void InstallAsync()
@@ -342,7 +352,15 @@ namespace WargameModInstaller.Services.Install
 
                 var configFilePath = ConfigFileLocator.GetConfigFilePath();
 
-                var commandGroups = installCommandsReader.ReadGroups(configFilePath);
+                IEnumerable<ICmdGroup> commandGroups = null;
+                if (ComponentsToInstall != null)
+                {
+                    commandGroups = installCommandsReader.ReadGroups(configFilePath, ComponentsToInstall);
+                }
+                else
+                {
+                    commandGroups = installCommandsReader.ReadGroups(configFilePath);
+                }
                 var commandGroupsExecutors = CreateCommandGroupsExecutors(commandGroups);
 
                 var progressProvidingExecutors = GetProgressProvidingExecutors(commandGroupsExecutors);

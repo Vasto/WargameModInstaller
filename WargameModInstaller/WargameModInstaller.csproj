@@ -103,10 +103,12 @@
     <Compile Include="Infrastructure\Commands\IInstallCmdReader.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Infrastructure\Components\ComponentReader.cs" />
     <Compile Include="Infrastructure\Content\ContentFileReader.cs" />
     <Compile Include="Infrastructure\Content\ContentFileWriter.cs" />
     <Compile Include="Infrastructure\Content\IContentFileReader.cs" />
     <Compile Include="Infrastructure\Content\IContentFileWriter.cs" />
+    <Compile Include="Infrastructure\Components\IComponentsReader.cs" />
     <Compile Include="Model\Commands\CmdEntryType.cs" />
     <Compile Include="Model\Commands\IHasTargetContent.cs" />
     <Compile Include="Model\Commands\MultiLevelEdataCmdGroup.cs" />
@@ -127,6 +129,8 @@
     <Compile Include="Infrastructure\Image\ITgvBinReader.cs" />
     <Compile Include="Infrastructure\Image\ITgvBinWriter.cs" />
     <Compile Include="Model\Config\WargameVersionType.cs" />
+    <Compile Include="Model\Components\Component.cs" />
+    <Compile Include="Model\Components\ComponentType.cs" />
     <Compile Include="Model\WMIEntryType.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileReader.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileWriter.cs" />
@@ -213,6 +217,7 @@
     <Compile Include="Common\Utilities\Image\TGV\TgvUtilities.cs" />
     <Compile Include="Common\Utilities\MiscUtilities.cs" />
     <Compile Include="Common\Utilities\PathUtilities.cs" />
+    <Compile Include="ViewModels\ComponentViewModel.cs" />
     <Compile Include="ViewModels\Factories\IInstallScreenViewModelFactory.cs" />
     <Compile Include="ViewModels\Factories\InstallScreenViewModelFactory.cs" />
     <Compile Include="ViewModels\IInstallScreen.cs" />
@@ -227,13 +232,18 @@
     <Compile Include="ViewModels\InstallLocationViewModel.cs" />
     <Compile Include="ViewModels\InstallScreenViewModelBase.cs" />
     <Compile Include="ViewModels\Messages\Message.cs" />
+    <Compile Include="ViewModels\InstallComponentScreenViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="ViewModels\InstallWelcomeViewModel.cs" />
+    <Compile Include="Views\Attached\FrameworkElementAttachedBehavior.cs" />
     <Compile Include="Views\InstallFinishView.xaml.cs">
       <DependentUpon>InstallFinishView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\InstallLocationView.xaml.cs">
       <DependentUpon>InstallLocationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\InstallComponentScreenView.xaml.cs">
+      <DependentUpon>InstallComponentScreenView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\InstallProgressView.xaml.cs">
       <DependentUpon>InstallProgressView.xaml</DependentUpon>
@@ -241,6 +251,7 @@
     <Compile Include="Views\InstallWelcomeView.xaml.cs">
       <DependentUpon>InstallWelcomeView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Selectors\ComponentTemplateSelector.cs" />
     <Compile Include="Views\ShellView.xaml.cs">
       <DependentUpon>ShellView.xaml</DependentUpon>
     </Compile>
@@ -254,6 +265,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\InstallLocationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\InstallComponentScreenView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

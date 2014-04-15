@@ -51,6 +51,7 @@ namespace WargameModInstaller.Infrastructure.Config
             result.Add(ScreenSettingsEntryType.InstallCompletedScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.InstallCompletedScreen));
             result.Add(ScreenSettingsEntryType.InstallCanceledScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.InstallCanceledScreen));
             result.Add(ScreenSettingsEntryType.InstallFailedScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.InstallFailedScreen));
+            result.Add(ScreenSettingsEntryType.ComponentSelectionScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.ComponentSelectionScreen));
 
             return result;
         }

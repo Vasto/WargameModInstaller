@@ -1,2 +1,1 @@
 ﻿- There is an issue with the image part replacement when the coordinates aren't dividable by 4.
-- To many replacing commands will result in a loading too many content and app will run out of memory - implement max limit of loaded content per .dat rebuild.

@@ -13,8 +13,9 @@ namespace WargameModInstaller.Infrastructure.Commands
     /// </summary>
     public interface IInstallCmdReader
     {
-        IEnumerable<IInstallCmd> Read(String filePath, CmdEntryType entryType);
         IEnumerable<IInstallCmd> ReadAll(String filePath);
+        IEnumerable<IInstallCmd> ReadAll(String filePath, IEnumerable<String> components);
         IEnumerable<ICmdGroup> ReadGroups(String filePath);
+        IEnumerable<ICmdGroup> ReadGroups(String filePath, IEnumerable<String> components);
     }
 }

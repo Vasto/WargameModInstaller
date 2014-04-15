@@ -22,6 +22,7 @@ namespace WargameModInstaller.Services.Install
         event EventHandler<EventArgs<String>> CleanupFailed;
 
         String InstallLocation { get; set; }
+        IEnumerable<String> ComponentsToInstall { get; set; }
 
         void InstallAsync();
         void RestoreAsync();

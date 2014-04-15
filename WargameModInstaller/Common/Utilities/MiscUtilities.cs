@@ -157,5 +157,21 @@ namespace WargameModInstaller.Common.Utilities
         //    return body.Member.Name;
         //}
 
+        /// <summary>
+        /// Returns the executing assembly version.
+        /// </summary>
+        /// <returns></returns>
+        public static String GetAssemblyVerison()
+        {
+            Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            String versionString = "Version: " +
+                version.Major.ToString() + "." +
+                version.Minor.ToString() + "." +
+                version.Build.ToString() + "." +
+                version.Revision.ToString();
+
+            return versionString;
+        }
+
     }
 }
