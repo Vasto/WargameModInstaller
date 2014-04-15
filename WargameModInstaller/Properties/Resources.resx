@@ -265,10 +265,10 @@ Click Next to continue.</value>
   <data name="RebuildingParametrizedMsg" xml:space="preserve">
     <value>Rebuilding {0}...</value>
   </data>
-  <data name="ModuleScreenDetail" xml:space="preserve">
+  <data name="ComponentScreenDetail" xml:space="preserve">
     <value>Select the components you want to install. Click Install to start the installation.</value>
   </data>
-  <data name="ModuleScreenHeader" xml:space="preserve">
+  <data name="ComponentScreenHeader" xml:space="preserve">
     <value>Select Components</value>
   </data>
   <data name="NoComponentsSelectedDetail" xml:space="preserve">

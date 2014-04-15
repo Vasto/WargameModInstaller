@@ -115,8 +115,8 @@ namespace WargameModInstaller.Model.Config
             funcs.Add(ScreenSettingsEntryType.ComponentSelectionScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.ComponentSelectionScreen,
-                    Resources.ModuleScreenHeader,
-                    Resources.ModuleScreenDetail,
+                    Resources.ComponentScreenHeader,
+                    Resources.ComponentScreenDetail,
                     new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
 
             return funcs;

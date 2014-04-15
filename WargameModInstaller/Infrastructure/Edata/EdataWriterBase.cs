@@ -300,12 +300,6 @@ namespace WargameModInstaller.Infrastructure.Edata
 
         protected bool CanUseReplacementWrite(EdataFile file)
         {
-            long minDistance = GetMinDistanceBetweenFiles(file);
-            long maxDistance = GetMaxDistanceBetweenFiles(file);
-            double averageDistance = GetAverageDistanceBetweenFiles(file);
-            double meanRelativeDistance = GetAverageDistanceRelativeToSizeBetweenFiles(file);
-            bool areOffsets16Based = AreOffsets16Based(file);
-
             //chyba zbedne to sotrtowaie...
             var contentFiles = file.ContentFiles
                 .OrderBy(cf => cf.TotalOffset)
@@ -354,6 +348,7 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
         }
 
+#if DEBUG
         #region Temp Helpers
 
         private bool AreOffsets16Based(EdataFile ef)
@@ -454,6 +449,7 @@ namespace WargameModInstaller.Infrastructure.Edata
             return relativeDistanceAccumulator / (double)contentFiles.Length;
         } 
         #endregion
+#endif
 
     }
 

@@ -107,6 +107,24 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select the components you want to install. Click Install to start the installation..
+        /// </summary>
+        internal static string ComponentScreenDetail {
+            get {
+                return ResourceManager.GetString("ComponentScreenDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select Components.
+        /// </summary>
+        internal static string ComponentScreenHeader {
+            get {
+                return ResourceManager.GetString("ComponentScreenHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Config File Error.
         /// </summary>
         internal static string ConfigFileErrorHeader {
@@ -338,24 +356,6 @@ namespace WargameModInstaller.Properties {
         internal static string LocationScreenHeader {
             get {
                 return ResourceManager.GetString("LocationScreenHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select the components you want to install. Click Install to start the installation..
-        /// </summary>
-        internal static string ModuleScreenDetail {
-            get {
-                return ResourceManager.GetString("ModuleScreenDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select Components.
-        /// </summary>
-        internal static string ModuleScreenHeader {
-            get {
-                return ResourceManager.GetString("ModuleScreenHeader", resourceCulture);
             }
         }
         
