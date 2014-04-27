@@ -27,14 +27,17 @@ namespace WargameModInstaller.Services.Commands
             CurrentStep = 0;
             CurrentMessage = Command.GetExecutionMessage();
 
-
-            //Backup cmd operates only in the installer's target dir.
             String sourceFullPath = Path.Combine(context.InstallerTargetDirectory, Command.SourcePath);
-            String targetfullPath = Path.Combine(context.InstallerTargetDirectory, Command.TargetPath);
-            if (!File.Exists(sourceFullPath) || !File.Exists(targetfullPath))
+            if (!File.Exists(sourceFullPath))
             {
-                throw new CmdExecutionFailedException(
-                    "One of the command's Source or Target paths is not a valid file path.",
+                throw new CmdExecutionFailedException("A file given by the sourcePath doesn't exist.",
+                    String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
+            }
+
+            String targetfullPath = Path.Combine(context.InstallerTargetDirectory, Command.TargetPath);
+            if (!PathUtilities.IsValidPath(targetfullPath))
+            {
+                throw new CmdExecutionFailedException("A given targetPath is not a valid path.",
                     String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
             }
 

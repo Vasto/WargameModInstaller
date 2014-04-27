@@ -15,8 +15,6 @@ using WargameModInstaller.ViewModels.Messages;
 
 namespace WargameModInstaller.ViewModels
 {
-    //For now conductor screen until i impelement moduleVM
-    //To jednak nie jest potrzebne i będzie mozna wrócic do screenBase, bo te vm to nie beda w kolekcji itemów
     public class InstallComponentScreenViewModel : InstallScreenViewModelBase
     {
         private readonly IInstallerService installer;

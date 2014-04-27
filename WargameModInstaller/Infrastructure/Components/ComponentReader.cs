@@ -72,7 +72,7 @@ namespace WargameModInstaller.Infrastructure.Components
             var name = source.Attribute("name").ValueNullSafe(); //Co z unikalnością imienia
             var text = source.Attribute("text").ValueNullSafe();
             var type = source.Attribute("type").ValueNullSafe();
-            bool isMarkedForInstall = source.Attribute("markedForInstall").ValueOr<bool>(true);
+            bool isMarkedForInstall = source.Attribute("isMarkedForInstall").ValueOr<bool>(true);
 
             ComponentType componentType = ComponentType.GetDefault();
             if (ComponentType.IsKnownVersion(type))

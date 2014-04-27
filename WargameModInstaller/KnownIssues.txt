@@ -1,1 +1,3 @@
 ﻿- There is an issue with the image part replacement when the coordinates aren't dividable by 4.
+- Logger saves localized exceptions
+- Report of the file being not replaced, and the installer completing installation with the success, though not much details and separated case (v.10, v.11 also)

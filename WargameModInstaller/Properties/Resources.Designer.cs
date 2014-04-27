@@ -248,7 +248,7 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Backuping game files....
+        ///   Looks up a localized string similar to Backuping game files for the installation time....
         /// </summary>
         internal static string InstallerBackupingFiles {
             get {

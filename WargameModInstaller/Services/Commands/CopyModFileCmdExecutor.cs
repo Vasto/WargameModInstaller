@@ -28,11 +28,16 @@ namespace WargameModInstaller.Services.Commands
             CurrentMessage = Command.GetExecutionMessage();
 
             String sourceFullPath = Path.Combine(context.InstallerSourceDirectory, Command.SourcePath);
-            String targetfullPath = Path.Combine(context.InstallerTargetDirectory, Command.TargetPath);
-            if (!File.Exists(sourceFullPath) || !File.Exists(targetfullPath))
+            if (!File.Exists(sourceFullPath))
             {
-                throw new CmdExecutionFailedException(
-                    "One of the command's Source or Target paths is not a valid file path.",
+                throw new CmdExecutionFailedException("A file given by the sourcePath doesn't exist.",
+                    String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
+            }
+
+            String targetfullPath = Path.Combine(context.InstallerTargetDirectory, Command.TargetPath);
+            if (!PathUtilities.IsValidPath(targetfullPath))
+            {
+                throw new CmdExecutionFailedException("A given targetPath is not a valid path.",
                     String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
             }
 

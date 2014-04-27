@@ -218,7 +218,7 @@ Click Next to continue.</value>
     <value>Welcome to the $ModName Installer</value>
   </data>
   <data name="InstallerBackupingFiles" xml:space="preserve">
-    <value>Backuping game files...</value>
+    <value>Backuping game files for the installation time...</value>
   </data>
   <data name="InstallerClearingFiles" xml:space="preserve">
     <value>Clearing installation files...</value>
