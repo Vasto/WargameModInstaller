@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +10,7 @@ using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    //To do: reconsider method names
+    //To do: reconsider method names, reconsider class name
 
     public abstract class ReplaceCmdExecutorBase<T> : CmdExecutorBase<T> where T : IInstallCmd
     {

@@ -72,7 +72,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             }
             catch (XmlException ex)
             {
-                WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+                Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
 
                 throw;
             }
@@ -123,7 +123,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             }
             catch (XmlException ex)
             {
-                WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+                Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
 
                 throw;
             }
@@ -149,7 +149,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             }
             catch (XmlException ex)
             {
-                WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
+                Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
 
                 throw;
             }
@@ -212,6 +212,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             queries.Add(CmdEntryType.ReplaceImagePart, ReadReplaceImageTileCmds);
             queries.Add(CmdEntryType.ReplaceImageTile, ReadReplaceImagePartCmds);
             queries.Add(CmdEntryType.ReplaceContent, ReadReplaceContentCmds);
+            queries.Add(CmdEntryType.AlterDictionary, ReadAlterDictionaryCmds);
 
             return queries;
         }
@@ -252,6 +253,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             edataCmds.AddRange(cmds.OfType<ReplaceImagePartCmd>());
             edataCmds.AddRange(cmds.OfType<ReplaceImageTileCmd>());
             edataCmds.AddRange(cmds.OfType<ReplaceContentCmd>());
+            edataCmds.AddRange(cmds.OfType<AlterDictionaryCmd>());
 
             var groups = from cmd in edataCmds
                          group cmd by new { ((IHasTarget)cmd).TargetPath, cmd.Priority };
@@ -278,6 +280,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImagePartCmd>());
             multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImageTileCmd>());
             multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceContentCmd>());
+            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<AlterDictionaryCmd>());
 
             var groups = from cmd in multiLevelEdataCmds
                          group cmd by new { 
@@ -473,14 +476,62 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var edataContentPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceContentCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.TargetContentPath = new ContentPath(edataImagePath);
+                newCmd.TargetContentPath = new ContentPath(edataContentPath);
+                newCmd.IsCritical = isCritical;
+                newCmd.Priority = priority;
+
+                result.Add(newCmd);
+            }
+
+            return result;
+        }
+
+        private IEnumerable<AlterDictionaryCmd> ReadAlterDictionaryCmds(XElement source)
+        {
+            var result = new List<AlterDictionaryCmd>();
+
+            var cmdElementsCollection = source.Elements(CmdEntryType.AlterDictionary.Name);
+            foreach (var cmdElement in cmdElementsCollection)
+            {
+                var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
+                var dictionaryPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
+
+                //Read Entries
+                var entries = new List<KeyValuePair<String, String>>();
+                var entriesElements = cmdElement.Elements("Entry");
+                foreach (var entryElement in entriesElements)
+                {
+                    //First try to read the attribute, because an empty tag element value returns an empty string not null.
+                    var value = entryElement.Attribute("value").ValueNullSafe() ??
+                        entryElement.ValueNullSafe();
+
+                    var hash = entryElement.Attribute("hash").ValueNullSafe();
+                    if (hash != null)
+                    {
+                        var newEntry = new KeyValuePair<String, String>(hash, value);
+                        entries.Add(newEntry);
+                    }
+                    else
+                    {
+                        var line = (entryElement as IXmlLineInfo).LineNumber;
+                        var warning = String.Format("Entry at line: \"{0}\" was ignored. It doesn't contain a specified hash attribute.", line);
+                        Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
+                    }
+                }
+
+                var newCmd = new AlterDictionaryCmd();
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.TargetContentPath = new ContentPath(dictionaryPath);
+                newCmd.AlteredEntries = entries;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

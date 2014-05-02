@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
@@ -121,6 +122,21 @@ namespace WargameModInstaller.Common.Utilities
                 number++;
 
             return number;
+        }
+
+        public static byte[] HexByteStringToByteArray(String hex)
+        {
+            int numberChars = hex.Length / 2;
+            byte[] bytes = new byte[numberChars];
+            using (var sr = new StringReader(hex))
+            {
+                for (int i = 0; i < numberChars; i++)
+                {
+                    bytes[i] = Convert.ToByte(new String(new char[2] { (char)sr.Read(), (char)sr.Read() }), 16);
+                }
+            }
+
+            return bytes;
         }
 
         /// <summary>

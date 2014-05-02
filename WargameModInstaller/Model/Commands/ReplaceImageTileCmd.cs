@@ -95,7 +95,7 @@ namespace WargameModInstaller.Model.Commands
 
         public String GetExecutionMessage()
         {
-            return String.Format(WargameModInstaller.Properties.Resources.Copying + " {0}...",
+            return String.Format(Properties.Resources.Copying + " {0}...",
                 SourcePath);
         }
 

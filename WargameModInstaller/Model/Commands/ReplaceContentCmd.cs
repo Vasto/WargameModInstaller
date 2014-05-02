@@ -7,6 +7,9 @@ using WargameModInstaller.Common.Entities;
 
 namespace WargameModInstaller.Model.Commands
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ReplaceContentCmd : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
     {
         /// <summary>
@@ -67,7 +70,7 @@ namespace WargameModInstaller.Model.Commands
 
         public String GetExecutionMessage()
         {
-            return String.Format(WargameModInstaller.Properties.Resources.Copying + " {0}...",
+            return String.Format(Properties.Resources.Copying + " {0}...",
                 SourcePath);
         }
     }

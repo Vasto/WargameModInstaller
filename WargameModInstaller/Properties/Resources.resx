@@ -277,4 +277,10 @@ Click Next to continue.</value>
   <data name="NoComponentsSelectedHeader" xml:space="preserve">
     <value>No components selected</value>
   </data>
+  <data name="AlterDictionartErrorMsg" xml:space="preserve">
+    <value>The Installer was unable to alter the dictionary file.</value>
+  </data>
+  <data name="AlteringDictionary" xml:space="preserve">
+    <value>Altering dictionary</value>
+  </data>
 </root>

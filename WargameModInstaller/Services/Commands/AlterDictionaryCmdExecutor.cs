@@ -6,16 +6,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Extensions;
-using WargameModInstaller.Infrastructure.Content;
+using WargameModInstaller.Common.Utilities;
+using WargameModInstaller.Infrastructure.Dictionaries;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
+using WargameModInstaller.Model.Dictionaries;
 using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceContentCmdExecutor : ReplaceCmdExecutorBase<ReplaceContentCmd>
+    public class AlterDictionaryCmdExecutor : ReplaceCmdExecutorBase<AlterDictionaryCmd>
     {
-        public ReplaceContentCmdExecutor(ReplaceContentCmd command)
+        public AlterDictionaryCmdExecutor(AlterDictionaryCmd command)
             : base(command)
         {
             this.TotalSteps = 2;
@@ -29,13 +31,12 @@ namespace WargameModInstaller.Services.Commands
             //Cancel if requested;
             token.ThrowIfCanceledAndNotNull();
 
-            String sourceFullPath = Command.SourcePath.GetAbsoluteOrPrependIfRelative(context.InstallerSourceDirectory);
             String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
-            if (!File.Exists(sourceFullPath) || !File.Exists(targetfullPath))
+            if (!File.Exists(targetfullPath))
             {
                 throw new CmdExecutionFailedException(
-                    "One of the command's Source or Target paths is not a valid file path.",
-                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    "Command's Target paths is not a valid file path.",
+                    String.Format(Properties.Resources.AlterDictionartErrorMsg));
             }
 
             String contentPath = Command.TargetContentPath.LastPart;
@@ -43,13 +44,13 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     "Invalid command's TargetContentPath value.",
-                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.AlterDictionartErrorMsg));
             }
 
             var edataFileReader = new EdataFileReader();
             var contentOwningEdata = CanGetEdataFromContext(context) ?
                 GetEdataFromContext(context) :
-                edataFileReader.Read(targetfullPath, false); //Wprowadzić to wszędzie, najlepiej w formie metod klasy bazowe
+                edataFileReader.Read(targetfullPath, false);
 
             EdataContentFile contentFile = contentOwningEdata.GetContentFileByPath(contentPath);
             if (!contentFile.IsContentLoaded)
@@ -59,9 +60,28 @@ namespace WargameModInstaller.Services.Commands
 
             CurrentStep++;
 
-            var contentFileReader = new ContentFileReader();
-            byte[] newContent = contentFileReader.Read(sourceFullPath);
-            contentFile.Content = newContent;
+            var dictReader = new DictionaryBinReader();
+            var entries = dictReader.Read(contentFile.Content);
+            var hashToEntriesMap = entries.ToDictionary(key => key.Hash, new ByteArrayComparer());
+
+            foreach (var alteredEntry in Command.AlteredEntries)
+            {
+                var hash = MiscUtilities.HexByteStringToByteArray(alteredEntry.Key);
+                DictionaryEntry entry;
+                if (hashToEntriesMap.TryGetValue(hash, out entry))
+                {
+                    entry.Content = alteredEntry.Value;
+                }
+                else
+                {
+                    var warning = String.Format("The entry with the given hash \"{0}\" wasn't found.", alteredEntry.Key);
+                    Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
+                }
+            }
+
+            var dictWriter = new DictionaryBinWriter();
+            var rawDictionaryData = dictWriter.Write(entries);
+            contentFile.Content = rawDictionaryData;
 
             if (!CanGetEdataFromContext(context))
             {
@@ -79,6 +99,6 @@ namespace WargameModInstaller.Services.Commands
             CurrentStep = TotalSteps;
         }
 
-    }
 
+    }
 }

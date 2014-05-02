@@ -61,6 +61,24 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Installer was unable to alter the dictionary file..
+        /// </summary>
+        internal static string AlterDictionartErrorMsg {
+            get {
+                return ResourceManager.GetString("AlterDictionartErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Altering dictionary.
+        /// </summary>
+        internal static string AlteringDictionary {
+            get {
+                return ResourceManager.GetString("AlteringDictionary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Wargame Mod Installer.
         /// </summary>
         internal static string AppName {

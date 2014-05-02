@@ -4,15 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
-using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class RemoveFileCmd : IInstallCmd, IHasSource
+    /// <summary>
+    /// 
+    /// </summary>
+    public class AlterDictionaryCmd : IInstallCmd, IHasTarget, IHasTargetContent
     {
-        public RemoveFileCmd()
+        public AlterDictionaryCmd()
         {
+            this.AlteredEntries = new List<KeyValuePair<String, String>>();
+        }
 
+        /// <summary>
+        /// Gets or sets a dictionary containing hash values of entries as keys and content to alter.
+        /// </summary>
+        public IEnumerable<KeyValuePair<String, String>>  AlteredEntries
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -35,9 +46,18 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
-        /// Gets or sets a file path which has to be removed.
+        /// Gets or sets a path to the dat file which holds the image to replace
         /// </summary>
-        public InstallEntityPath SourcePath
+        public InstallEntityPath TargetPath
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a path to a content inside the dat file.
+        /// </summary>
+        public ContentPath TargetContentPath
         {
             get;
             set;
@@ -55,10 +75,8 @@ namespace WargameModInstaller.Model.Commands
 
         public String GetExecutionMessage()
         {
-            return String.Format(Properties.Resources.Removing + " {0}...",
-                System.IO.Path.GetFileName(SourcePath));
+            return String.Format(Properties.Resources.AlteringDictionary + " {0}...",
+                TargetContentPath);
         }
-
     }
-
 }

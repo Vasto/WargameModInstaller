@@ -95,6 +95,7 @@
     <Compile Include="Common\Extensions\XExtensions.cs" />
     <Compile Include="Common\Logging\Logger.cs" />
     <Compile Include="Common\Logging\LoggerFactory.cs" />
+    <Compile Include="Common\Utilities\ByteArrayComparer.cs" />
     <Compile Include="Common\Utilities\CopyFileExWrapper.cs" />
     <Compile Include="Common\Utilities\FileUtilities.cs" />
     <Compile Include="Common\Utilities\Image\MiscImageUtilities.cs" />
@@ -109,6 +110,9 @@
     <Compile Include="Infrastructure\Content\IContentFileReader.cs" />
     <Compile Include="Infrastructure\Content\IContentFileWriter.cs" />
     <Compile Include="Infrastructure\Components\IComponentsReader.cs" />
+    <Compile Include="Infrastructure\Dictionaries\DictionaryBinReader.cs" />
+    <Compile Include="Infrastructure\Dictionaries\DictionaryBinWriter.cs" />
+    <Compile Include="Model\Commands\AlterDictionaryCmd.cs" />
     <Compile Include="Model\Commands\CmdEntryType.cs" />
     <Compile Include="Model\Commands\IHasTargetContent.cs" />
     <Compile Include="Model\Commands\MultiLevelEdataCmdGroup.cs" />
@@ -131,6 +135,7 @@
     <Compile Include="Model\Config\WargameVersionType.cs" />
     <Compile Include="Model\Components\Component.cs" />
     <Compile Include="Model\Components\ComponentType.cs" />
+    <Compile Include="Model\Dictionaries\DictionaryEntry.cs" />
     <Compile Include="Model\WMIEntryType.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileReader.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileWriter.cs" />
@@ -168,6 +173,7 @@
     <Compile Include="Model\Commands\CopyModFileCmd.cs" />
     <Compile Include="Model\Commands\ReplaceImageCmd.cs" />
     <Compile Include="Model\Commands\ReplaceImageTileCmd.cs" />
+    <Compile Include="Services\Commands\AlterDictionaryCmdExecutor.cs" />
     <Compile Include="Services\Commands\BasicCmdGroupExecutor.cs" />
     <Compile Include="Services\Commands\CmdGroupExecutorBase.cs" />
     <Compile Include="Services\Commands\CmdExecutionContext.cs" />

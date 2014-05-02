@@ -64,7 +64,7 @@ namespace WargameModInstaller.Model.Commands
 
         public String GetExecutionMessage()
         {
-            return String.Format(WargameModInstaller.Properties.Resources.Backuping + " {0}...",
+            return String.Format(Properties.Resources.Backuping + " {0}...",
                 System.IO.Path.GetFileName(SourcePath));
         }
 
