@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using WargameModInstaller.Common.Utilities;
+using WargameModInstaller.Common.Utilities.Compression;
+using WargameModInstaller.Common.Utilities.Image.TGV;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities.Compression;
-using WargameModInstaller.Utilities.Image.TGV;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
@@ -57,7 +57,7 @@ namespace WargameModInstaller.Infrastructure.Image
 
                 buffer = Encoding.ASCII.GetBytes(file.PixelFormatString);
                 stream.Write(buffer, 0, buffer.Length);
-                stream.Seek(MiscUtilities.RoundToNextDivBy4(fmtLen) - fmtLen, SeekOrigin.Current);
+                stream.Seek(MathUtilities.RoundToNextDivBy4(fmtLen) - fmtLen, SeekOrigin.Current);
 
                 stream.Write(file.SourceChecksum, 0, file.SourceChecksum.Length);
 
@@ -103,7 +103,7 @@ namespace WargameModInstaller.Infrastructure.Image
                     bool needSupplementTo4 = (stream.Position % 4) != 0;
                     if (multiMipMaps && needSupplementTo4)
                     {
-                        int supplementSize = (int)(MiscUtilities.RoundToNextDivBy4(stream.Position) - stream.Position);
+                        int supplementSize = (int)(MathUtilities.RoundToNextDivBy4(stream.Position) - stream.Position);
                         byte[] supplementBuffer = new byte[supplementSize];
                         stream.Write(supplementBuffer, 0, supplementBuffer.Length);
                     }

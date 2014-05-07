@@ -15,7 +15,7 @@ using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class AlterDictionaryCmdExecutor : ReplaceCmdExecutorBase<AlterDictionaryCmd>
+    public class AlterDictionaryCmdExecutor : AlterEdataCmdExecutorBase<AlterDictionaryCmd>
     {
         public AlterDictionaryCmdExecutor(AlterDictionaryCmd command)
             : base(command)
@@ -85,15 +85,7 @@ namespace WargameModInstaller.Services.Commands
 
             if (!CanGetEdataFromContext(context))
             {
-                IEdataFileWriter edataWriter = new EdataFileWriter();
-                if (token.HasValue)
-                {
-                    edataWriter.Write(contentOwningEdata, token.Value);
-                }
-                else
-                {
-                    edataWriter.Write(contentOwningEdata);
-                }
+                SaveEdataFile(contentOwningEdata, token);
             }
 
             CurrentStep = TotalSteps;

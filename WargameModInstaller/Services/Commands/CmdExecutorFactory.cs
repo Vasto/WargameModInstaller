@@ -50,7 +50,7 @@ namespace WargameModInstaller.Services.Commands
                 }
             }
 
-            throw new InvalidOperationException("Cannot create executor for the provided command group");
+            throw new InvalidOperationException("Cannot create an executor for the provided command group");
         }
 
         public virtual ICmdExecutor CreateForCommand(IInstallCmd command) 
@@ -66,7 +66,7 @@ namespace WargameModInstaller.Services.Commands
                 }
             }
 
-            throw new InvalidOperationException("Cannot create executor for the provided command");
+            throw new InvalidOperationException("Cannot create an executor for the provided command");
         }
 
         protected virtual IDictionary<Type, Type> CreateCommandToExecutorsMap()

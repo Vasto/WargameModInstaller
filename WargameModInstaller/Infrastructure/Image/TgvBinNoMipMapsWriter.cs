@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities.Compression;
+using WargameModInstaller.Common.Utilities.Compression;
 
 namespace WargameModInstaller.Infrastructure.Image
 {

@@ -77,7 +77,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace WargameModInstaller.Utilities.Image.DDS
+namespace WargameModInstaller.Common.Utilities.Image.DDS
 {
     public class DDSFormat
     {

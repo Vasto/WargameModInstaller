@@ -98,6 +98,7 @@
     <Compile Include="Common\Utilities\ByteArrayComparer.cs" />
     <Compile Include="Common\Utilities\CopyFileExWrapper.cs" />
     <Compile Include="Common\Utilities\FileUtilities.cs" />
+    <Compile Include="Common\Utilities\Image\DDS\DDSMipMapUilities.cs" />
     <Compile Include="Common\Utilities\Image\MiscImageUtilities.cs" />
     <Compile Include="Common\Utilities\MathUtilities.cs" />
     <Compile Include="Infrastructure\Commands\InstallCmdReader.cs" />
@@ -182,7 +183,8 @@
     <Compile Include="Services\Commands\CmdExecutorBase.cs" />
     <Compile Include="Services\Commands\CmdExecutionFailedException.cs" />
     <Compile Include="Services\Commands\MultiLevelEdataCmdGroupExecutor.cs" />
-    <Compile Include="Services\Commands\ReplaceCmdExecutorBase.cs" />
+    <Compile Include="Services\Commands\AlterEdataCmdExecutorBase.cs" />
+    <Compile Include="Services\Commands\ReplaceImageCmdExecutorBase.cs" />
     <Compile Include="Services\Commands\ReplaceImagePartCmdExecutor.cs" />
     <Compile Include="Services\Commands\ReplaceContentCmdExecutor.cs" />
     <Compile Include="Services\Commands\SharedEdataCmdExecutionContext.cs" />

@@ -107,35 +107,6 @@ namespace WargameModInstaller.Common.Utilities
             return obj != null && obj.GetType().IsValueType;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Credits to enohka for this code.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        public static int RoundToNextDivBy4(int number)
-        {
-            while (number % 4 != 0)
-                number++;
-
-            return number;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
-        public static long RoundToNextDivBy4(long number)
-        {
-            while (number % 4 != 0)
-                number++;
-
-            return number;
-        }
 
         public static byte[] HexByteStringToByteArray(String hex)
         {

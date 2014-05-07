@@ -399,6 +399,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
                 newCmd.TargetContentPath = new ContentPath(edataImagePath);
+                newCmd.UseMipMaps = useMipMaps;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

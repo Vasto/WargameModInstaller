@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities.Compression;
-using WargameModInstaller.Utilities.Image.TGV;
+using WargameModInstaller.Common.Utilities.Compression;
+using WargameModInstaller.Common.Utilities.Image.TGV;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
@@ -63,7 +63,7 @@ namespace WargameModInstaller.Infrastructure.Image
                 ms.Read(buffer, 0, buffer.Length);
                 tgvFile.PixelFormatString = Encoding.ASCII.GetString(buffer);
 
-                ms.Seek(MiscUtilities.RoundToNextDivBy4(pixelFormatLen) - pixelFormatLen, SeekOrigin.Current);
+                ms.Seek(MathUtilities.RoundToNextDivBy4(pixelFormatLen) - pixelFormatLen, SeekOrigin.Current);
 
                 buffer = new byte[16];
                 ms.Read(buffer, 0, buffer.Length);

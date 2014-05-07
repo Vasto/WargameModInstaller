@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities;
+using WargameModInstaller.Common.Utilities.Image.DDS;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities.Image.DDS;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
@@ -18,8 +18,21 @@ namespace WargameModInstaller.Infrastructure.Image
     {
         public TgvDDSReader()
         {
-            //ale z drugiej strony taki liczbowy limit nic nie daje, potrzeba limit rozmiarowy,
-            // bo w przypadku mid jest tylko 9 mipmap bo rozmiar obrazka jest 1024x1024
+            //Those are minimum values for the default in-Wargame mipmaps
+            this.MinMipMapWidth = 4;
+            this.MinMipMapHeight = 4;
+        }
+
+        public uint MinMipMapWidth
+        {
+            get;
+            set;
+        }
+
+        public uint MinMipMapHeight
+        {
+            get;
+            set;
         }
 
         public virtual TgvImage Read(String filePath)
@@ -41,31 +54,42 @@ namespace WargameModInstaller.Infrastructure.Image
                 ms.Read(buffer, 0, buffer.Length);
 
                 var header = MiscUtilities.ByteArrayToStructure<DDSFormat.Header>(buffer);
-
                 if (header.MipMapCount == 0)
                 {
                     header.MipMapCount = 1;
                 }
 
-                //Może zrobić discard  najmnijszych MipMap, jeśli przekroczono limit (np domyślny 10)?
-                uint mipSize = header.Width * header.Height;
+                uint mipWidth = header.Width;
+                uint mipHeight = header.Height;
+                uint mipSize = mipWidth * mipHeight;
                 for (ushort i = 0; i < header.MipMapCount; i++)
                 {
+                    if (mipWidth < MinMipMapWidth || mipHeight < MinMipMapHeight)
+                    {
+                        break;
+                    }
+
+                    uint minMipMapSize = DDSMipMapUilities.GetMinimumMipMapSizeForFormat(header.PixelFormat);
+                    mipSize = Math.Max(minMipMapSize, mipSize);
+
                     buffer = new byte[mipSize];
                     ms.Read(buffer, 0, buffer.Length);
 
-                    var mip = new TgvMipMap { Content = buffer };
+                    var mip = new TgvMipMap();
+                    mip.Content = buffer;
+                    mip.Size = mipSize;
                     file.MipMaps.Add(mip);
 
-                    mipSize /= 4;
-                    mipSize = Math.Max(16, mipSize); //16 dla dxt2-5 dla dxt1 powino być 8
+                    mipWidth /= 2;
+                    mipHeight /= 2;
+                    mipSize = mipWidth * mipHeight;
                 }
 
                 file.Height = header.Height;
                 file.ImageHeight = header.Height;
                 file.Width = header.Width;
                 file.ImageHeight = header.Width;
-                file.MipMapCount = (ushort)header.MipMapCount;
+                file.MipMapCount = (ushort)file.MipMaps.Count;
 
                 DDSHelper.ConversionFlags conversionFlags;
                 file.Format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags);
@@ -73,6 +97,7 @@ namespace WargameModInstaller.Infrastructure.Image
 
             return file;
         }
+
 
     }
 }

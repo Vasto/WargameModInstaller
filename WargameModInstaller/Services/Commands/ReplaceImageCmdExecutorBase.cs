@@ -6,16 +6,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Extensions;
-using WargameModInstaller.Infrastructure.Content;
 using WargameModInstaller.Infrastructure.Edata;
+using WargameModInstaller.Infrastructure.Image;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceContentCmdExecutor : AlterEdataCmdExecutorBase<ReplaceContentCmd>
+    public abstract class ReplaceImageCmdExecutorBase<T> : AlterEdataCmdExecutorBase<T> 
+        where T : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
     {
-        public ReplaceContentCmdExecutor(ReplaceContentCmd command)
+        public ReplaceImageCmdExecutorBase(T command)
             : base(command)
         {
             this.TotalSteps = 2;
@@ -46,10 +48,12 @@ namespace WargameModInstaller.Services.Commands
                     String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
+
             var edataFileReader = new EdataFileReader();
             var contentOwningEdata = CanGetEdataFromContext(context) ?
                 GetEdataFromContext(context) :
                 edataFileReader.Read(targetfullPath, false);
+
 
             EdataContentFile contentFile = contentOwningEdata.GetContentFileByPath(contentPath);
             if (!contentFile.IsContentLoaded)
@@ -57,11 +61,17 @@ namespace WargameModInstaller.Services.Commands
                 edataFileReader.LoadContent(contentFile);
             }
 
+            if (contentFile.FileType != EdataContentFileType.Image)
+            {
+                throw new CmdExecutionFailedException(
+                    "Invalid command's TargetContentPath value. It doesn't point to an image content.",
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+            }
+
             CurrentStep++;
 
-            var contentFileReader = new ContentFileReader();
-            byte[] newContent = contentFileReader.Read(sourceFullPath);
-            contentFile.Content = newContent;
+            var modifiedImageContent = ModifyImageContent(contentFile.Content, sourceFullPath);
+            contentFile.Content = modifiedImageContent;
 
             if (!CanGetEdataFromContext(context))
             {
@@ -69,6 +79,38 @@ namespace WargameModInstaller.Services.Commands
             }
 
             CurrentStep = TotalSteps;
+        }
+
+        protected abstract byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath);
+
+        protected TgvImage GetTgvFromDDS(String sourceFullPath, bool discardMipMaps = true)
+        {
+            ITgvFileReader tgvReader = discardMipMaps ?
+                (ITgvFileReader)(new TgvDDSMoMipMapsReader()) :
+                (ITgvFileReader)(new TgvDDSReader());
+
+            TgvImage newtgv = tgvReader.Read(sourceFullPath);
+
+            return newtgv;
+        }
+
+        protected TgvImage GetTgvFromBytes(byte[] rawTgv)
+        {
+            ITgvBinReader rawReader = new TgvBinReader();
+            TgvImage oldTgv = rawReader.Read(rawTgv);
+
+            return oldTgv;
+        }
+
+        protected byte[] ConvertTgvToBytes(TgvImage tgv, bool discardMipMaps = true)
+        {
+            ITgvBinWriter tgvRawWriter = discardMipMaps ?
+                new TgvBinNoMipMapsWriter() :
+                new TgvBinWriter();
+
+            var bytes = tgvRawWriter.Write(tgv);
+
+            return bytes;
         }
 
     }

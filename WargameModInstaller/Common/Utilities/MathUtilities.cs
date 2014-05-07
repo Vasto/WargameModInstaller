@@ -46,5 +46,22 @@ namespace WargameModInstaller.Common.Utilities
             return (multiple - (value % multiple)) + value;
         }
 
+
+        public static int RoundToNextDivBy4(int number)
+        {
+            while (number % 4 != 0)
+                number++;
+
+            return number;
+        }
+
+        public static long RoundToNextDivBy4(long number)
+        {
+            while (number % 4 != 0)
+                number++;
+
+            return number;
+        }
+
     }
 }

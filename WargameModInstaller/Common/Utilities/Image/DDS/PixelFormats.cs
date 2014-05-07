@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WargameModInstaller.Utilities.Image.DDS
+namespace WargameModInstaller.Common.Utilities.Image.DDS
 {
     /// <summary>
     /// 

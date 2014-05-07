@@ -6,6 +6,8 @@ using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Image
 {
+    //To do: Add support for the MipMaps parts replacing
+
     public class ImageComposerService : IImageComposerService
     {
         /// <summary>

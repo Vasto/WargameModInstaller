@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WargameModInstaller.Utilities.Image.DDS;
+using WargameModInstaller.Common.Utilities.Image.DDS;
 
 namespace WargameModInstaller.Model.Image
 {

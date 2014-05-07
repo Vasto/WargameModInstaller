@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Image;
-using WargameModInstaller.Utilities.Image.DDS;
+using WargameModInstaller.Common.Utilities.Image.DDS;
 
 namespace WargameModInstaller.Infrastructure.Image
 {

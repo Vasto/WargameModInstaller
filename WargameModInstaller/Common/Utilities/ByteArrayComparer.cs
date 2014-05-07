@@ -33,5 +33,6 @@ namespace WargameModInstaller.Common.Utilities
 
             return sum;
         }
+
     }
 }

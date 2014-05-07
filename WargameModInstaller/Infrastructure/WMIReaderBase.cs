@@ -33,6 +33,6 @@ namespace WargameModInstaller.Infrastructure
         }
 
         protected abstract Dictionary<WMIEntryType, Func<TQuerySource, TQuaryResult>> CreateReadingQueries();
-
     }
+
 }

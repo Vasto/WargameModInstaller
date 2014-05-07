@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
-using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Model.Commands
 {
@@ -61,6 +60,16 @@ namespace WargameModInstaller.Model.Commands
         /// If the critical command fails, whole installation fails.
         /// </summary>
         public bool IsCritical
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets an information wheather a MipMaps of the image 
+        /// should be taken into consdieration during the replacement process.
+        /// </summary>
+        public bool UseMipMaps
         {
             get;
             set;
