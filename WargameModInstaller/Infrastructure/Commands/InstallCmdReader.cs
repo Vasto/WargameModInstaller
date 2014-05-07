@@ -26,12 +26,14 @@ namespace WargameModInstaller.Infrastructure.Commands
     {
         private readonly String installCommandsElementPath = "WargameModInstallerConfig/InstallCommands";
         private readonly ISettingsProvider settingsProvider;
-        private readonly bool defaultCriticalValue;
+        private readonly bool defaultCriticalCmdsValue;
+        private readonly bool defaultUseMipMapsValue;
 
         public InstallCmdReader(ISettingsProvider settingsProvider)
         {
             this.settingsProvider = settingsProvider;
-            this.defaultCriticalValue = settingsProvider
+            this.defaultUseMipMapsValue = false;
+            this.defaultCriticalCmdsValue = settingsProvider
                 .GetGeneralSettings(GeneralSettingEntryType.CriticalCommands)
                 .Value
                 .ToOrDefault<bool>();
@@ -315,7 +317,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(3);
 
                 //Any validation here is not a good idea. Commands should be left over in an invalid state, 
@@ -342,7 +344,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(4);
 
                 var newCmd = new CopyGameFileCmd();
@@ -365,7 +367,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             foreach (var cmdElement in cmdElementsCollection)
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(1);
 
                 var newCmd = new RemoveFileCmd();
@@ -389,7 +391,8 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
                 var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(defaultUseMipMapsValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceImageCmd();
@@ -418,7 +421,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var column = cmdElement.Attribute("column").ValueOrDefault<int?>();
                 var row = cmdElement.Attribute("row").ValueOrDefault<int?>();
                 var tileSize = cmdElement.Attribute("tileSize").ValueOr<int>(256);
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceImageTileCmd();
@@ -449,7 +452,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var xPos = cmdElement.Attribute("xPos").ValueOr<int>(0);
                 var yPos = cmdElement.Attribute("yPos").ValueOr<int>(0);
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceImagePartCmd();
@@ -477,7 +480,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
                 var edataContentPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceContentCmd();
@@ -502,7 +505,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
                 var dictionaryPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
-                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 //Read Entries

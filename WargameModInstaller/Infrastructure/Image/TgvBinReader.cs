@@ -10,8 +10,13 @@ using WargameModInstaller.Utilities.Image.TGV;
 
 namespace WargameModInstaller.Infrastructure.Image
 {
+    /// <summary>
+    /// A reader which can read a TGV image file from the raw bytes data.
+    /// </summary>
     public class TgvBinReader : ITgvBinReader
     {
+        protected static readonly byte[] ZIPO = new byte[] { 0x5A, 0x49, 0x50, 0x4F };
+
         /// <summary>
         /// 
         /// </summary>
@@ -64,26 +69,16 @@ namespace WargameModInstaller.Infrastructure.Image
                 ms.Read(buffer, 0, buffer.Length);
                 tgvFile.SourceChecksum = (byte[])buffer.Clone();
 
-                buffer = new byte[4];
+                //Read MipMaps
+                var mipMaps = CreateEmptyMipMaps(tgvFile.MipMapCount);
 
-                for (int i = 0; i < tgvFile.MipMapCount; i++)
-                {
-                    ms.Read(buffer, 0, buffer.Length);
-                    uint offset = BitConverter.ToUInt32(buffer, 0);
-                    tgvFile.Offsets.Add(offset);
-                }
+                ReadMipMapsOffsets(ms, mipMaps);
 
-                for (int i = 0; i < tgvFile.MipMapCount; i++)
-                {
-                    ms.Read(buffer, 0, buffer.Length);
-                    uint offset = BitConverter.ToUInt32(buffer, 0);
-                    tgvFile.Sizes.Add(offset);
-                }
+                ReadMipMapsSizes(ms, mipMaps);
 
-                for (int i = 0; i < tgvFile.MipMapCount; i++)
-                {
-                    tgvFile.MipMaps.Add(ReadMipMap(i, rawTgvData, tgvFile));
-                }
+                ReadMipMapsContent(ms, mipMaps, tgvFile.IsCompressed);
+
+                tgvFile.MipMaps = mipMaps;
             }
 
             tgvFile.Format = TgvUtilities.GetPixelFormatFromTgv(tgvFile.PixelFormatString);
@@ -91,56 +86,123 @@ namespace WargameModInstaller.Infrastructure.Image
             return tgvFile;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="fs"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Credits to enohka for this code.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        protected TgvMipMap ReadMipMap(int id, byte[] rawTgvData, TgvImage tgvFile)
+        private IList<TgvMipMap> CreateEmptyMipMaps(int count)
         {
-            if (id > tgvFile.MipMapCount)
+            var mipMaps = new List<TgvMipMap>();
+            for (int i = 0; i < count; ++i)
             {
-                throw new ArgumentException("id");
+                mipMaps.Add(new TgvMipMap());
             }
 
-            var zipo = new byte[] { 0x5A, 0x49, 0x50, 0x4F };
+            return mipMaps;
+        }
 
-            var mipMap = new TgvMipMap(tgvFile.Offsets[id], tgvFile.Sizes[id], 0);
+        private void ReadMipMapsOffsets(Stream stream, IList<TgvMipMap> mipMaps)
+        {
+            var buffer = new byte[4];
+            for (int i = 0; i < mipMaps.Count; i++)
+            {
+                stream.Read(buffer, 0, buffer.Length);
+                uint offset = BitConverter.ToUInt32(buffer, 0);
+                mipMaps[i].Offset = offset;
+            }
+        }
 
-            using (var ms = new MemoryStream(rawTgvData, (int)mipMap.Offset, (int)mipMap.Size))
+        private void ReadMipMapsSizes(Stream stream, IList<TgvMipMap> mipMaps)
+        {
+            var buffer = new byte[4];
+            for (int i = 0; i < mipMaps.Count; i++)
+            {
+                stream.Read(buffer, 0, buffer.Length);
+                uint size = BitConverter.ToUInt32(buffer, 0);
+                mipMaps[i].Size = size;
+            }
+        }
+
+        private void ReadMipMapsContent(Stream stream, IList<TgvMipMap> mipMaps, bool compressed)
+        {
+            for (int i = 0; i < mipMaps.Count; i++)
             {
                 var buffer = new byte[4];
 
-                if (tgvFile.IsCompressed)
+                stream.Seek(mipMaps[i].Offset, SeekOrigin.Begin);
+
+                if (compressed)
                 {
-                    ms.Read(buffer, 0, buffer.Length);
-                    if (!MiscUtilities.ComparerByteArrays(buffer, zipo))
+                    stream.Read(buffer, 0, buffer.Length);
+                    if (!MiscUtilities.ComparerByteArrays(buffer, ZIPO))
                     {
                         throw new InvalidDataException("Mipmap has to start with \"ZIPO\"!");
                     }
 
-                    ms.Read(buffer, 0, buffer.Length);
-                    mipMap.MipWidth = BitConverter.ToInt32(buffer, 0);
+                    stream.Read(buffer, 0, buffer.Length);
+                    mipMaps[i].MipWidth = BitConverter.ToInt32(buffer, 0);
                 }
 
-                buffer = new byte[ms.Length - ms.Position];
-                ms.Read(buffer, 0, buffer.Length);
+                // odejmujemy 8 bo rozmiar zawiera 8 bajtów dodatkowych, 4 magii i 4 rozmiaru mipampy
+                buffer = new byte[mipMaps[i].Size - 8]; 
+                stream.Read(buffer, 0, buffer.Length);
 
-                if (tgvFile.IsCompressed)
+                if (compressed)
                 {
                     ICompressor comp = new ZlibCompressor();
                     buffer = comp.Decompress(buffer);
                 }
 
-                mipMap.Content = buffer;
-
-                return mipMap;
+                mipMaps[i].Content = buffer;
             }
         }
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="fs"></param>
+        ///// <returns></returns>
+        ///// <remarks>
+        ///// Credits to enohka for this code.
+        ///// See more at: http://github.com/enohka/moddingSuite
+        ///// </remarks>
+        //protected TgvMipMap ReadMipMap(int id, byte[] rawTgvData, TgvImage tgvFile)
+        //{
+        //    if (id > tgvFile.MipMapCount)
+        //    {
+        //        throw new ArgumentException("id");
+        //    }
+
+        //    var zipo = new byte[] { 0x5A, 0x49, 0x50, 0x4F };
+
+        //    var mipMap = new TgvMipMap(tgvFile.Offsets[id], tgvFile.Sizes[id], 0);
+
+        //    using (var ms = new MemoryStream(rawTgvData, (int)mipMap.Offset, (int)mipMap.Size))
+        //    {
+        //        var buffer = new byte[4];
+
+        //        if (tgvFile.IsCompressed)
+        //        {
+        //            ms.Read(buffer, 0, buffer.Length);
+        //            if (!MiscUtilities.ComparerByteArrays(buffer, zipo))
+        //            {
+        //                throw new InvalidDataException("Mipmap has to start with \"ZIPO\"!");
+        //            }
+
+        //            ms.Read(buffer, 0, buffer.Length);
+        //            mipMap.MipWidth = BitConverter.ToInt32(buffer, 0);
+        //        }
+
+        //        buffer = new byte[ms.Length - ms.Position];
+        //        ms.Read(buffer, 0, buffer.Length);
+
+        //        if (tgvFile.IsCompressed)
+        //        {
+        //            ICompressor comp = new ZlibCompressor();
+        //            buffer = comp.Decompress(buffer);
+        //        }
+
+        //        mipMap.Content = buffer;
+
+        //        return mipMap;
+        //    }
+        //}
 
     }
 }

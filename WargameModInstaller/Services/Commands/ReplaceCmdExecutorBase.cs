@@ -19,9 +19,12 @@ namespace WargameModInstaller.Services.Commands
 
         }
 
-        protected TgvImage GetTgvFromDDS(String sourceFullPath)
+        protected TgvImage GetTgvFromDDS(String sourceFullPath, bool discardMipMaps = true)
         {
-            ITgvFileReader tgvReader = new TgvDDSReader();
+            ITgvFileReader tgvReader = discardMipMaps ? 
+                (ITgvFileReader)(new TgvDDSMoMipMapsReader()) :
+                (ITgvFileReader)(new TgvDDSReader());
+
             TgvImage newtgv = tgvReader.Read(sourceFullPath);
 
             return newtgv;
@@ -35,9 +38,12 @@ namespace WargameModInstaller.Services.Commands
             return oldTgv;
         }
 
-        protected byte[] ConvertTgvToBytes(TgvImage tgv)
+        protected byte[] ConvertTgvToBytes(TgvImage tgv, bool discardMipMaps = true)
         {
-            ITgvBinWriter tgvRawWriter = new TgvNoMipMapBinWriter();
+            ITgvBinWriter tgvRawWriter = discardMipMaps ? 
+                new TgvBinNoMipMapsWriter() :
+                new TgvBinWriter();
+
             var bytes = tgvRawWriter.Write(tgv);
 
             return bytes;

@@ -8,7 +8,10 @@ using WargameModInstaller.Model.Dictionaries;
 
 namespace WargameModInstaller.Infrastructure.Dictionaries
 {
-    public class DictionaryBinWriter
+    /// <summary>
+    /// Represents a writer which can writea a TRAD dictionary file to a raw byte data form.
+    /// </summary>
+    public class DictionaryBinWriter : IDictionaryBinWriter
     {
         public byte[] Write(IEnumerable<DictionaryEntry> entries)
         {

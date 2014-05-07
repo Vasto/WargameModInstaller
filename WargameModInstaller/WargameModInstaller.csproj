@@ -112,6 +112,9 @@
     <Compile Include="Infrastructure\Components\IComponentsReader.cs" />
     <Compile Include="Infrastructure\Dictionaries\DictionaryBinReader.cs" />
     <Compile Include="Infrastructure\Dictionaries\DictionaryBinWriter.cs" />
+    <Compile Include="Infrastructure\Dictionaries\IDictionaryBinReader.cs" />
+    <Compile Include="Infrastructure\Dictionaries\IDictionaryBinWriter.cs" />
+    <Compile Include="Infrastructure\Image\TgvDDSReader.cs" />
     <Compile Include="Model\Commands\AlterDictionaryCmd.cs" />
     <Compile Include="Model\Commands\CmdEntryType.cs" />
     <Compile Include="Model\Commands\IHasTargetContent.cs" />
@@ -143,9 +146,8 @@
     <Compile Include="Infrastructure\Edata\IEdataFileWriter.cs" />
     <Compile Include="Infrastructure\Image\ITgvFileReader.cs" />
     <Compile Include="Infrastructure\Image\ITgvFileWriter.cs" />
-    <Compile Include="Infrastructure\Image\TgvDDSReader.cs" />
-    <Compile Include="Infrastructure\Image\TgvDDSWriter.cs" />
-    <Compile Include="Infrastructure\Image\TgvNoMipMapBinWriter.cs" />
+    <Compile Include="Infrastructure\Image\TgvDDSMoMipMapsReader.cs" />
+    <Compile Include="Infrastructure\Image\TgvBinNoMipMapsWriter.cs" />
     <Compile Include="Infrastructure\Image\TgvBinReader.cs" />
     <Compile Include="Infrastructure\Image\TgvBinWriter.cs" />
     <Compile Include="Infrastructure\WMIReaderBase.cs" />

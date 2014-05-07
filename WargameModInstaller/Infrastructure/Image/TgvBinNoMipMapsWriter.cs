@@ -10,9 +10,10 @@ using WargameModInstaller.Utilities.Compression;
 namespace WargameModInstaller.Infrastructure.Image
 {
     /// <summary>
-    /// Writes a Tgv file to the byte array without any additional MipMaps. 
+    /// A writer which can write a TGV image to a byte form. 
+    /// This writer discards any additional MipMaps from the writing process.
     /// </summary>
-    public class TgvNoMipMapBinWriter : TgvBinWriter
+    public class TgvBinNoMipMapsWriter : TgvBinWriter
     {
         /// <summary>
         /// 
@@ -29,11 +30,8 @@ namespace WargameModInstaller.Infrastructure.Image
             noMipMapsFile.ImageHeight = file.ImageHeight;
             noMipMapsFile.ImageWidth = file.ImageWidth;
             noMipMapsFile.IsCompressed = file.IsCompressed;
-            noMipMapsFile.Offsets = file.Offsets;
-            noMipMapsFile.Sizes = file.Sizes;
             noMipMapsFile.SourceChecksum = file.SourceChecksum;
             noMipMapsFile.Version = file.Version;
-            //Use only the main content MipMap
             noMipMapsFile.MipMaps.Add(file.MipMaps.ToArray().OrderBy(x => x.Size).Last());
             noMipMapsFile.MipMapCount = 1;
 

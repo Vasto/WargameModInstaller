@@ -1,10 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Image;
 using WargameModInstaller.Utilities.Image.DDS;
@@ -12,16 +10,20 @@ using WargameModInstaller.Utilities.Image.DDS;
 namespace WargameModInstaller.Infrastructure.Image
 {
     /// <summary>
-    /// Represents a reader which can read a TGV imgae from a DDS file.
+    /// Represents a reader which can read a TGV image from a DDS file. 
+    /// This reader ignores any additional MipMap images during the file reading.
     /// </summary>
-    public class TgvDDSReader : ITgvFileReader
+    public class TgvDDSMoMipMapsReader : ITgvFileReader
     {
-        public TgvDDSReader()
-        {
-            //ale z drugiej strony taki liczbowy limit nic nie daje, potrzeba limit rozmiarowy,
-            // bo w przypadku mid jest tylko 9 mipmap bo rozmiar obrazka jest 1024x1024
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Credits to enohka for this code.
+        /// See more at: http://github.com/enohka/moddingSuite
+        /// </remarks>
         public virtual TgvImage Read(String filePath)
         {
             var file = new TgvImage();
@@ -41,37 +43,29 @@ namespace WargameModInstaller.Infrastructure.Image
                 ms.Read(buffer, 0, buffer.Length);
 
                 var header = MiscUtilities.ByteArrayToStructure<DDSFormat.Header>(buffer);
+                header.MipMapCount = 1;
 
-                if (header.MipMapCount == 0)
-                {
-                    header.MipMapCount = 1;
-                }
+                //read only the main content mipmap
+                uint mainContentMipMapSize = header.Width * header.Height; 
+                buffer = new byte[mainContentMipMapSize];
+                ms.Read(buffer, 0, buffer.Length);
 
-                //Może zrobić discard  najmnijszych MipMap, jeśli przekroczono limit (np domyślny 10)?
-                uint mipSize = header.Width * header.Height;
-                for (ushort i = 0; i < header.MipMapCount; i++)
-                {
-                    buffer = new byte[mipSize];
-                    ms.Read(buffer, 0, buffer.Length);
+                var mainContentMipMap = new TgvMipMap();
+                mainContentMipMap.Content = buffer;
 
-                    var mip = new TgvMipMap { Content = buffer };
-                    file.MipMaps.Add(mip);
-
-                    mipSize /= 4;
-                    mipSize = Math.Max(16, mipSize); //16 dla dxt2-5 dla dxt1 powino być 8
-                }
-
+                file.MipMapCount = (ushort)header.MipMapCount;
+                file.MipMaps.Add(mainContentMipMap);
                 file.Height = header.Height;
                 file.ImageHeight = header.Height;
                 file.Width = header.Width;
                 file.ImageHeight = header.Width;
-                file.MipMapCount = (ushort)header.MipMapCount;
 
                 DDSHelper.ConversionFlags conversionFlags;
                 file.Format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags);
             }
 
             return file;
+
         }
 
     }

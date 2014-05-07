@@ -38,6 +38,10 @@ namespace WargameModInstaller.Services.Image
         /// <param name="yPos"></param>
         public void ReplaceImagePart(TgvImage destination, TgvImage source, uint xPos, uint yPos)
         {
+            //Jeśli chodzi o podmienianie częśći obrazka w mipMapach, warunkiem było by że użytkownik zapewnia obrazek źródłowy posiadający mipMapy
+            //W takiej sytuacji trzeba było by obliczać dla którego nr mipmapy obrazka z siatką (lods orygianlny) możliwa była by podmiania z wykorzystaniem
+            //mipmap obrazka źródłowego od użytkownika...
+
             if (destination.MipMaps.Count == 0 || source.MipMaps.Count == 0)
             {
                 return;
@@ -106,11 +110,12 @@ namespace WargameModInstaller.Services.Image
                 uint currentBlockStride = stride;
                 if (currentBlock == BlockCount)
                 {
-                    currentBlockStride = height % stride == 0 ? stride : height % stride;
+                    currentBlockStride = height % stride == 0 ? stride :  height % stride;
                 }
 
-                uint x = (i - (passedBlocks * width * stride)) / currentBlockStride;
-                uint y = (i % currentBlockStride) + (passedBlocks * stride);
+                uint passedBlockStrideMultiplied = passedBlocks * stride;
+                uint x = (i - (passedBlockStrideMultiplied * width)) / currentBlockStride;
+                uint y = (i % currentBlockStride) + passedBlockStrideMultiplied;
 
                 result[x, y] = content[i];
             }
@@ -141,9 +146,10 @@ namespace WargameModInstaller.Services.Image
                     {
                         //Sprawdzenie czy indeks y nie wykroczył poza granice, w przypadku obrazów o romiarze nie będącym wielokrotnością liczby stride (4).
                         //uint passedBlocks = (((long)currentBlock - 1) < 0 ? 0 : currentBlock - 1);
-                        if ((y + (currentBlock * stride)) < height)
+                        uint blockStrideMultiplied = currentBlock * stride;
+                        if ((y + (blockStrideMultiplied)) < height)
                         {
-                            result[resultIndexer++] = content[x, y + (currentBlock * stride)];
+                            result[resultIndexer++] = content[x, y + blockStrideMultiplied];
                         }
                     }
                 }

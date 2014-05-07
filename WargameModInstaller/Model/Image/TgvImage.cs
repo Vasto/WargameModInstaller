@@ -18,8 +18,8 @@ namespace WargameModInstaller.Model.Image
     {
         public TgvImage()
         {
-            this.Offsets = new List<uint>();
-            this.Sizes = new List<uint>();
+            //this.Offsets = new List<uint>();
+            //this.Sizes = new List<uint>();
             this.MipMaps = new List<TgvMipMap>();
         }
 
@@ -77,17 +77,17 @@ namespace WargameModInstaller.Model.Image
             set;
         }
 
-        public List<uint> Offsets
-        {
-            get;
-            set;
-        }
+        //public List<uint> Offsets
+        //{
+        //    get;
+        //    set;
+        //}
 
-        public List<uint> Sizes
-        {
-            get;
-            set;
-        }
+        //public List<uint> Sizes
+        //{
+        //    get;
+        //    set;
+        //}
 
         public string PixelFormatString
         {
@@ -95,10 +95,10 @@ namespace WargameModInstaller.Model.Image
             set;
         }
 
-        public List<TgvMipMap> MipMaps
+        public IList<TgvMipMap> MipMaps
         {
             get;
-            private set;
+            set;
         }
 
     }

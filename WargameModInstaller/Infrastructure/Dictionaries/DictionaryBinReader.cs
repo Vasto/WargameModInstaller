@@ -8,7 +8,10 @@ using WargameModInstaller.Model.Dictionaries;
 
 namespace WargameModInstaller.Infrastructure.Dictionaries
 {
-    public class DictionaryBinReader
+    /// <summary>
+    /// Represents a reader which can read a TRAD dictionary file from the raw byte data.
+    /// </summary>
+    public class DictionaryBinReader : IDictionaryBinReader
     {
         public IEnumerable<DictionaryEntry> Read(byte[] rawDictionaryData)
         {

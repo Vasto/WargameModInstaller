@@ -124,6 +124,19 @@ namespace WargameModInstaller.Common.Utilities
             return number;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public static long RoundToNextDivBy4(long number)
+        {
+            while (number % 4 != 0)
+                number++;
+
+            return number;
+        }
+
         public static byte[] HexByteStringToByteArray(String hex)
         {
             int numberChars = hex.Length / 2;
