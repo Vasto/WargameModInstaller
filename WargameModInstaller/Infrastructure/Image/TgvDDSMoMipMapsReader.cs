@@ -46,15 +46,21 @@ namespace WargameModInstaller.Infrastructure.Image
                 header.MipMapCount = 1;
 
                 //read only the main content mipmap
-                uint mainContentMipMapSize = header.Width * header.Height; 
-                buffer = new byte[mainContentMipMapSize];
+                uint minMipByteLength = DDSMipMapUilities.GetMinimumMipMapSizeForFormat(header.PixelFormat);
+                uint mipByteLength = Math.Max(minMipByteLength, header.Width * header.Height);
+
+                buffer = new byte[mipByteLength];
                 ms.Read(buffer, 0, buffer.Length);
 
-                var mainContentMipMap = new TgvMipMap();
-                mainContentMipMap.Content = buffer;
+                var mip = new TgvMipMap();
+                mip.Content = buffer;
+                mip.Length = mipByteLength;
+                mip.MipSize = header.Width * header.Height;
+                mip.MipWidth = header.Width;
+                mip.MipHeight = header.Height; 
 
                 file.MipMapCount = (ushort)header.MipMapCount;
-                file.MipMaps.Add(mainContentMipMap);
+                file.MipMaps.Add(mip);
                 file.Height = header.Height;
                 file.ImageHeight = header.Height;
                 file.Width = header.Width;

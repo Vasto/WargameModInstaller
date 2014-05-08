@@ -28,6 +28,20 @@ namespace WargameModInstaller.Common.Utilities.Image.DDS
                 return 0;
             }
         }
+
+        public static uint GetMipMapDimension(uint imageDimension, uint mipMapIndex)
+        {
+            uint mipMapDiemension = imageDimension;
+
+            for (int i = 0; i < mipMapIndex; ++i)
+            {
+                mipMapDiemension /= 2;
+            }
+
+            return mipMapDiemension;
+        }
+
+
     }
 
 }

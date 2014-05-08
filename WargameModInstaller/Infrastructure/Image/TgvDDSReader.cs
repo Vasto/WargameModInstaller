@@ -59,30 +59,31 @@ namespace WargameModInstaller.Infrastructure.Image
                     header.MipMapCount = 1;
                 }
 
-                uint mipWidth = header.Width;
-                uint mipHeight = header.Height;
-                uint mipSize = mipWidth * mipHeight;
-                for (ushort i = 0; i < header.MipMapCount; i++)
+                for (int i = 0; i < header.MipMapCount; i++)
                 {
+                    uint mipScale = (uint)Math.Max(1, 2 << (i - 1));
+                    uint mipWidth = Math.Max(1, header.Width / mipScale);
+                    uint mipHeight = Math.Max(1, header.Height / mipScale);
+
                     if (mipWidth < MinMipMapWidth || mipHeight < MinMipMapHeight)
                     {
                         break;
                     }
 
-                    uint minMipMapSize = DDSMipMapUilities.GetMinimumMipMapSizeForFormat(header.PixelFormat);
-                    mipSize = Math.Max(minMipMapSize, mipSize);
+                    uint minMipByteLength = DDSMipMapUilities.GetMinimumMipMapSizeForFormat(header.PixelFormat);
+                    uint mipByteLength = Math.Max(minMipByteLength, mipWidth * mipHeight);
 
-                    buffer = new byte[mipSize];
+                    buffer = new byte[mipByteLength];
                     ms.Read(buffer, 0, buffer.Length);
 
                     var mip = new TgvMipMap();
                     mip.Content = buffer;
-                    mip.Size = mipSize;
-                    file.MipMaps.Add(mip);
+                    mip.Length = mipByteLength;
+                    mip.MipSize = mipWidth * mipHeight;//(int)mipSize; //spr. czy to jest równe size czy width * height;
+                    mip.MipWidth = mipWidth;
+                    mip.MipHeight = mipHeight; 
 
-                    mipWidth /= 2;
-                    mipHeight /= 2;
-                    mipSize = mipWidth * mipHeight;
+                    file.MipMaps.Add(mip);
                 }
 
                 file.Height = header.Height;

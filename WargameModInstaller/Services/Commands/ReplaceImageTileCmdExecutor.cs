@@ -26,11 +26,11 @@ namespace WargameModInstaller.Services.Commands
         protected override byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath)
         {
             TgvImage oldTgv = GetTgvFromBytes(orginalImageContent);
-            TgvImage newtgv = GetTgvFromDDS(sourceImagePath);
+            TgvImage newtgv = GetTgvFromDDS(sourceImagePath, !Command.UseMipMaps);
 
             ImageComposerService.ReplaceImageTile(oldTgv, newtgv, (uint)Command.TileSize.Value, (uint)Command.Column.Value, (uint)Command.Row.Value);
 
-            byte[] rawOldTgv = ConvertTgvToBytes(oldTgv);
+            byte[] rawOldTgv = ConvertTgvToBytes(oldTgv, !Command.UseMipMaps);
             return rawOldTgv;
         }
 

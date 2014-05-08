@@ -93,6 +93,16 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
+        /// <summary>
+        /// Gets or sets an information wheather a MipMaps of the image 
+        /// should be taken into consdieration during the replacement process.
+        /// </summary>
+        public bool UseMipMaps
+        {
+            get;
+            set;
+        }
+
         public String GetExecutionMessage()
         {
             return String.Format(Properties.Resources.Copying + " {0}...",

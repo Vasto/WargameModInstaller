@@ -422,6 +422,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var column = cmdElement.Attribute("column").ValueOrDefault<int?>();
                 var row = cmdElement.Attribute("row").ValueOrDefault<int?>();
                 var tileSize = cmdElement.Attribute("tileSize").ValueOr<int>(256);
+                var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(defaultUseMipMapsValue);
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
@@ -432,6 +433,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.Column = column;
                 newCmd.Row = row;
                 newCmd.TileSize = tileSize;
+                newCmd.UseMipMaps = useMipMaps;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -453,6 +455,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var xPos = cmdElement.Attribute("xPos").ValueOr<int>(0);
                 var yPos = cmdElement.Attribute("yPos").ValueOr<int>(0);
+                var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(defaultUseMipMapsValue);
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
@@ -462,6 +465,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.TargetContentPath = new ContentPath(edataImagePath);
                 newCmd.XPosition = xPos;
                 newCmd.YPosition = yPos;
+                newCmd.UseMipMaps = useMipMaps;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

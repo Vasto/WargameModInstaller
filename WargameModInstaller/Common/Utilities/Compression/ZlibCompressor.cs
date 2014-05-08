@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Common.Utilities.Compression
 {
+    //To do: rozwa¿yæ inne biblitoeki pod k¹tem lepszej kompresji, tak aby zminimalizowaæ koniecznoœc przebudowy plików.
+
     public class ZlibCompressor : ICompressor
     {
         /// <summary>

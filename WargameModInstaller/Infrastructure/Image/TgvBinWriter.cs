@@ -65,7 +65,7 @@ namespace WargameModInstaller.Infrastructure.Image
 
                 stream.Seek(8 * file.MipMapCount, SeekOrigin.Current);
 
-                var sortedMipMaps = file.MipMaps.OrderBy(x => x.Content.Length).ToList();
+                var sortedMipMaps = file.MipMaps.OrderBy(x => x.MipSize).ToList();
 
                 // Create the content and write all MipMaps, 
                 // since we compress on this part its the first part where we know the size of a MipMap
@@ -80,24 +80,26 @@ namespace WargameModInstaller.Infrastructure.Image
                         //buffer = BitConverter.GetBytes(mipImgsizes[sortedMipMaps.IndexOf(sortedMipMap)]);
                         //To Ÿle dzia³a. W orygianlnym pliku bajty s¹ w innej kolejnoœci. Pozatym to zak³ada ze potêg¹ jest indeks, 
                         //a w przypadku ma³ej liczby bitmap to nie ma sensu
-                        uint mipSize = GetMipMapSize(file.Width, file.Height, sortedMipMaps.IndexOf(sortedMipMap), sortedMipMaps.Count);
+                        uint mipSize = sortedMipMap.MipSize; //GetMipMapSize(file.Width, file.Height, sortedMipMaps.IndexOf(sortedMipMap), sortedMipMaps.Count);
                         buffer = BitConverter.GetBytes(mipSize); 
                         stream.Write(buffer, 0, buffer.Length);
 
                         ICompressor comp = new ZlibCompressor();
                         buffer = comp.Compress(sortedMipMap.Content);
                         stream.Write(buffer, 0, buffer.Length);
-                        sortedMipMap.Size = (uint)buffer.Length;
+                        sortedMipMap.Length = (uint)buffer.Length;
                     }
                     else
                     {
                         stream.Write(sortedMipMap.Content, 0, sortedMipMap.Content.Length);
-                        sortedMipMap.Size = (uint)sortedMipMap.Content.Length;
+                        sortedMipMap.Length = (uint)sortedMipMap.Content.Length;
                     }
 
                     //Wygl¹da na to ¿e mipMapy musza mieæ offset wzglêden pocz¹tku pliku podzielny przez 4.
                     //Trzeba dope³niæ do liczby podzielnej przez 4 przed zapisem nastêpnego
                     //To dope³nienie zak³ada ¿e nag³ówek ma d³ugoœæ podzielna przez 4, tak ¿e pierwsza MipMapa nie jest przesuniêta.
+
+                    //Plik Edata wie o tym poszerzeniu rozmiaru, bo odczytuje d³ugoœæ pliku z rozmiaru contentu.
 
                     bool multiMipMaps = file.MipMaps.Count > 1;
                     bool needSupplementTo4 = (stream.Position % 4) != 0;
@@ -121,7 +123,7 @@ namespace WargameModInstaller.Infrastructure.Image
                 // Write the size collection into the header.
                 for (int i = 0; i < file.MipMapCount; i++)
                 {
-                    buffer = BitConverter.GetBytes(sortedMipMaps[i].Size + 8); //+ 4 magii i + 4 rozmiaru mapy
+                    buffer = BitConverter.GetBytes(sortedMipMaps[i].Length + 8); //+ 4 magii i + 4 rozmiaru mapy
                     stream.Write(buffer, 0, buffer.Length);
                 }
 
@@ -129,23 +131,23 @@ namespace WargameModInstaller.Infrastructure.Image
             }
         }
 
-        private uint GetMipMapSize(uint imageWidth, uint imageHeight, int mipMapIndex, int mipMapsCount)
-        {
-            if (mipMapIndex == mipMapsCount - 1)
-            {
-                return imageWidth * imageHeight;
-            }
+        //private uint GetMipMapSize(uint imageWidth, uint imageHeight, int mipMapIndex, int mipMapsCount)
+        //{
+        //    if (mipMapIndex == mipMapsCount - 1)
+        //    {
+        //        return imageWidth * imageHeight;
+        //    }
 
-            uint mipWidth = imageWidth;
-            uint mipHeight = imageHeight;
-            for (int i = mipMapsCount - 1; i > mipMapIndex; --i)
-            {
-                mipWidth /= 2;
-                mipHeight /= 2;
-            }
+        //    uint mipWidth = imageWidth;
+        //    uint mipHeight = imageHeight;
+        //    for (int i = mipMapsCount - 1; i > mipMapIndex; --i)
+        //    {
+        //        mipWidth /= 2;
+        //        mipHeight /= 2;
+        //    }
 
-            return mipWidth * mipHeight;
-        }
+        //    return mipWidth * mipHeight;
+        //}
 
 
     }

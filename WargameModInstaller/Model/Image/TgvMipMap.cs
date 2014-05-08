@@ -19,31 +19,63 @@ namespace WargameModInstaller.Model.Image
         {
         }
 
-        public TgvMipMap(uint offset, uint size, ushort mipWidth)
+        public TgvMipMap(uint offset, uint length, uint mipSize, uint mipWidth, uint mipHeight)
         {
             this.Offset = offset;
-            this.Size = size;
+            this.Length = length;
+            this.MipSize = mipSize;
             this.MipWidth = mipWidth;
+            this.MipHeight = mipHeight;
         }
 
+        /// <summary>
+        /// Gets or sets an offset of the MipMap from the begining of the TGV file.
+        /// </summary>
         public uint Offset
         {
             get;
             set;
         }
 
-        public uint Size
+        /// <summary>
+        /// Gets or sets a length of the byte content of the MipMap in the file (only content length).
+        /// </summary>
+        public uint Length
         {
             get;
             set;
         }
 
-        public int MipWidth
+        /// <summary>
+        /// Gets or sets a dimensional size of the MipMap.
+        /// </summary>
+        public uint MipSize
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Gets or sets a width of the MipMap image.
+        /// </summary>
+        public uint MipWidth
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a height of the MipMap image.
+        /// </summary>
+        public uint MipHeight
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a raw MipMap Image content.
+        /// </summary>
         public byte[] Content
         {
             get;

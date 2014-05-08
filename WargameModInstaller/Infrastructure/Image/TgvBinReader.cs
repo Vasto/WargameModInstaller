@@ -74,9 +74,11 @@ namespace WargameModInstaller.Infrastructure.Image
 
                 ReadMipMapsOffsets(ms, mipMaps);
 
-                ReadMipMapsSizes(ms, mipMaps);
+                ReadMipMapsLengths(ms, mipMaps);
 
                 ReadMipMapsContent(ms, mipMaps, tgvFile.IsCompressed);
+
+                SetMipMapsDimensions(mipMaps, tgvFile.Width, tgvFile.Height);
 
                 tgvFile.MipMaps = mipMaps;
             }
@@ -108,14 +110,14 @@ namespace WargameModInstaller.Infrastructure.Image
             }
         }
 
-        private void ReadMipMapsSizes(Stream stream, IList<TgvMipMap> mipMaps)
+        private void ReadMipMapsLengths(Stream stream, IList<TgvMipMap> mipMaps)
         {
             var buffer = new byte[4];
             for (int i = 0; i < mipMaps.Count; i++)
             {
                 stream.Read(buffer, 0, buffer.Length);
-                uint size = BitConverter.ToUInt32(buffer, 0);
-                mipMaps[i].Size = size;
+                uint length = BitConverter.ToUInt32(buffer, 0);
+                mipMaps[i].Length = length;
             }
         }
 
@@ -136,11 +138,11 @@ namespace WargameModInstaller.Infrastructure.Image
                     }
 
                     stream.Read(buffer, 0, buffer.Length);
-                    mipMaps[i].MipWidth = BitConverter.ToInt32(buffer, 0);
+                    mipMaps[i].MipSize = (uint)BitConverter.ToInt32(buffer, 0); //Tu nie by³o rzutowania
                 }
 
                 // odejmujemy 8 bo rozmiar zawiera 8 bajtów dodatkowych, 4 magii i 4 rozmiaru mipampy
-                buffer = new byte[mipMaps[i].Size - 8]; 
+                buffer = new byte[mipMaps[i].Length - 8]; 
                 stream.Read(buffer, 0, buffer.Length);
 
                 if (compressed)
@@ -150,6 +152,20 @@ namespace WargameModInstaller.Infrastructure.Image
                 }
 
                 mipMaps[i].Content = buffer;
+            }
+        }
+
+        private void SetMipMapsDimensions(IList<TgvMipMap> mipMaps, uint imageWidth, uint imageHeight)
+        {
+            var sortedMipMaps = mipMaps.OrderByDescending(x => x.MipSize).ToList();
+            for (int i = 0; i < sortedMipMaps.Count; i++)
+            {
+                uint scale = (uint)Math.Max(1, 2 << (i - 1));
+                uint width = Math.Max(1, imageWidth / scale);
+                uint height = Math.Max(1, imageHeight / scale);
+
+                sortedMipMaps[i].MipWidth = width;
+                sortedMipMaps[i].MipHeight = height;
             }
         }
 

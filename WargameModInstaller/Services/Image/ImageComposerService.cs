@@ -34,60 +34,71 @@ namespace WargameModInstaller.Services.Image
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="destination"></param>
+        /// <param name="target"></param>
         /// <param name="source"></param>
         /// <param name="xPos"></param>
         /// <param name="yPos"></param>
-        public void ReplaceImagePart(TgvImage destination, TgvImage source, uint xPos, uint yPos)
+        public void ReplaceImagePart(TgvImage target, TgvImage source, uint xPos, uint yPos)
         {
             //Jeśli chodzi o podmienianie częśći obrazka w mipMapach, warunkiem było by że użytkownik zapewnia obrazek źródłowy posiadający mipMapy
             //W takiej sytuacji trzeba było by obliczać dla którego nr mipmapy obrazka z siatką (lods orygianlny) możliwa była by podmiania z wykorzystaniem
             //mipmap obrazka źródłowego od użytkownika...
 
-            if (destination.MipMaps.Count == 0 || source.MipMaps.Count == 0)
+            if (target.MipMaps.Count == 0 || source.MipMaps.Count == 0)
             {
                 return;
             }
 
-            if (xPos >= destination.Width || xPos < 0 ||
-                yPos >= destination.Height || yPos < 0)
+            if (xPos >= target.Width || xPos < 0 ||
+                yPos >= target.Height || yPos < 0)
             {
                 return;
             }
 
-            var targetImage = GetBiggestMipMap(destination);
-            var sourceImage = GetBiggestMipMap(source);
+            var sortedSourceMips = source.MipMaps.OrderByDescending(x => x.MipSize).ToArray();
+            var sortedTargettMips = target.MipMaps.OrderByDescending(x => x.MipSize).ToArray();
 
-            //Pomyśleć nad odczytywaniem rozmiarów z obiektu mipMapy
-            var targetRectangleContent = ConvertContentToRectangleArray(targetImage.Content, destination.Width, destination.Height);
-            var sourceRectangleContent = ConvertContentToRectangleArray(sourceImage.Content, source.Width, source.Height);
-
-            for (int x = 0; x < source.Width; ++x)
+            for (int i = 0; (i < sortedSourceMips.Length) && (i < sortedTargettMips.Length); ++i)
             {
-                for (int y = 0; y < source.Height; ++y)
+                var sourceMip = sortedSourceMips[i];
+                var targetMip = sortedTargettMips[i];
+
+                //1. Przeskalować pozycje umieszczenia
+                //2. Spr czy pozycje umieszczenia są poprawne
+                //3. ocenić kiedy nie można / staję sie niebezpieczne dalsze przepisywnia mipmap przy jednoczesnym znikomym rezultacie.
+
+                uint mipScale = (uint)Math.Max(1, 2 << (i - 1));//Przenieśc to do jakiego utilies
+                uint targetMipXPos = xPos / mipScale;
+                uint targetMipYPos = yPos / mipScale;
+
+                if (targetMipXPos >= 0 && targetMipXPos < targetMip.MipWidth &&
+                    targetMipYPos >= 0 && targetMipYPos < targetMip.MipHeight)
                 {
-                    if (xPos + x < destination.Width &&
-                        yPos + y < destination.Height)
+                    ReplaceMipMapPart(targetMip, sourceMip, targetMipXPos, targetMipYPos);
+                }
+            }
+        }
+
+        private void ReplaceMipMapPart(TgvMipMap target, TgvMipMap source, uint xPos, uint yPos)
+        {
+            var targetRectangleContent = ConvertContentToRectangleArray(target.Content, target.MipWidth, target.MipHeight);
+            var sourceRectangleContent = ConvertContentToRectangleArray(source.Content, source.MipWidth, source.MipHeight);
+
+            for (int x = 0; x < source.MipWidth; ++x)
+            {
+                for (int y = 0; y < source.MipHeight; ++y)
+                {
+                    if (xPos + x < target.MipWidth && yPos + y < target.MipHeight)
                     {
                         targetRectangleContent[xPos + x, yPos + y] = sourceRectangleContent[x, y];
                     }
                 }
             }
 
-            targetImage.Content = ConvertContentToLinearArray(targetRectangleContent);
-            sourceImage.Content = ConvertContentToLinearArray(sourceRectangleContent);
+            target.Content = ConvertContentToLinearArray(targetRectangleContent);
+            source.Content = ConvertContentToLinearArray(sourceRectangleContent);
         }
 
-        private TgvMipMap GetBiggestMipMap(TgvImage image)
-        {
-            var result = image
-                .MipMaps
-                .ToArray()
-                .OrderBy(x => x.Size)
-                .Last();
-
-            return result;
-        }
 
         /// <summary>
         /// Converts the raw Tgv image stored in the linear byte array to the two dimensional byte array with a byte order
@@ -142,13 +153,14 @@ namespace WargameModInstaller.Services.Image
 
             for (uint currentBlock = 0; currentBlock < BlockCount; ++currentBlock)
             {
+                uint blockStrideMultiplied = currentBlock * stride;
+
                 for (uint x = 0; x < width; ++x)
                 {
                     for (uint y = 0; y < stride; ++y)
                     {
                         //Sprawdzenie czy indeks y nie wykroczył poza granice, w przypadku obrazów o romiarze nie będącym wielokrotnością liczby stride (4).
                         //uint passedBlocks = (((long)currentBlock - 1) < 0 ? 0 : currentBlock - 1);
-                        uint blockStrideMultiplied = currentBlock * stride;
                         if ((y + (blockStrideMultiplied)) < height)
                         {
                             result[resultIndexer++] = content[x, y + blockStrideMultiplied];

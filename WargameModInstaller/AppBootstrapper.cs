@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Windows.Threading;
 using WargameModInstaller.Common.Logging;
 using WargameModInstaller.Infrastructure.Commands;
 using WargameModInstaller.Infrastructure.Config;
@@ -24,6 +25,8 @@ namespace WargameModInstaller
 
         static AppBootstrapper()
         {
+
+
 #if DEBUG
             //LogManager.GetLog = (type) => LoggerFactory.Create(type);
 #endif
@@ -122,6 +125,13 @@ namespace WargameModInstaller
             }
 
             return assemblies;
+        }
+
+        protected override void OnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            LoggerFactory.Create(this.GetType()).Error(e.Exception);
+
+            base.OnUnhandledException(sender, e);
         }
 
         protected override void OnStartup(object sender, System.Windows.StartupEventArgs e)
