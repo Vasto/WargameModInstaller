@@ -83,6 +83,10 @@ namespace WargameModInstaller.Model.Edata
             private set;
         }
 
+        /// <summary>
+        /// Ca³oœæ danych pomiedzy ostatnim bajtem nag³ówka, a pierwszym bajtem contentu plików.
+        /// W sumie to s¹ g³ównie zera, s³ownik, zera... (po co to tak naprawde by³a?, wiem ze niedzialo bez tego...)
+        /// </summary>
         public byte[] PostHeaderData
         {
             get;

@@ -32,7 +32,7 @@ namespace WargameModInstaller.Infrastructure.Image
             noMipMapsFile.IsCompressed = file.IsCompressed;
             noMipMapsFile.SourceChecksum = file.SourceChecksum;
             noMipMapsFile.Version = file.Version;
-            noMipMapsFile.MipMaps.Add(file.MipMaps.ToArray().OrderBy(x => x.Length).Last());
+            noMipMapsFile.MipMaps.Add(file.MipMaps.OrderBy(x => x.Length).Last());
             noMipMapsFile.MipMapCount = 1;
 
             return base.Write(noMipMapsFile);

@@ -34,6 +34,9 @@ namespace WargameModInstaller.Model.Edata
         /// </summary>
         public event EventHandler ContentUnloaded;
 
+        /// <summary>
+        /// Gets or sets the path written in the edata dictionary.
+        /// </summary>
         public String Path
         {
             get;
@@ -68,24 +71,36 @@ namespace WargameModInstaller.Model.Edata
             set; 
         }
 
+        /// <summary>
+        /// Gets or sets the file checksum.
+        /// </summary>
         public byte[] Checksum
         {
             get;
             set; 
         }
 
+        /// <summary>
+        /// Gets or set the order id in the dictionary.
+        /// </summary>
         public uint Id
         {
             get;
             set; 
         }
 
+        /// <summary>
+        /// Gets or sets the edata content file type.
+        /// </summary>
         public EdataContentFileType FileType
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the file raw content.
+        /// </summary>
         public byte[] Content
         {
             get
@@ -108,6 +123,10 @@ namespace WargameModInstaller.Model.Edata
             }
         }
 
+        /// <summary>
+        /// Gets the file's content length in bytes.
+        /// Returns zero when no content.
+        /// </summary>
         public long ContentSize
         {
             get
@@ -116,7 +135,10 @@ namespace WargameModInstaller.Model.Edata
             }
         }
 
-        //Zastanowić się nad tym jak to powinno być ustalane
+        /// <summary>
+        /// Gets the information wheather the file's content is loaded.
+        /// False, when content null, true when content set, even if zero bytes long.
+        /// </summary>
         public bool IsContentLoaded
         {
             get;
