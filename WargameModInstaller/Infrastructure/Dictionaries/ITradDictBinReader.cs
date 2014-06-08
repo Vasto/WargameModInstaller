@@ -4,8 +4,8 @@ using WargameModInstaller.Model.Dictionaries;
 
 namespace WargameModInstaller.Infrastructure.Dictionaries
 {
-    public interface IDictionaryBinReader
+    public interface ITradDictBinReader
     {
-        IEnumerable<DictionaryEntry> Read(byte[] rawDictionaryData);
+        IEnumerable<TradDictEntry> Read(byte[] rawDictionaryData);
     }
 }

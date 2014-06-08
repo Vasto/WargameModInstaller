@@ -11,9 +11,9 @@ namespace WargameModInstaller.Infrastructure.Dictionaries
     /// <summary>
     /// Represents a writer which can writea a TRAD dictionary file to a raw byte data form.
     /// </summary>
-    public class DictionaryBinWriter : IDictionaryBinWriter
+    public class TradDictBinWriter : ITradDictBinWriter
     {
-        public byte[] Write(IEnumerable<DictionaryEntry> entries)
+        public byte[] Write(IEnumerable<TradDictEntry> entries)
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -41,7 +41,7 @@ namespace WargameModInstaller.Infrastructure.Dictionaries
         /// Credits go to enohka for this code.
         /// See more at: https://github.com/enohka/moddingSuite/blob/master/moddingSuite/BL/TradManager.cs
         /// </remarks>
-        protected virtual void WriteEntries(MemoryStream ms, IEnumerable<DictionaryEntry> entires)
+        protected virtual void WriteEntries(MemoryStream ms, IEnumerable<TradDictEntry> entires)
         {
             foreach (var entry in entires)
             {

@@ -145,8 +145,8 @@ namespace WargameModInstaller.Services.Commands
                 {
                     //var holdingFileOfParentEdata = GetEdataContentFileByPath(parentEntity.EdataFile, currentEntity.OwnerPath);
 
-                    var holdingFileOfParentEdata = parentEntity.EdataFile.GetContentFileByPath(currentEntity.OwnerPath);
-                    holdingFileOfParentEdata.Content = contentFileReader.Read(currentEntity.EdataFile.Path);
+                    var owner = parentEntity.EdataFile.GetContentFileByPath(currentEntity.OwnerPath);
+                    owner.Content = contentFileReader.Read(currentEntity.EdataFile.Path);
                 }
             }
         }

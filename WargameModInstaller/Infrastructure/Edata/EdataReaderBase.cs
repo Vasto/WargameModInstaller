@@ -133,7 +133,8 @@ namespace WargameModInstaller.Infrastructure.Edata
                     {
                         long currentStreamPosition = stream.Position;
 
-                        file.Content = ReadContent(stream, header.FileOffset + file.Offset, file.Size);
+                        file.Content = ReadContent(stream, file.TotalOffset, file.Size);
+                        //file.Content = ReadContent(stream, header.FileOffset + file.Offset, file.Size);
                         //file.Size = file.Content.Length;
 
                         stream.Seek(currentStreamPosition, SeekOrigin.Begin);

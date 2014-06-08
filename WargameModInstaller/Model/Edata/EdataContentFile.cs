@@ -35,7 +35,7 @@ namespace WargameModInstaller.Model.Edata
         public event EventHandler ContentUnloaded;
 
         /// <summary>
-        /// Gets or sets the path written in the edata dictionary.
+        /// Gets or sets the path written in the edata dictionary. 
         /// </summary>
         public String Path
         {
@@ -143,6 +143,11 @@ namespace WargameModInstaller.Model.Edata
         {
             get;
             private set;
+        }
+
+        public override string ToString()
+        {
+            return Path;
         }
 
         private void NotifyContentLoaded()

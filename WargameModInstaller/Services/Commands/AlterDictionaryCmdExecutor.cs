@@ -60,14 +60,14 @@ namespace WargameModInstaller.Services.Commands
 
             CurrentStep++;
 
-            var dictReader = new DictionaryBinReader();
+            var dictReader = new TradDictBinReader();
             var entries = dictReader.Read(contentFile.Content);
             var hashToEntriesMap = entries.ToDictionary(key => key.Hash, new ByteArrayComparer());
 
             foreach (var alteredEntry in Command.AlteredEntries)
             {
                 var hash = MiscUtilities.HexByteStringToByteArray(alteredEntry.Key);
-                DictionaryEntry entry;
+                TradDictEntry entry;
                 if (hashToEntriesMap.TryGetValue(hash, out entry))
                 {
                     entry.Content = alteredEntry.Value;
@@ -79,7 +79,7 @@ namespace WargameModInstaller.Services.Commands
                 }
             }
 
-            var dictWriter = new DictionaryBinWriter();
+            var dictWriter = new TradDictBinWriter();
             var rawDictionaryData = dictWriter.Write(entries);
             contentFile.Content = rawDictionaryData;
 

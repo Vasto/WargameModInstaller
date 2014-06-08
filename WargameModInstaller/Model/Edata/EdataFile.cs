@@ -5,6 +5,11 @@ using System.Text;
 
 namespace WargameModInstaller.Model.Edata
 {
+    //To do: spróbowaæ wywaliæ to postheaderData, bo wydaje siê ¿e zawiera ono tylko ci¹g zer a¿ do ofssetu s³ownika, sam s³ownik, i ci¹g zer
+    //       a¿ do kontentu plików. Poprostu trzeba okreœliæ obie d³ ciagu zer (pierwsza to napewno chyba do 1037Bajta) i wpisaæ pomiêdzy nie s³ownik
+    //       kwestia tylko tego jak to wyglada przy zagniezdzonych pakietach, pewnie bedzie problem, bo to jest tu chyba po to zeby od razu mozna by³o wpsiaæ
+    //       ca³oœæ z pamieci.
+
     public class EdataFile
     {
         private IDictionary<String, EdataContentFile> contentFilesDictionary;
@@ -63,20 +68,6 @@ namespace WargameModInstaller.Model.Edata
         /// <summary>
         /// 
         /// </summary>
-        public bool IsVirtual
-        {
-            get;
-            private set;
-        }
-
-        public String Name
-        {
-            get
-            {
-                return System.IO.Path.GetFileName(Path);
-            }
-        }
-
         public EdataHeader Header
         {
             get;
@@ -93,6 +84,27 @@ namespace WargameModInstaller.Model.Edata
             private set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsVirtual
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool HasContentFilesCollectionChanged
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<EdataContentFile> ContentFiles
         {
             get
@@ -113,6 +125,42 @@ namespace WargameModInstaller.Model.Edata
                 throw new InvalidOperationException(
                     String.Format(Properties.Resources.ContentFileNotFoundParametrizedMsg, contentPath));
             }
+        }
+
+        public void AddContentFile(EdataContentFile contentFile)
+        {
+            if(String.IsNullOrEmpty(contentFile.Path))
+            {
+                throw new ArgumentException(
+                    String.Format("Cannot add a content file without the specified path."), 
+                    "contentFile");
+            }
+
+            //Check for whitespaces
+
+            if (contentFilesDictionary.ContainsKey(contentFile.Path))
+            {
+                throw new ArgumentException(
+                    String.Format("Cannot add a content file with the follwing path \"{0}\", because a content file with this path already exists."), 
+                    "contentFile");
+            }
+
+            contentFilesDictionary.Add(contentFile.Path, contentFile);
+            contentFile.Owner = this;
+            HasContentFilesCollectionChanged = true;
+        }
+
+        public void RemoveContentFile(EdataContentFile contentFile)
+        {
+            if (!contentFilesDictionary.ContainsKey(contentFile.Path))
+            {
+                throw new InvalidOperationException(
+                    String.Format("Cannot remove a content file with the follwing path \"{0}\", because it doesn't exist."));
+            }
+
+            contentFilesDictionary.Remove(contentFile.Path);
+            contentFile.Owner = null;
+            HasContentFilesCollectionChanged = true;
         }
 
         protected void AssignOwnership(IEnumerable<EdataContentFile> contentFiles)

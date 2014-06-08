@@ -111,10 +111,10 @@
     <Compile Include="Infrastructure\Content\IContentFileReader.cs" />
     <Compile Include="Infrastructure\Content\IContentFileWriter.cs" />
     <Compile Include="Infrastructure\Components\IComponentsReader.cs" />
-    <Compile Include="Infrastructure\Dictionaries\DictionaryBinReader.cs" />
-    <Compile Include="Infrastructure\Dictionaries\DictionaryBinWriter.cs" />
-    <Compile Include="Infrastructure\Dictionaries\IDictionaryBinReader.cs" />
-    <Compile Include="Infrastructure\Dictionaries\IDictionaryBinWriter.cs" />
+    <Compile Include="Infrastructure\Dictionaries\TradDictBinReader.cs" />
+    <Compile Include="Infrastructure\Dictionaries\TradDictBinWriter.cs" />
+    <Compile Include="Infrastructure\Dictionaries\ITradDictBinReader.cs" />
+    <Compile Include="Infrastructure\Dictionaries\ITradDictBinWriter.cs" />
     <Compile Include="Infrastructure\Image\TgvDDSReader.cs" />
     <Compile Include="Model\Commands\AlterDictionaryCmd.cs" />
     <Compile Include="Model\Commands\CmdEntryType.cs" />
@@ -139,7 +139,10 @@
     <Compile Include="Model\Config\WargameVersionType.cs" />
     <Compile Include="Model\Components\Component.cs" />
     <Compile Include="Model\Components\ComponentType.cs" />
-    <Compile Include="Model\Dictionaries\DictionaryEntry.cs" />
+    <Compile Include="Model\Dictionaries\TradDictEntry.cs" />
+    <Compile Include="Model\Edata\EdataDictSubPath.cs" />
+    <Compile Include="Model\Edata\EdataDictDirSubPath.cs" />
+    <Compile Include="Model\Edata\EdataDictFileSubPath.cs" />
     <Compile Include="Model\WMIEntryType.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileReader.cs" />
     <Compile Include="Infrastructure\Edata\EdataFileWriter.cs" />

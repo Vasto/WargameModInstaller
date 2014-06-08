@@ -13,6 +13,7 @@ namespace WargameModInstaller.Model.Edata
         Image,
         Package,
         Save,
+        Prxypcpc,
         Unknown
     }
 

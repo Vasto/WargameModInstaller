@@ -11,9 +11,9 @@ namespace WargameModInstaller.Infrastructure.Dictionaries
     /// <summary>
     /// Represents a reader which can read a TRAD dictionary file from the raw byte data.
     /// </summary>
-    public class DictionaryBinReader : IDictionaryBinReader
+    public class TradDictBinReader : ITradDictBinReader
     {
-        public IEnumerable<DictionaryEntry> Read(byte[] rawDictionaryData)
+        public IEnumerable<TradDictEntry> Read(byte[] rawDictionaryData)
         {
             using (var stream = new MemoryStream(rawDictionaryData))
             {
@@ -49,15 +49,15 @@ namespace WargameModInstaller.Infrastructure.Dictionaries
         /// Credits go to enohka for this code.
         /// See more at: https://github.com/enohka/moddingSuite/blob/master/moddingSuite/BL/TradManager.cs
         /// </remarks>
-        protected virtual IEnumerable<DictionaryEntry> ReadEntries(MemoryStream ms, uint entriesCount)
+        protected virtual IEnumerable<TradDictEntry> ReadEntries(MemoryStream ms, uint entriesCount)
         {
-            var entries = new List<DictionaryEntry>();
+            var entries = new List<TradDictEntry>();
 
             var buffer = new byte[4];
 
             for (int i = 0; i < entriesCount; i++)
             {
-                var entry = new DictionaryEntry();
+                var entry = new TradDictEntry();
                 entry.OffsetDictionary = (uint)ms.Position;
 
                 var hashBuffer = new byte[8];
@@ -81,7 +81,7 @@ namespace WargameModInstaller.Infrastructure.Dictionaries
         /// Credits go to enohka for this code.
         /// See more at: https://github.com/enohka/moddingSuite/blob/master/moddingSuite/BL/TradManager.cs
         /// </remarks>
-        protected virtual void LoadEntriesContent(MemoryStream ms, IEnumerable<DictionaryEntry> entries)
+        protected virtual void LoadEntriesContent(MemoryStream ms, IEnumerable<TradDictEntry> entries)
         {
             foreach (var entry in entries)
             {

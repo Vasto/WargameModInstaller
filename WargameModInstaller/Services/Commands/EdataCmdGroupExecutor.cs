@@ -33,7 +33,7 @@ namespace WargameModInstaller.Services.Commands
             if (!File.Exists(targetfullPath))
             {
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
-                throw new CmdExecutionFailedException("Specified Edata file doesn't exist",
+                throw new CmdExecutionFailedException(String.Format("Specified Edata file: \"{0}\" doesn't exist", targetfullPath),
                     String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
             }
 

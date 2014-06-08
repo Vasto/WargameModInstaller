@@ -300,7 +300,7 @@ namespace WargameModInstaller.Infrastructure.Edata
 
         protected bool CanUseReplacementWrite(EdataFile file)
         {
-            //chyba zbedne to sotrtowaie...
+            //chyba zbedne to sotrtowaie, ale dla pewności...
             var contentFiles = file.ContentFiles
                 .OrderBy(cf => cf.TotalOffset)
                 .ToArray();
@@ -348,17 +348,214 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
         }
 
-#if DEBUG
-        #region Temp Helpers
+        #region OldMethod
 
-        private bool AreOffsets16Based(EdataFile ef)
+        //protected virtual ICollection<EdataDictSubPath> CreateDictionaryEntriesForContentFiles(
+        //    IEnumerable<EdataContentFile> contentFiles)
+        //{
+        //    //This alghoritm assumes that there are no two content files with the same paths.
+
+        //    var remainingSplitPaths = contentFiles
+        //        .OrderBy(file => file.Path)
+        //        .Select(file => new ContentPathSplitInfo() { Path = file.Path })
+        //        .ToList();
+
+        //    var dictionaryEntries = new List<EdataDictSubPath>();
+
+        //    while (remainingSplitPaths.Count > 0)
+        //    {
+        //        //powinny być tylko te pierwsze o wspólnym indeksie. //splitPathsWorkingSet
+        //        var comparedPaths = remainingSplitPaths.ToList();
+        //        int matchIndex = 0;
+
+        //        //Ten warunek jest do dupy, bo na dobra sprawe nigdy petla nie kończy sie w wyniku jego spełnienia
+        //        // a raczej w wyniku break.
+        //        while (comparedPaths.Count > 0)
+        //        {
+        //            if (comparedPaths.Count == 1)
+        //            {
+        //                //
+        //                var path = comparedPaths[0];
+
+        //                var newFilePathEntry = new EdataDictFileSubPath();
+        //                newFilePathEntry.SubPath = path.GetPathFromSplitIndex();
+
+        //                AddEntryToDictionary(newFilePathEntry, path, dictionaryEntries);
+
+        //                remainingSplitPaths.Remove(path);
+
+        //                break;
+        //            }
+
+        //            int matchedPathsCount = 1;
+        //            bool allPathsMatched = true;
+
+        //            for (int i = 1; i < comparedPaths.Count; ++i)
+        //            {
+        //                var path1 = comparedPaths[i - 1];
+        //                var path2 = comparedPaths[i];
+
+        //                int index1 = matchIndex + path1.SplitIndex;
+        //                int index2 = matchIndex + path2.SplitIndex;
+
+        //                if (index1 == index2 &&
+        //                    index1 < path1.Path.Length &&
+        //                    index2 < path2.Path.Length &&
+        //                    path1.Path[index1] == path2.Path[index2])
+        //                {
+        //                    matchedPathsCount++;
+        //                }
+        //                else
+        //                {
+        //                    // czy match end moze nie nastąpić? kluczowe pytanie, i co jesli tak i w jakiej sytuacji?
+        //                    // update, w takiej sytuacji jak mamy obecnie to nie nastapi tylko gdy cała kolumna (wszysktie wpisy) w danym indeksie ma te same znaki
+        //                    // czyl przechodzimy poprostu do nastepengo indesku z pełnym dopasowaniem.
+        //                    allPathsMatched = false;
+        //                    break;
+        //                }
+        //            }
+
+        //            if (allPathsMatched)
+        //            {
+        //                matchIndex++;
+        //            }
+        //            else
+        //            {
+        //                if (matchIndex == 0)
+        //                {
+        //                    comparedPaths.RemoveRange(matchedPathsCount, comparedPaths.Count - matchedPathsCount);
+        //                    matchIndex++;
+        //                }
+        //                else if (matchIndex > 0)
+        //                {
+        //                    var path = comparedPaths[0];
+
+        //                    var newDirPathEntry = new EdataDictDirSubPath();
+        //                    newDirPathEntry.SubPath = path.GetPathFromSplitIndex(length: matchIndex);
+
+        //                    AddEntryToDictionary(newDirPathEntry, path, dictionaryEntries);
+
+        //                    //czy tu powinno być += czy tylko przypisanie?
+        //                    comparedPaths.ForEach(p => p.SplitIndex += matchIndex);
+
+        //                    break;
+        //                }
+        //            }
+
+        //        }
+        //    }
+
+        //    return dictionaryEntries;
+        //}
+        
+        #endregion
+
+        protected virtual ICollection<EdataDictSubPath> CreateDictionaryEntriesForContentFiles(IEnumerable<EdataContentFile> contentFiles)
         {
-            var contentFiles = ef.ContentFiles.ToArray();
+            //This alghoritm assumes that there are no two content files with the same paths.
 
-            for (int i = 0; i < contentFiles.Length; ++i)
+            //Przenisc to sortowanie gdzies indziej, bo sie powtarza w innych metodach.
+            var pathsToSplit = contentFiles
+                .OrderBy(file => file.Path)
+                .Select(file => new ContentPathSplitInfo() { Path = file.Path })
+                .ToList();
+
+            var dictionaryEntries = new List<EdataDictSubPath>();
+
+            //Wide match can't be picked over a long match.
+            while (pathsToSplit.Count > 0)
             {
-                var currentFile = contentFiles[i];
-                if ((currentFile.TotalOffset % 16) != 0)
+                var pathsToCompare = GetPathsToCompare(pathsToSplit);
+                if (pathsToCompare.Count == 1)
+                {
+                    var newEntry = new EdataDictFileSubPath();
+                    newEntry.SubPath = pathsToCompare[0].GetPathFromSplitIndex();
+                    AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryEntries);
+
+                    pathsToSplit.Remove(pathsToCompare[0]);
+                }
+                else if (pathsToCompare.Count > 1)
+                {
+                    int matchIndex = 0;
+
+                    while (true) //Zastanowić sie co z warunkiem kończoaczym, czy to break moze nie zaistnieć.
+                    {
+                        bool allPathsMatched = CheckIfAllPathsMatchAtIndex(pathsToCompare, matchIndex); ;
+                        if (allPathsMatched)
+                        {
+                            matchIndex++;
+                        }
+                        else
+                        {
+                            var newEntry = new EdataDictDirSubPath();
+                            newEntry.SubPath = pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex);
+                            AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryEntries);
+
+                            //czy tu powinno być += czy tylko przypisanie?
+                            pathsToCompare.ForEach(x => x.SplitIndex += matchIndex);
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return dictionaryEntries;
+        }
+
+        /// <summary>
+        /// Selects a list of paths to comparison from an another  list of paths. 
+        /// Paths which can be compared have an equal SplitIndex value, and start with the same first character.
+        /// </summary>
+        /// <param name="remainingSplitPaths"></param>
+        /// <returns></returns>
+        private List<ContentPathSplitInfo> GetPathsToCompare(IList<ContentPathSplitInfo> remainingSplitPaths)
+        {
+            var pathsToCompare = new List<ContentPathSplitInfo>();
+
+            var orgItem = remainingSplitPaths[0];
+            pathsToCompare.Add(orgItem);
+
+            //Zastąpić algorytmem porównującym z dzielenie obszaru porównywania. Czyli pierwsze porówniaie indeks 0 i ostatni.
+            //jesli nie pasują to zero i pół itd, az do znalezienie dopasowania.
+            for (int i = 1; i < remainingSplitPaths.Count; ++i)
+            {
+                var currentItem = remainingSplitPaths[i];
+
+                if (currentItem.SplitIndex == orgItem.SplitIndex &&
+                    currentItem.GetCharAtSplitIndex() == orgItem.GetCharAtSplitIndex())
+                {
+                    pathsToCompare.Add(remainingSplitPaths[i]);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return pathsToCompare;
+        }
+
+        /// <summary>
+        /// Checks wheather paths in the given list, have the same character value at given index.
+        /// </summary>
+        /// <param name="comparedPaths"></param>
+        /// <param name="matchIndex"></param>
+        /// <returns></returns>
+        private bool CheckIfAllPathsMatchAtIndex(IList<ContentPathSplitInfo> comparedPaths, int matchIndex)
+        {
+            var orgItem = comparedPaths[0];
+            int orgIndex = orgItem.SplitIndex + matchIndex;
+
+            for (int i = 1; i < comparedPaths.Count; ++i)
+            {
+                var currentItem = comparedPaths[i];
+                int currentIndex = currentItem.SplitIndex + matchIndex;
+
+                if (!(currentIndex == orgIndex &&
+                    currentIndex < currentItem.Path.Length &&
+                    orgIndex < orgItem.Path.Length &&
+                    currentItem.Path[currentIndex] == orgItem.Path[orgIndex]))
                 {
                     return false;
                 }
@@ -367,89 +564,72 @@ namespace WargameModInstaller.Infrastructure.Edata
             return true;
         }
 
-        private long GetMinDistanceBetweenFiles(EdataFile ef)
+        private void AddEntryToDictionary(
+            EdataDictSubPath entry,
+            ContentPathSplitInfo entryPathSplitInfo,
+            List<EdataDictSubPath> dictionaryEntries)
         {
-            var contentFiles = ef.ContentFiles.ToArray();
-
-            long minDistance = long.MaxValue;
-            for (int i = 0; i < contentFiles.Length; ++i)
+            //First one so, no need to search for a predecessor.
+            if (dictionaryEntries.Count == 0)
             {
-                var currentFile = contentFiles[i];
-                var nextFile = i + 1 < contentFiles.Length ? contentFiles[i + 1] : null;
-                if (nextFile != null)
+                dictionaryEntries.Add(entry);
+                return;
+            }
+
+            var precedingPath = entryPathSplitInfo.GetPathToSplitIndex();
+            EdataDictSubPath precedingPathEntry = null;
+            foreach (var e in dictionaryEntries)
+            {
+                var matchingEntry = e.SelectEntryByPath(precedingPath);
+                if (matchingEntry != null)
                 {
-                    var distance = (nextFile.TotalOffset - (currentFile.TotalOffset + currentFile.Size));
-                    if (minDistance >= distance)
-                    {
-                        minDistance = distance;
-                    }
+                    precedingPathEntry = matchingEntry;
+                    break;
                 }
             }
 
-            return minDistance;
+            var pp = precedingPathEntry as EdataDictDirSubPath;
+            if (precedingPathEntry != null)
+            {
+                pp.AddFollowingSubPath(entry);
+                entry.PrecedingSubPath = pp;
+            }
         }
 
-        private long GetMaxDistanceBetweenFiles(EdataFile ef)
-        {
-            var contentFiles = ef.ContentFiles.ToArray();
+        #region Nested class ContentPathSplitInfo
 
-            long maxDistance = 0;
-            for (int i = 0; i < contentFiles.Length; ++i)
+        protected class ContentPathSplitInfo 
+        {
+            public String Path { get; set; }
+            public int SplitIndex { get; set; }
+
+            public String GetPathToSplitIndex()
             {
-                var currentFile = contentFiles[i];
-                var nextFile = i + 1 < contentFiles.Length ? contentFiles[i + 1] : null;
-                if (nextFile != null)
-                {
-                    var distance = (nextFile.TotalOffset - (currentFile.TotalOffset + currentFile.Size));
-                    if (maxDistance <= distance)
-                    {
-                        maxDistance = distance;
-                    }
-                }
+                return Path.Substring(0, SplitIndex);
             }
 
-            return maxDistance;
+            public String GetPathFromSplitIndex()
+            {
+                return Path.Substring(SplitIndex);
+            }
+
+            public String GetPathFromSplitIndex(int length)
+            {
+                return Path.Substring(SplitIndex, length);
+            }
+
+            public char GetCharAtSplitIndex()
+            {
+                return Path[SplitIndex];
+            }
+
+            public override String ToString()
+            {
+                return Path.ToString();
+            }
         }
 
-        private double GetAverageDistanceBetweenFiles(EdataFile ef)
-        {
-            var contentFiles = ef.ContentFiles.ToArray();
-
-            long totalDistance = 0;
-            for (int i = 0; i < contentFiles.Length; ++i)
-            {
-                var currentFile = contentFiles[i];
-                var nextFile = i + 1 < contentFiles.Length ? contentFiles[i + 1] : null;
-                if (nextFile != null)
-                {
-                    var distance = (nextFile.TotalOffset - (currentFile.TotalOffset + currentFile.Size));
-                    totalDistance += distance;
-                }
-            }
-
-            return totalDistance / (double)contentFiles.Length;
-        }
-
-        private double GetAverageDistanceRelativeToSizeBetweenFiles(EdataFile ef)
-        {
-            var contentFiles = ef.ContentFiles.ToArray();
-
-            double relativeDistanceAccumulator = 0;
-            for (int i = 0; i < contentFiles.Length; ++i)
-            {
-                var currentFile = contentFiles[i];
-                var nextFile = i + 1 < contentFiles.Length ? contentFiles[i + 1] : null;
-                if (nextFile != null)
-                {
-                    var distance = (nextFile.TotalOffset - (currentFile.TotalOffset + currentFile.Size));
-                    relativeDistanceAccumulator += distance / (double)currentFile.Size;
-                }
-            }
-
-            return relativeDistanceAccumulator / (double)contentFiles.Length;
-        } 
-        #endregion
-#endif
+        #endregion //ContentPathSplitInfo
 
     }
 

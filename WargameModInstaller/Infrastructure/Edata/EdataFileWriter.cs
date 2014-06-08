@@ -59,6 +59,9 @@ namespace WargameModInstaller.Infrastructure.Edata
                     ReplaceLoadedContent(sourceEdata, edataFile, token);
 
                     WriteDictionary(sourceEdata, edataFile, token);
+
+                    //-------------------------
+                    CreateDictionaryEntriesForContentFiles(edataFile.ContentFiles);
                 }
             }
             else
@@ -87,6 +90,9 @@ namespace WargameModInstaller.Infrastructure.Edata
                     WriteNotLoadedContent(sourceEdata, newEdata, edataFile, token);
 
                     WriteDictionary(newEdata, edataFile, token);
+
+                    //-------------------------
+                    CreateDictionaryEntriesForContentFiles(edataFile.ContentFiles);
 
                     //Free file handles before the file move and delete
                     CloseEdataFilesStreams(sourceEdata, newEdata);

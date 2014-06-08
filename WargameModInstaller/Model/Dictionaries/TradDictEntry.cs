@@ -10,7 +10,7 @@ namespace WargameModInstaller.Model.Dictionaries
     /// Credits go to enohka for this code.
     /// See more at: https://github.com/enohka/moddingSuite/blob/master/moddingSuite/Model/Trad/TradEntry.cs
     /// </remarks>
-    public class DictionaryEntry
+    public class TradDictEntry
     {
         public byte[] Hash
         {

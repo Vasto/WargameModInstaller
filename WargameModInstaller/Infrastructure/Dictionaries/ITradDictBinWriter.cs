@@ -4,8 +4,8 @@ using WargameModInstaller.Model.Dictionaries;
 
 namespace WargameModInstaller.Infrastructure.Dictionaries
 {
-    public interface IDictionaryBinWriter
+    public interface ITradDictBinWriter
     {
-        byte[] Write(IEnumerable<DictionaryEntry> entries);
+        byte[] Write(IEnumerable<TradDictEntry> entries);
     }
 }
