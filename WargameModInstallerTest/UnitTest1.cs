@@ -12,39 +12,19 @@ namespace WargameSkinInstallerTest
         {
             string path = @"pc\textures\assets\file1.tgv";
 
-            EdataDictDirSubPath a1 = new EdataDictDirSubPath() {
-                    SubPath = @"pc\",
-                };
+            EdataDictDirSubPath a1 = new EdataDictDirSubPath(@"pc\");
 
-            EdataDictDirSubPath a2 = new EdataDictDirSubPath()
-            {
-                SubPath = @"textures\",
-            };
+            EdataDictDirSubPath a2 = new EdataDictDirSubPath(@"textures\");
 
-            EdataDictDirSubPath a2a = new EdataDictDirSubPath()
-            {
-                SubPath = @"textures2\",
-            };
+            EdataDictDirSubPath a2a = new EdataDictDirSubPath(@"textures2\");
 
-            EdataDictDirSubPath a3a = new EdataDictDirSubPath()
-            {
-                SubPath = @"assets2\",
-            };
+            EdataDictDirSubPath a3a = new EdataDictDirSubPath(@"assets2\");
 
-            EdataDictDirSubPath a3= new EdataDictDirSubPath()
-            {
-                SubPath = @"assets\",
-            };
+            EdataDictDirSubPath a3 = new EdataDictDirSubPath(@"assets\");
 
-            EdataDictFileSubPath a4 = new EdataDictFileSubPath()
-            {
-                SubPath = @"file1.tgv",
-            };
+            EdataDictFileSubPath a4 = new EdataDictFileSubPath(@"file1.tgv");
 
-            EdataDictFileSubPath a4a = new EdataDictFileSubPath()
-            {
-                SubPath = @"file1.tgv",
-            };
+            EdataDictFileSubPath a4a = new EdataDictFileSubPath(@"file1.tgv");
 
             a1.AddFollowingSubPath(a2a);
             a1.AddFollowingSubPath(a2);

@@ -10,6 +10,15 @@ namespace WargameModInstaller.Model.Edata
     //       kwestia tylko tego jak to wyglada przy zagniezdzonych pakietach, pewnie bedzie problem, bo to jest tu chyba po to zeby od razu mozna by³o wpsiaæ
     //       ca³oœæ z pamieci.
 
+    //To do: To wszystko tutaj jest do przerobionia, bo zak³¹da tylko stworzenie obiektu i uniemo¿liwia jego modyfikacjê co raczej jest konieczne
+    //w wersji gdzie ten obiket ca³yczas posaida poprawne dane, a nei tylko dane z odczytu, oraz moze byæ modyfikowany poprzez dodanie nowych ContentFiles.
+
+    //Zak³adj¹c ¿e chcemy umo¿liwiæ zmiane zawrtoœci tego pliku (chodzi o pliki contentu), trzeba jkoœ rozró¿niæ stan oryginalny od zmodyfikowanego.
+    //Raczej nie mo¿na sobie ot tak nadpiswywaæ co popadnie, lub zmieniaæ wartoœci odpoiwadajace za lokalizacji contentu w pliku fizycnzym, bo wtedy
+    //nie mo¿liwe bêdzie odczytywanie z pliku. Trzeba dodaæ jakies dodatkowe list przechwoujace stan zmodyfikowane, który w trkacie persystencji jest
+    //zamienianie na stan normalny odpowiadajacy fizycznemu plikowi. Wtedy te¿ takie wpisy dostawa³y by poprawne wartoœci.
+
+
     public class EdataFile
     {
         private IDictionary<String, EdataContentFile> contentFilesDictionary;
@@ -71,7 +80,7 @@ namespace WargameModInstaller.Model.Edata
         public EdataHeader Header
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>

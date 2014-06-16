@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Model.Edata
 {
+    //To do: pomyśleć nad nazwą tej klasy
+
     /// <summary>
     /// Represents a hierarchical entry in the EDATa's file dictionary.
     /// </summary>
@@ -13,9 +15,16 @@ namespace WargameModInstaller.Model.Edata
     {
         protected List<EdataDictSubPath> followingSubPaths;
 
-        public EdataDictSubPath()
+        public EdataDictSubPath(String subPath)
         {
+            if (String.IsNullOrEmpty(subPath))
+            {
+                throw new ArgumentException("Edata dictionary path entry cannot be empty or null.", "subPath");
+            }
+
+            this.SubPath = subPath;
             this.followingSubPaths = new List<EdataDictSubPath>();
+
         }
 
         /// <summary>
@@ -39,21 +48,36 @@ namespace WargameModInstaller.Model.Edata
         }
 
         /// <summary>
-        /// Gets or sets the length of entry in bytes.
-        /// </summary>
-        public uint Length
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the textual content of the current dictioanry entry.
         /// </summary>
         public String SubPath
         {
             get;
-            set;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the length of entry in bytes.
+        /// //Może to obliczać na twardo?
+        /// </summary>
+        public uint Length
+        {
+            get
+            {
+                return GetLengthInBytes();
+            }
+        }
+
+        /// <summary>
+        /// Gets a total length in bytes of entry. This is a total length, 
+        /// which includes all additional bytes which belong to the entry, not only the data length.
+        /// </summary>
+        public uint TotalLength
+        {
+            get
+            {
+                return GetTotalLengthInBytes();
+            }
         }
 
         //wyniesc to z tad bo to no chyba ze pominiemy koniecznosc odnoszenia sie do pliku czyli podklasy bo to jest zło
@@ -108,6 +132,12 @@ namespace WargameModInstaller.Model.Edata
         {
             return SubPath.ToString(System.Globalization.CultureInfo.CurrentCulture);
         }
+
+        public abstract byte[] ToBytes();
+
+        protected abstract uint GetTotalLengthInBytes();
+
+        protected abstract uint GetLengthInBytes();
 
     }
 }

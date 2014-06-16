@@ -50,7 +50,8 @@ namespace WargameModInstaller.Model.Edata
         public uint FileLenght;
 
         public readonly uint Unkown_1;
-        public uint Padding;
+        //wyglada na to ¿e tutaj mamy zapian¹ liczbe której wielokrotnoœæ jest u¿yta do oblicznenia offsetu czêœci plików.
+        public uint Padding; 
 
         public Md5Hash Checksum_V2;
     }
