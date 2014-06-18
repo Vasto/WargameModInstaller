@@ -26,7 +26,7 @@ namespace WargameModInstaller.Common.Entities
 
         protected override IEnumerable<PathTypeResolveRule> CreateResolveRules()
         {
-            var embededResourcePathRule = new PathTypeResolveRule(ResourcePathType.EmbeddedResource, 1, EmbeddedResourceResolveRule);
+            var embededResourcePathRule = new PathTypeResolveRule(ResourcePathType.Embedded, 1, EmbeddedResourceResolveRule);
             var absolutePathRule = new PathTypeResolveRule(ResourcePathType.LocalAbsolute, 2, AbsolutePathRule);
             var relativePathRule = new PathTypeResolveRule(ResourcePathType.LocalRelative, 3, RelativePathRule);
 

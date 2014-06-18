@@ -16,9 +16,9 @@ namespace WargameModInstaller.Services.Commands
     //Kroki trochę sie nie zgadzają, bo te dodakowe rebuildy nie są brane pod uwagę, trzeba było by określić możliwą ilosc
     //Rebuildów w konstruktorze...
 
-    public class EdataCmdGroupExecutor : CmdGroupExecutorBase<EdataCmdGroup>
+    public class SharedTargetCmdGroupExecutor : CmdGroupExecutorBase<SharedTargetCmdGroup>
     {
-        public EdataCmdGroupExecutor(EdataCmdGroup cmdGroup, ICmdExecutorFactory executorsFactory)
+        public SharedTargetCmdGroupExecutor(SharedTargetCmdGroup cmdGroup, ICmdExecutorFactory executorsFactory)
             : base(cmdGroup, executorsFactory)
         {
             this.TotalSteps++;
@@ -29,11 +29,12 @@ namespace WargameModInstaller.Services.Commands
             //Ta metoda bez bloków łapania wyjątków, w przypadku ewentualnego wyjątku pochodzącego z kodu z poza execute, spowoduje 
             //wykrzaczenie się całej instalacji. Może trzeba zaimplementować IsCritical także dla CmdGroup...
 
-            String targetfullPath = CommandGroup.CommonEdataPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
+            String targetfullPath = CommandGroup.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
             if (!File.Exists(targetfullPath))
             {
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
-                throw new CmdExecutionFailedException(String.Format("Specified Edata file: \"{0}\" doesn't exist", targetfullPath),
+                throw new CmdExecutionFailedException(
+                    String.Format("A specified Edata file: \"{0}\" doesn't exist", targetfullPath),
                     String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
             }
 
@@ -70,7 +71,7 @@ namespace WargameModInstaller.Services.Commands
 
         private void SaveEdataChanges(EdataFile edataFile, CancellationToken? token = null)
         {
-            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.CommonEdataPath);
+            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.TargetPath);
 
             IEdataFileWriter edataWriter = new EdataFileWriter();
             edataWriter.Write(edataFile, token.Value);
@@ -80,8 +81,8 @@ namespace WargameModInstaller.Services.Commands
         {
             var contentFilesPaths = CommandGroup
                 .Commands
-                .OfType<IHasTargetContent>()
-                .Select(c => c.TargetContentPath);
+                .OfType<IHasNestedTarget>()
+                .Select(c => c.NestedTargetPath);
 
             var contentFilesToBeLoaded = new List<EdataContentFile>();
             foreach (var path in contentFilesPaths)

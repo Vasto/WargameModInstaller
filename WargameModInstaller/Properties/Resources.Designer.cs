@@ -61,6 +61,15 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Adding.
+        /// </summary>
+        internal static string Adding {
+            get {
+                return ResourceManager.GetString("Adding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Installer was unable to alter the dictionary file..
         /// </summary>
         internal static string AlterDictionartErrorMsg {

@@ -9,7 +9,6 @@ namespace WargameModInstaller.Model.Commands
     public interface ICmdGroup
     {
         int Priority { get; set; }
-        IEnumerable<IInstallCmd> Commands { get; }
-        int CommandsCount { get; }
+        IReadOnlyCollection<IInstallCmd> Commands { get; }
     }
 }

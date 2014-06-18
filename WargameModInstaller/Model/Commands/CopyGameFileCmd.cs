@@ -8,32 +8,8 @@ using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class CopyGameFileCmd : IInstallCmd, IHasSource, IHasTarget
+    public class CopyGameFileCmd : InstallCmdBase, IHasSource, IHasTarget
     {
-        public CopyGameFileCmd()
-        {
-
-        }
-
-        /// <summary>
-        /// Gets or sets a command ID.
-        /// </summary>
-        public int Id
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a command execution priority.
-        /// Commands with a higher priority are executed sooner.
-        /// </summary>
-        public int Priority
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// Gets or sets a path to the file which has to be copied
         /// </summary>
@@ -53,16 +29,10 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
-        /// Gets or sets an information wheather a command is critical.
-        /// If the critical command fails, whole installation fails.
+        /// Gets the message which contains a descriptive text of command's execution.
         /// </summary>
-        public bool IsCritical
-        {
-            get;
-            set;
-        }
-
-        public String GetExecutionMessage()
+        /// <returns></returns>
+        public override String GetExecutionMessage()
         {
             return String.Format(Properties.Resources.Backuping + " {0}...",
                 System.IO.Path.GetFileName(SourcePath));

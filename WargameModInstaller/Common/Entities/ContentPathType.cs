@@ -8,12 +8,12 @@ using WargameModInstaller.Common.Utilities;
 namespace WargameModInstaller.Common.Entities
 {
     /// <summary>
-    /// Represents the possible types of content paths.
+    /// Represents a possible types of content paths.
     /// </summary>
     public class ContentPathType : PathType
     {
-        public static readonly ContentPathType EdataContent = new ContentPathType(1, "EdataContent");
-        public static readonly ContentPathType EdataNestedContent = new ContentPathType(2, "EdataNestedContent");
+        public static readonly ContentPathType Normal = new ContentPathType(1, "Normal");
+        public static readonly ContentPathType MultipleNested = new ContentPathType(2, "MultipleNested");
         public static readonly ContentPathType Unknown = new ContentPathType(3, "Unknown");
 
         protected ContentPathType(int value, String name)

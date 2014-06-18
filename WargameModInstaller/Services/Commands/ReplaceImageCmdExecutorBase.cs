@@ -15,7 +15,7 @@ using WargameModInstaller.Model.Image;
 namespace WargameModInstaller.Services.Commands
 {
     public abstract class ReplaceImageCmdExecutorBase<T> : AlterEdataCmdExecutorBase<T> 
-        where T : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
+        where T : IInstallCmd, IHasSource, IHasTarget, IHasNestedTarget
     {
         public ReplaceImageCmdExecutorBase(T command)
             : base(command)
@@ -40,7 +40,7 @@ namespace WargameModInstaller.Services.Commands
                     String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
-            String contentPath = Command.TargetContentPath.LastPart;
+            String contentPath = Command.NestedTargetPath.LastPart;
             if (contentPath == null)
             {
                 throw new CmdExecutionFailedException(

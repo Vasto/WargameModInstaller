@@ -106,7 +106,7 @@ namespace WargameModInstaller.Services.Config
         {
             bool result = false;
 
-            if (path.PathType == ResourcePathType.EmbeddedResource)
+            if (path.PathType == ResourcePathType.Embedded)
             {
                 var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
                 result = resourceNames.Contains(path);

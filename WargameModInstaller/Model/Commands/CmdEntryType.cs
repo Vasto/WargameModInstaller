@@ -17,6 +17,8 @@ namespace WargameModInstaller.Model.Commands
         public static readonly CmdEntryType ReplaceImageTile = new CmdEntryType(6, "ReplaceImageTile");
         public static readonly CmdEntryType ReplaceContent = new CmdEntryType(7, "ReplaceContent");
         public static readonly CmdEntryType AlterDictionary = new CmdEntryType(8, "AlterDictionary");
+        public static readonly CmdEntryType AddContent = new CmdEntryType(9, "AddContent");
+        public static readonly CmdEntryType AddImage = new CmdEntryType(10, "AddImage");
 
         protected CmdEntryType(int value, String name)
             : base(value, name)

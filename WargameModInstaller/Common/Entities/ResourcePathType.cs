@@ -14,7 +14,7 @@ namespace WargameModInstaller.Common.Entities
     {
         public static readonly ResourcePathType LocalAbsolute = new ResourcePathType(1, "LocalAbsolute");
         public static readonly ResourcePathType LocalRelative = new ResourcePathType(2, "LocalRelative");
-        public static readonly ResourcePathType EmbeddedResource = new ResourcePathType(3, "EmbeddedResource");
+        public static readonly ResourcePathType Embedded = new ResourcePathType(3, "Embedded");
         public static readonly ResourcePathType Unknown = new ResourcePathType(3, "Unknown");
 
         protected ResourcePathType(int value, String name)

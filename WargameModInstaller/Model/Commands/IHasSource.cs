@@ -9,6 +9,9 @@ namespace WargameModInstaller.Model.Commands
 {
     //To do: Pomyśleć nad nazewnictwem tego wszystkiego.
 
+    /// <summary>
+    /// Represents a command which uses a source file.
+    /// </summary>
     public interface IHasSource
     {
         /// <summary>

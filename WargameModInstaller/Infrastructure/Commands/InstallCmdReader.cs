@@ -83,7 +83,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         }
 
         /// <summary>
-        /// Reads all install command entires.
+        /// Reads all install command entires belonging to the given components entries collection.
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="components"></param>
@@ -160,7 +160,8 @@ namespace WargameModInstaller.Infrastructure.Commands
         }
 
         /// <summary>
-        /// Reads all install comand entries and groups them if possible.
+        /// Reads all install comand entires belonging to the given components entries collection
+        /// and groups them if possible.
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="components"></param>
@@ -261,10 +262,10 @@ namespace WargameModInstaller.Infrastructure.Commands
                          group cmd by new { ((IHasTarget)cmd).TargetPath, cmd.Priority };
 
 
-            var resultGroups = new List<EdataCmdGroup>();
+            var resultGroups = new List<SharedTargetCmdGroup>();
             foreach (var group in groups)
             {
-                var newGroup = new EdataCmdGroup(group, group.Key.TargetPath, group.Key.Priority);
+                var newGroup = new SharedTargetCmdGroup(group, group.Key.TargetPath, group.Key.Priority);
                 resultGroups.Add(newGroup);
             }
 
@@ -274,8 +275,8 @@ namespace WargameModInstaller.Infrastructure.Commands
         private IEnumerable<ICmdGroup> MultiLevelCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
         {
             var multiLevelCmds = cmds
-                .OfType<IHasTargetContent>()
-                .Where(cmd => cmd.TargetContentPath.PathType == ContentPathType.EdataNestedContent);
+                .OfType<IHasNestedTarget>()
+                .Where(cmd => cmd.NestedTargetPath.PathType == ContentPathType.MultipleNested);
 
             var multiLevelEdataCmds = new List<IInstallCmd>();
             multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImageCmd>());
@@ -288,15 +289,15 @@ namespace WargameModInstaller.Infrastructure.Commands
                          group cmd by new { 
                              cmd.Priority,
                              ((IHasTarget)cmd).TargetPath, 
-                             ((IHasTargetContent)cmd).TargetContentPath.PreLastPart 
+                             ((IHasNestedTarget)cmd).NestedTargetPath.PreLastPart 
                          };
 
 
-            var resultGroups = new List<MultiLevelEdataCmdGroup>();
+            var resultGroups = new List<SharedNestedTargetCmdGroup>();
             foreach (var group in groups)
             {
                 var multilevelContentPath = new ContentPath(group.Key.PreLastPart);
-                var newGroup = new MultiLevelEdataCmdGroup(
+                var newGroup = new SharedNestedTargetCmdGroup(
                     group, 
                     group.Key.TargetPath,
                     multilevelContentPath,
@@ -398,7 +399,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceImageCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.TargetContentPath = new ContentPath(edataImagePath);
+                newCmd.NestedTargetPath = new ContentPath(edataImagePath);
                 newCmd.UseMipMaps = useMipMaps;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
@@ -429,7 +430,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceImageTileCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.TargetContentPath = new ContentPath(edataImagePath);
+                newCmd.NestedTargetPath = new ContentPath(edataImagePath);
                 newCmd.Column = column;
                 newCmd.Row = row;
                 newCmd.TileSize = tileSize;
@@ -462,7 +463,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceImagePartCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.TargetContentPath = new ContentPath(edataImagePath);
+                newCmd.NestedTargetPath = new ContentPath(edataImagePath);
                 newCmd.XPosition = xPos;
                 newCmd.YPosition = yPos;
                 newCmd.UseMipMaps = useMipMaps;
@@ -491,7 +492,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceContentCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.TargetContentPath = new ContentPath(edataContentPath);
+                newCmd.NestedTargetPath = new ContentPath(edataContentPath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -531,14 +532,16 @@ namespace WargameModInstaller.Infrastructure.Commands
                     else
                     {
                         var line = (entryElement as IXmlLineInfo).LineNumber;
-                        var warning = String.Format("Entry at line: \"{0}\" was ignored. It doesn't contain a specified hash attribute.", line);
+                        var warning = String.Format(
+                            "Entry at line: \"{0}\" was ignored. It doesn't contain a specified hash attribute.",
+                            line);
                         Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
                     }
                 }
 
                 var newCmd = new AlterDictionaryCmd();
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.TargetContentPath = new ContentPath(dictionaryPath);
+                newCmd.NestedTargetPath = new ContentPath(dictionaryPath);
                 newCmd.AlteredEntries = entries;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;

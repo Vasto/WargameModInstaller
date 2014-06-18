@@ -8,7 +8,7 @@ using WargameModInstaller.Common.Utilities;
 namespace WargameModInstaller.Common.Entities
 {
     /// <summary>
-    /// Represents a path to a specific content residing inside a dat file.
+    /// Represents a path to a specific content residing inside a package file.
     /// </summary>
     public class ContentPath : PathBase
     {
@@ -79,12 +79,18 @@ namespace WargameModInstaller.Common.Entities
 
         protected override IEnumerable<PathTypeResolveRule> CreateResolveRules()
         {
-            var edataMultilevelContentPathRule = new PathTypeResolveRule(ContentPathType.EdataNestedContent, 1, EdataMultilevelContentPathRule);
-            var edataContentPathRule = new PathTypeResolveRule(ContentPathType.EdataContent, 2, EdataContentPathRule);
+            var multipleNestedContentPathRule = new PathTypeResolveRule(
+                ContentPathType.MultipleNested,
+                1, 
+                MultipleNestedPathRule);
+            var normalContentPathRule = new PathTypeResolveRule(
+                ContentPathType.Normal, 
+                2, 
+                NormalContentPathRule);
 
             var rulesList = new List<PathTypeResolveRule>();
-            rulesList.Add(edataMultilevelContentPathRule);
-            rulesList.Add(edataContentPathRule);
+            rulesList.Add(multipleNestedContentPathRule);
+            rulesList.Add(normalContentPathRule);
 
             return rulesList;
         }
@@ -94,7 +100,7 @@ namespace WargameModInstaller.Common.Entities
             return ContentPathType.Unknown;
         }
 
-        private bool EdataMultilevelContentPathRule(String path)
+        private bool MultipleNestedPathRule(String path)
         {
             var subPaths = path.Split(new[] { "|+" }, StringSplitOptions.RemoveEmptyEntries);
             if (subPaths.Length <= 1)
@@ -113,7 +119,7 @@ namespace WargameModInstaller.Common.Entities
             return true;
         }
 
-        private bool EdataContentPathRule(String path)
+        private bool NormalContentPathRule(String path)
         {
             return PathUtilities.IsValidRelativePath(path);
         }

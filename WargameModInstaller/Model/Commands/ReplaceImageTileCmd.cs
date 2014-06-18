@@ -8,27 +8,8 @@ using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.Model.Commands
 {
-    public class ReplaceImageTileCmd : IInstallCmd, IHasSource, IHasTarget, IHasTargetContent
+    public class ReplaceImageTileCmd : InstallCmdBase, IHasSource, IHasTarget, IHasNestedTarget
     {
-        /// <summary>
-        /// Gets or sets a command ID.
-        /// </summary>
-        public int Id
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a command execution priority.
-        /// Commands with a higher priority are executed sooner.
-        /// </summary>
-        public int Priority 
-        { 
-            get;
-            set; 
-        }
-
         /// <summary>
         /// Gets or sets a path to a image file which has to be used as a replacer.
         /// </summary>
@@ -50,17 +31,7 @@ namespace WargameModInstaller.Model.Commands
         /// <summary>
         /// Gets or sets a path to a content inside the dat file.
         /// </summary>
-        public ContentPath TargetContentPath
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets an information wheather a command is critical.
-        /// If the critical command fails, whole installation fails.
-        /// </summary>
-        public bool IsCritical
+        public ContentPath NestedTargetPath
         {
             get;
             set;
@@ -85,7 +56,7 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
-        /// Size of a replacement cell.
+        /// Gets or sets a size of the replacement cell.
         /// </summary>
         public int? TileSize
         {
@@ -103,7 +74,11 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
-        public String GetExecutionMessage()
+        /// <summary>
+        /// Gets the message which contains a descriptive text of command's execution.
+        /// </summary>
+        /// <returns></returns>
+        public override String GetExecutionMessage()
         {
             return String.Format(Properties.Resources.Copying + " {0}...",
                 SourcePath);

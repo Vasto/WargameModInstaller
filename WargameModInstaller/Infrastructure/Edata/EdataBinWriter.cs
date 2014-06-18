@@ -44,9 +44,9 @@ namespace WargameModInstaller.Infrastructure.Edata
                     var header = edataFile.Header;
 
                     var dictEntries = CreateDictionaryEntriesOfContentFiles(edataFile.ContentFiles);
-                    var dictOffset = header.DictOffset;
-                    var dictLength = GetDictionaryLength(dictEntries);
-                    var dictEnd = dictOffset + dictLength;
+                    uint dictOffset = header.DictOffset;
+                    uint dictLength = GetDictionaryLength(dictEntries);
+                    uint dictEnd = dictOffset + dictLength;
 
                     //Clear the old part of file up to content.
                     WritePadding(edataStream, 0, header.FileOffset);
@@ -66,11 +66,11 @@ namespace WargameModInstaller.Infrastructure.Edata
                 {
                     //W tym przypadku rozmieszczamy wszystko od zera wg wartości obliczonych.
                     var dictEntries = CreateDictionaryEntriesOfContentFiles(edataFile.ContentFiles);
-                    var dictOffset = GetDictionaryOffset();
-                    var dictLength = GetDictionaryLength(dictEntries);
-                    var dictEnd = dictOffset + dictLength;
+                    uint dictOffset = GetDictionaryOffset();
+                    uint dictLength = GetDictionaryLength(dictEntries);
+                    uint dictEnd = dictOffset + dictLength;
 
-                    var fileOffset = GetFileOffset(dictEnd);
+                    uint fileOffset = GetFileOffset(dictEnd);
 
                     WritePadding(edataStream, 0, fileOffset);
 

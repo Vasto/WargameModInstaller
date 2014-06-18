@@ -75,49 +75,49 @@ namespace WargameModInstaller.Model.Config
                     ScreenSettingsEntryType.WelcomeScreen,
                     Resources.WelcomeScreenHeader,
                     Resources.WelcomeScreenDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             funcs.Add(ScreenSettingsEntryType.LocationScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.LocationScreen,
                     Resources.LocationScreenHeader,
                     Resources.LocationScreenDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             funcs.Add(ScreenSettingsEntryType.ProgressScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.ProgressScreen,
                     Resources.ProgressScreenInstallingHeader,
                     Resources.ProgressScreenInstallingDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             funcs.Add(ScreenSettingsEntryType.InstallCompletedScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallCompletedScreen,
                     Resources.EndScreenCompletedHeader,
                     Resources.EndScreenCompletedDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             funcs.Add(ScreenSettingsEntryType.InstallCanceledScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallCanceledScreen,
                     Resources.EndScreenCanceledHeader,
                     Resources.EndScreenCanceledDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             funcs.Add(ScreenSettingsEntryType.InstallFailedScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.InstallFailedScreen,
                     Resources.EndScreenFailedHeader,
                     Resources.EndScreenFailedDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             funcs.Add(ScreenSettingsEntryType.ComponentSelectionScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.ComponentSelectionScreen,
                     Resources.ComponentScreenHeader,
                     Resources.ComponentScreenDetail,
-                    new ResourcePath(backgroundResPath, ResourcePathType.EmbeddedResource)));
+                    new ResourcePath(backgroundResPath, ResourcePathType.Embedded)));
 
             return funcs;
         }

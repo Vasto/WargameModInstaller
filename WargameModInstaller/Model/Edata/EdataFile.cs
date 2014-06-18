@@ -18,7 +18,9 @@ namespace WargameModInstaller.Model.Edata
     //nie mo¿liwe bêdzie odczytywanie z pliku. Trzeba dodaæ jakies dodatkowe list przechwoujace stan zmodyfikowane, który w trkacie persystencji jest
     //zamienianie na stan normalny odpowiadajacy fizycznemu plikowi. Wtedy te¿ takie wpisy dostawa³y by poprawne wartoœci.
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public class EdataFile
     {
         private IDictionary<String, EdataContentFile> contentFilesDictionary;
@@ -86,6 +88,9 @@ namespace WargameModInstaller.Model.Edata
         /// <summary>
         /// Ca³oœæ danych pomiedzy ostatnim bajtem nag³ówka, a pierwszym bajtem contentu plików.
         /// W sumie to s¹ g³ównie zera, s³ownik, zera... (po co to tak naprawde by³a?, wiem ze niedzialo bez tego...)
+        /// 
+        /// Update: Wraz z implementacj¹ budowy s³ownika edata od zera, te dane nie bêd¹ potrzebne. Póki
+        /// Póki co dla kompatybilnowsci z poprzednimi klasami, nie korzystajcymi z budowy s³ownika, musi zostaæ.
         /// </summary>
         public byte[] PostHeaderData
         {
@@ -122,6 +127,11 @@ namespace WargameModInstaller.Model.Edata
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
         public EdataContentFile GetContentFileByPath(String contentPath)
         {
             EdataContentFile result;

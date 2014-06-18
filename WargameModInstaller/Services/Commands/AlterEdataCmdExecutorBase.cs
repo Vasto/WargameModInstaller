@@ -15,7 +15,7 @@ namespace WargameModInstaller.Services.Commands
     //To do: reconsider method names, reconsider class name
 
     public abstract class AlterEdataCmdExecutorBase<T> : CmdExecutorBase<T> 
-        where T : IInstallCmd, IHasTarget, IHasTargetContent
+        where T : IInstallCmd, IHasTarget, IHasNestedTarget
     {
         public AlterEdataCmdExecutorBase(T command)
             : base(command)

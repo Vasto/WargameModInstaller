@@ -283,4 +283,7 @@ Click Next to continue.</value>
   <data name="AlteringDictionary" xml:space="preserve">
     <value>Altering dictionary</value>
   </data>
+  <data name="Adding" xml:space="preserve">
+    <value>Adding</value>
+  </data>
 </root>

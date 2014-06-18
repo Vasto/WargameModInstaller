@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -216,13 +217,14 @@ namespace WargameModInstaller.Infrastructure.Edata
         /// </summary>
         /// <param name="contentFiles"></param>
         /// <returns></returns>
-        protected virtual IEnumerable<EdataDictSubPath> CreateDictionaryEntriesOfContentFiles(IEnumerable<EdataContentFile> contentFiles)
+        protected virtual IEnumerable<EdataDictSubPath> CreateDictionaryEntriesOfContentFiles(
+            IEnumerable<EdataContentFile> contentFiles)
         {
             //This alghoritm assumes that there are no two content files with the same paths.
 
-            //Przenisc to sortowanie gdzies indziej, bo sie powtarza w innych metodach.
+            ///Uses an ordinal comparison for correct ordering of names with hyphens
             var pathsToSplit = contentFiles
-                .OrderBy(file => file.Path)
+                .OrderBy(file => file.Path, StringComparer.Ordinal)
                 .Select(file => new ContentPathSplitInfo() { Path = file.Path })
                 .ToList();
 
@@ -365,6 +367,12 @@ namespace WargameModInstaller.Infrastructure.Edata
             {
                 pp.AddFollowingSubPath(entry);
                 entry.PrecedingSubPath = pp;
+            }
+            else
+            {
+                throw new Exception(String.Format(
+                    "Cannot find a following precedding entry: {0}", 
+                    precedingPath));
             }
         }
 

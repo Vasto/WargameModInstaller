@@ -45,7 +45,7 @@ namespace WargameModInstaller.Common.Utilities.Image
                     throw new IOException("File with the given path doesn't exist");
                 }
             }
-            else if (path.PathType == ResourcePathType.EmbeddedResource)
+            else if (path.PathType == ResourcePathType.Embedded)
             {
                 var resourceNames = Assembly.GetExecutingAssembly().GetManifestResourceNames();
                 if (resourceNames.Contains(path.Value))

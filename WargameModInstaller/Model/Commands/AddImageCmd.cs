@@ -7,13 +7,10 @@ using WargameModInstaller.Common.Entities;
 
 namespace WargameModInstaller.Model.Commands
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class ReplaceContentCmd : InstallCmdBase, IHasSource, IHasTarget, IHasNestedTarget
+    public class AddImageCmd : InstallCmdBase, IHasSource, IHasTarget, IHasNestedTarget
     {
         /// <summary>
-        /// Gets or sets a path to the content file which has to be used as a replacer
+        /// Gets or sets a path to a file file which has to be added to the target container file.
         /// </summary>
         public InstallEntityPath SourcePath
         {
@@ -22,7 +19,7 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
-        /// Gets or sets a path to the dat file which holds the content to replace
+        /// Gets or sets a path to a conteiner file, where the source file has to be added.
         /// </summary>
         public InstallEntityPath TargetPath
         {
@@ -31,7 +28,7 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
-        /// Gets or sets a path to a content inside the dat file.
+        /// Gets or sets a path where the source file has to be added in the container target file.
         /// </summary>
         public ContentPath NestedTargetPath
         {
@@ -45,7 +42,7 @@ namespace WargameModInstaller.Model.Commands
         /// <returns></returns>
         public override String GetExecutionMessage()
         {
-            return String.Format(Properties.Resources.Copying + " {0}...",
+            return String.Format(Properties.Resources.Adding + " {0}...",
                 SourcePath);
         }
 

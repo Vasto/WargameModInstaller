@@ -39,7 +39,7 @@ namespace WargameModInstaller.Services.Commands
                     String.Format(Properties.Resources.AlterDictionartErrorMsg));
             }
 
-            String contentPath = Command.TargetContentPath.LastPart;
+            String contentPath = Command.NestedTargetPath.LastPart;
             if (contentPath == null)
             {
                 throw new CmdExecutionFailedException(

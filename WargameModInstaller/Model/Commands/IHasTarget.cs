@@ -9,6 +9,9 @@ namespace WargameModInstaller.Model.Commands
 {
     //To do: Pomyśleć nad nazewnictwem tego wszystkiego.
 
+    /// <summary>
+    /// Represents a command which targets another file for modification.
+    /// </summary>
     public interface IHasTarget
     {
         /// <summary>

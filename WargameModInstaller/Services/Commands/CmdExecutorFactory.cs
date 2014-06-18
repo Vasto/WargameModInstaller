@@ -81,8 +81,8 @@ namespace WargameModInstaller.Services.Commands
             map.Add(typeof(ReplaceContentCmd), typeof(ReplaceContentCmdExecutor));
             map.Add(typeof(AlterDictionaryCmd), typeof(AlterDictionaryCmdExecutor));
             map.Add(typeof(BasicCmdGroup), typeof(BasicCmdGroupExecutor));
-            map.Add(typeof(EdataCmdGroup), typeof(EdataCmdGroupExecutor));
-            map.Add(typeof(MultiLevelEdataCmdGroup), typeof(MultiLevelEdataCmdGroupExecutor));
+            map.Add(typeof(SharedTargetCmdGroup), typeof(SharedTargetCmdGroupExecutor));
+            map.Add(typeof(SharedNestedTargetCmdGroup), typeof(SharedNestedTargetCmdGroupExecutor));
 
             return map;
         }

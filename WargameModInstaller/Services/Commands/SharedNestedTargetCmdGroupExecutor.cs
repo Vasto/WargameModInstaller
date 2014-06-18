@@ -14,9 +14,16 @@ using WargameModInstaller.Services.Edata;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class MultiLevelEdataCmdGroupExecutor : CmdGroupExecutorBase<MultiLevelEdataCmdGroup>
+    //To do: ta klasa musi stać sie bardziej kontenero nieświadoma, jako że obecnie wspeirany jest tylko kontener edata
+    //jednak gdy dojdzie wsparcie innych kontenerów (jak np. proxypcpc) to to wszystko co tu jest bedzię musiało być przebudowane.
+    //Więc zważając na te zmiany, nie ma co sie przejmować wyspecjalziowan nazwą dla tej klasy. Wystarczy tylko uwzglednić fakt
+    //użycia wielokortnie zagnieżdżonych pakietów jako nawizania w nazwie.
+
+    public class SharedNestedTargetCmdGroupExecutor : CmdGroupExecutorBase<SharedNestedTargetCmdGroup>
     {
-        public MultiLevelEdataCmdGroupExecutor(MultiLevelEdataCmdGroup cmdGroup, ICmdExecutorFactory executorsFactory)
+        public SharedNestedTargetCmdGroupExecutor(
+            SharedNestedTargetCmdGroup cmdGroup, 
+            ICmdExecutorFactory executorsFactory)
             : base(cmdGroup, executorsFactory)
         {
             this.TotalSteps += 2;
@@ -24,21 +31,25 @@ namespace WargameModInstaller.Services.Commands
 
         protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
         {
-            //Ta metoda bez bloków łapania wyjątków, w przypadku ewentualnego wyjątku pochodzącego z kodu z poza execute, spowoduje 
-            //wykrzaczenie się całej instalacji. Może trzeba zaimplementować IsCritical także dla CmdGroup...
+            //Ta metoda bez bloków łapania wyjątków, w przypadku ewentualnego wyjątku pochodzącego z kodu z poza execute, 
+            //spowoduje wykrzaczenie się całej instalacji. Może trzeba zaimplementować IsCritical także dla CmdGroup...
 
-            String targetfullPath = CommandGroup.CommonEdataPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
+            String targetfullPath = CommandGroup
+                .TargetPath
+                .GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
             if (!File.Exists(targetfullPath))
             {
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
-                throw new CmdExecutionFailedException("Specified Edata file doesn't exist",
+                throw new CmdExecutionFailedException(
+                    String.Format("A specified target file: \"{0}\" doesn't exist", targetfullPath),
                     String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
             }
 
-            String rootContentPath = CommandGroup.CommonMultiLevelEdataPath.Parts.FirstOrDefault();
+            String rootContentPath = CommandGroup.NestedTargetPath.Parts.FirstOrDefault();
             if (rootContentPath == null)
             {
-                throw new CmdExecutionFailedException("Command's TargetContentPath doesn't contain any proper content path part.");
+                throw new CmdExecutionFailedException(
+                    "Command's TargetContentPath doesn't contain any proper content path part.");
             }
 
             CurrentStep = 0;
@@ -74,7 +85,7 @@ namespace WargameModInstaller.Services.Commands
                 }
 
                 CurrentStep++;
-                CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.CommonEdataPath);
+                CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.TargetPath);
 
                 RollEdatas(edataHierarchy, token);
             }
@@ -82,10 +93,12 @@ namespace WargameModInstaller.Services.Commands
             {
                 if (temporaryCreatedEdatas != null)
                 {
-                    foreach (var tmpEdata in temporaryCreatedEdatas)
-                    {
-                        File.Delete(tmpEdata);
-                    }
+                    temporaryCreatedEdatas.ForEach(x => File.Delete(x));
+
+                    //foreach (var tmpEdata in temporaryCreatedEdatas)
+                    //{
+                    //    File.Delete(tmpEdata);
+                    //}
                 }
             }
 
@@ -108,7 +121,7 @@ namespace WargameModInstaller.Services.Commands
             EdataFile mainEdataFile = edataFileReader.Read(targetfullPath, false);
             edataHierarchy.Push(new EdataHierarchyEntity(mainEdataFile));
 
-            foreach (var edataPath in CommandGroup.CommonMultiLevelEdataPath.Parts)
+            foreach (var edataPath in CommandGroup.NestedTargetPath.Parts)
             {
                 var edataFile = edataHierarchy.Peek().EdataFile;
                 var contentFile = edataFile.GetContentFileByPath(edataPath);
@@ -153,24 +166,11 @@ namespace WargameModInstaller.Services.Commands
 
         private void SaveEdataChanges(EdataFile edataFile, CancellationToken? token = null)
         {
-            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.CommonEdataPath);
+            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.TargetPath);
 
             IEdataFileWriter edataWriter = new EdataFileWriter();
             edataWriter.Write(edataFile, token.Value);
         }
-
-        //protected EdataContentFile GetEdataContentFileByPath(EdataFile edataFile, String edataContentPath)
-        //{
-        //    var edataContentFile = edataFile.ContentFiles.FirstOrDefault(f => f.Path == edataContentPath);
-        //    if (edataContentFile == null)
-        //    {
-        //        throw new CmdExecutionFailedException(
-        //            String.Format("Cannot load \"{0}\"", edataContentPath),
-        //            String.Format(Properties.Resources.ContentFileNotFoundParametrizedMsg, edataContentPath));
-        //    }
-
-        //    return edataContentFile;
-        //}
 
         #region Nested Class EdataHierarchyEntity
 
