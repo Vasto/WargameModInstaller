@@ -14,14 +14,16 @@ using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public abstract class ReplaceImageCmdExecutorBase<T> : AlterEdataCmdExecutorBase<T> 
+    public abstract class ImageTargetCmdExecutorBase<T> : EdataTargetCmdExecutorBase<T> 
         where T : IInstallCmd, IHasSource, IHasTarget, IHasNestedTarget
     {
-        public ReplaceImageCmdExecutorBase(T command)
+        public ImageTargetCmdExecutorBase(T command)
             : base(command)
         {
             this.TotalSteps = 2;
         }
+
+        protected abstract byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath);
 
         protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
         {
@@ -32,11 +34,18 @@ namespace WargameModInstaller.Services.Commands
             token.ThrowIfCanceledAndNotNull();
 
             String sourceFullPath = Command.SourcePath.GetAbsoluteOrPrependIfRelative(context.InstallerSourceDirectory);
-            String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
-            if (!File.Exists(sourceFullPath) || !File.Exists(targetfullPath))
+            if (!File.Exists(sourceFullPath))
             {
                 throw new CmdExecutionFailedException(
-                    "One of the command's Source or Target paths is not a valid file path.",
+                    String.Format("Command's source file \"{0}\" doesn't exist.", Command.SourcePath),
+                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+            }
+
+            String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
+            if (!File.Exists(targetfullPath))
+            {
+                throw new CmdExecutionFailedException(
+                    String.Format("Command's target file \"{0}\" doesn't exist.", Command.TargetPath),
                     String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
 
@@ -47,7 +56,6 @@ namespace WargameModInstaller.Services.Commands
                     "Invalid command's TargetContentPath value.",
                     String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
             }
-
 
             var edataFileReader = new EdataFileReader();
             var contentOwningEdata = CanGetEdataFromContext(context) ?
@@ -81,9 +89,7 @@ namespace WargameModInstaller.Services.Commands
             CurrentStep = TotalSteps;
         }
 
-        protected abstract byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath);
-
-        protected TgvImage GetTgvFromDDS(String sourceFullPath, bool discardMipMaps = true)
+        protected TgvImage DDSFileToTgv(String sourceFullPath, bool discardMipMaps = true)
         {
             ITgvFileReader tgvReader = discardMipMaps ?
                 (ITgvFileReader)(new TgvDDSMoMipMapsReader()) :
@@ -94,7 +100,7 @@ namespace WargameModInstaller.Services.Commands
             return newtgv;
         }
 
-        protected TgvImage GetTgvFromBytes(byte[] rawTgv)
+        protected TgvImage BytesToTgv(byte[] rawTgv)
         {
             ITgvBinReader rawReader = new TgvBinReader();
             TgvImage oldTgv = rawReader.Read(rawTgv);
@@ -102,7 +108,7 @@ namespace WargameModInstaller.Services.Commands
             return oldTgv;
         }
 
-        protected byte[] ConvertTgvToBytes(TgvImage tgv, bool discardMipMaps = true)
+        protected byte[] TgvToBytes(TgvImage tgv, bool discardMipMaps = true)
         {
             ITgvBinWriter tgvRawWriter = discardMipMaps ?
                 new TgvBinNoMipMapsWriter() :

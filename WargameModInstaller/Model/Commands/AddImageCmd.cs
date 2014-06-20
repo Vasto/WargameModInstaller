@@ -37,6 +37,34 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
+        /// Gets the information whether the command requires to work an orginal content of target. 
+        /// </summary>
+        public bool UsesNestedTargetContent
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// Gets or sets the information whether the command should overwrite a content 
+        /// of the target content file when the command cannot add that file because it already exist.
+        /// </summary>
+        public bool OverwriteIfExist
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets an information wheather a MipMaps of the image 
+        /// should be taken into consdieration during the adding process.
+        /// </summary>
+        public bool UseMipMaps
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets the message which contains a descriptive text of command's execution.
         /// </summary>
         /// <returns></returns>

@@ -61,6 +61,15 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The installer was unable to add the file &quot;{0}&quot;.
+        /// </summary>
+        internal static string AddContentErrorParamMsg {
+            get {
+                return ResourceManager.GetString("AddContentErrorParamMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Adding.
         /// </summary>
         internal static string Adding {

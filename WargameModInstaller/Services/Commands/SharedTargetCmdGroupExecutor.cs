@@ -9,6 +9,7 @@ using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Services.Commands.Base;
 using WargameModInstaller.Services.Edata;
 
 namespace WargameModInstaller.Services.Commands
@@ -34,7 +35,7 @@ namespace WargameModInstaller.Services.Commands
             {
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
                 throw new CmdExecutionFailedException(
-                    String.Format("A specified Edata file: \"{0}\" doesn't exist", targetfullPath),
+                    String.Format("A specified target file: \"{0}\" doesn't exist", targetfullPath),
                     String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
             }
 
@@ -71,7 +72,9 @@ namespace WargameModInstaller.Services.Commands
 
         private void SaveEdataChanges(EdataFile edataFile, CancellationToken? token = null)
         {
-            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.TargetPath);
+            CurrentMessage = String.Format(
+                Properties.Resources.RebuildingParametrizedMsg,
+                CommandGroup.TargetPath);
 
             IEdataFileWriter edataWriter = new EdataFileWriter();
             edataWriter.Write(edataFile, token.Value);
@@ -79,16 +82,33 @@ namespace WargameModInstaller.Services.Commands
 
         private IEnumerable<EdataContentFile> GetContentFilesToBeLoaded(EdataFile ownerFile)
         {
-            var contentFilesPaths = CommandGroup
-                .Commands
+            //Ta metoda zakłada że nie otrzyma nigdy ścieżki wielokrotnie zagnieżdżonej.
+            //Na dobrą sprawę po dodaniu ContainsContentFileWithPath sprawdzanie wartości właściwości UsesNestedContent
+            //nie jest już konieczne. Pozatym wciąż jest problem z komendami takimi jak AddImage, które domyślnie nie potrzebują
+            //ładować content, jednak w pewnych sytuacjach będa go potrzebować (replace jeśli istnieje). Co w takiej sytuacji...?
+
+            var contentFilesPaths = new List<String>();
+
+            var paths = CommandGroup.Commands
                 .OfType<IHasNestedTarget>()
-                .Select(c => c.NestedTargetPath);
+                .Where(cmd => cmd.UsesNestedTargetContent)
+                .Select(x => x.NestedTargetPath.Value);
+            contentFilesPaths.AddRange(paths);
+
+            paths = CommandGroup.Commands
+                .OfType<IHasNestedSource>()
+                .Where(cmd => cmd.UsesNestedSourceContent)
+                .Select(x => x.NestedSourcePath.Value);
+            contentFilesPaths.AddRange(paths);
 
             var contentFilesToBeLoaded = new List<EdataContentFile>();
             foreach (var path in contentFilesPaths)
             {
-                var contentFile = ownerFile.GetContentFileByPath(path);
-                contentFilesToBeLoaded.Add(contentFile);
+                if (ownerFile.ContainsContentFileWithPath(path))
+                {
+                    var contentFile = ownerFile.GetContentFileByPath(path);
+                    contentFilesToBeLoaded.Add(contentFile);
+                }
             }
 
             return contentFilesToBeLoaded;

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Model.Commands;
+using WargameModInstaller.Services.Commands.Base;
 
 namespace WargameModInstaller.Services.Commands
 {

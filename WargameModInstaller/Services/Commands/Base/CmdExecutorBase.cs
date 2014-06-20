@@ -7,45 +7,41 @@ using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Model.Commands;
 
-namespace WargameModInstaller.Services.Commands
+namespace WargameModInstaller.Services.Commands.Base
 {
     //To do: Make this class more friendly as a base class for eventual future executors...
 
-    public abstract class CmdExecutorBase<T> : ICmdExecutor, IProgressProvider where T : IInstallCmd
+    public abstract class CmdExecutorBase<T> : ICmdExecutor, IProgressProvider 
+        where T : IInstallCmd
     {
         public CmdExecutorBase(T command)
         {
             this.Command = command;
         }
 
+        /// <summary>
+        /// Gets a command which has to be executed.
+        /// </summary>
         public T Command
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Executes a wrapped command.
+        /// </summary>
+        /// <param name="context">Context of execution.</param>
         public virtual void Execute(CmdExecutionContext context)
         {
-            try
-            {
-                ExecuteInternal(context);
-            }
-            catch (Exception ex)
-            {
-                if (Command.IsCritical)
-                {
-                    throw;
-                    //throw new CmdExecutionFailedException(ex.Message,
-                    //    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath),
-                    //    ex);
-                }
-                else
-                {
-                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
-                }
-            }
+            Execute(context, CancellationToken.None);
         }
 
+        /// <summary>
+        /// Executes a wrapped command.
+        /// </summary>
+        /// <param name="context">Context of execution.</param>
+        /// <param name="token"></param>
         public virtual void Execute(CmdExecutionContext context, CancellationToken token)
         {
             try
@@ -57,14 +53,9 @@ namespace WargameModInstaller.Services.Commands
                 if (Command.IsCritical)
                 {
                     throw;
-                    //throw new CmdExecutionFailedException(ex.Message,
-                    //    String.Format(WargameModInstaller.Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath),
-                    //    ex);
                 }
-                else
-                {
-                    WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
-                }
+                
+                WargameModInstaller.Common.Logging.LoggerFactory.Create(this.GetType()).Error(ex);
             }
         }
 

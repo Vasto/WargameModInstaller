@@ -37,6 +37,14 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
+        /// Gets the information whether the command requires to work an orginal content of target. 
+        /// </summary>
+        public bool UsesNestedTargetContent
+        {
+            get { return true; }
+        }
+
+        /// <summary>
         /// Gets or sets an X coordinate of the point where the replacement starts.
         /// </summary>
         public int? XPosition

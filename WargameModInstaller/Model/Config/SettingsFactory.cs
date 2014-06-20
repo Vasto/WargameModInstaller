@@ -65,7 +65,7 @@ namespace WargameModInstaller.Model.Config
                 CreateGeneralSetting(GeneralSettingEntryType.ModName, Resources.DefaultModname));
 
             funcs.Add(GeneralSettingEntryType.CriticalCommands, () => 
-                CreateGeneralSetting(GeneralSettingEntryType.CriticalCommands, Boolean.FalseString));
+                CreateGeneralSetting(GeneralSettingEntryType.CriticalCommands, Boolean.TrueString));
 
             funcs.Add(GeneralSettingEntryType.WargameVersion, () =>
                 CreateGeneralSetting(GeneralSettingEntryType.WargameVersion, WargameVersionType.GetDefault().Name));

@@ -11,7 +11,7 @@ namespace WargameModInstaller.Services.Commands
     /// <summary>
     /// 
     /// </summary>
-    public class ReplaceImageCmdExecutor : ReplaceImageCmdExecutorBase<ReplaceImageCmd>
+    public class ReplaceImageCmdExecutor : ImageTargetCmdExecutorBase<ReplaceImageCmd>
     {
         public ReplaceImageCmdExecutor(ReplaceImageCmd command)
             : base(command)
@@ -21,12 +21,12 @@ namespace WargameModInstaller.Services.Commands
 
         protected override byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath)
         {
-            TgvImage oldTgv = GetTgvFromBytes(orginalImageContent);
-            TgvImage newtgv = GetTgvFromDDS(sourceImagePath, !Command.UseMipMaps);
+            TgvImage oldTgv = BytesToTgv(orginalImageContent);
+            TgvImage newtgv = DDSFileToTgv(sourceImagePath, !Command.UseMipMaps);
             newtgv.SourceChecksum = oldTgv.SourceChecksum;
             newtgv.IsCompressed = oldTgv.IsCompressed;
 
-            byte[] rawNewTgv = ConvertTgvToBytes(newtgv, !Command.UseMipMaps);
+            byte[] rawNewTgv = TgvToBytes(newtgv, !Command.UseMipMaps);
             return rawNewTgv;
         }
     }

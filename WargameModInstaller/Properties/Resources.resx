@@ -286,4 +286,7 @@ Click Next to continue.</value>
   <data name="Adding" xml:space="preserve">
     <value>Adding</value>
   </data>
+  <data name="AddContentErrorParamMsg" xml:space="preserve">
+    <value>The installer was unable to add the file "{0}"</value>
+  </data>
 </root>

@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Infrastructure.Edata;
-using WargameModInstaller.Infrastructure.Image;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
-using WargameModInstaller.Model.Image;
+using WargameModInstaller.Services.Commands.Base;
 
 namespace WargameModInstaller.Services.Commands
 {
     //To do: reconsider method names, reconsider class name
 
-    public abstract class AlterEdataCmdExecutorBase<T> : CmdExecutorBase<T> 
+    public abstract class EdataTargetCmdExecutorBase<T> : CmdExecutorBase<T>
         where T : IInstallCmd, IHasTarget, IHasNestedTarget
     {
-        public AlterEdataCmdExecutorBase(T command)
+        public EdataTargetCmdExecutorBase(T command)
             : base(command)
         {
 

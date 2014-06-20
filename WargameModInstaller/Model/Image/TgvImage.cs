@@ -101,5 +101,20 @@ namespace WargameModInstaller.Model.Image
             set;
         }
 
+        //Jakby by³a potrzeba to temu mo¿na przekazywaæ strategie.
+        public virtual byte[] ComputeContentChecksum()
+        {
+            using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+            {
+                foreach (var mip in MipMaps)
+                {
+                    ms.Write(mip.Content, 0, mip.Content.Length);
+                }
+
+                var checksum = System.Security.Cryptography.MD5.Create().ComputeHash(ms.ToArray());
+                return checksum;
+            }
+        }
+
     }
 }

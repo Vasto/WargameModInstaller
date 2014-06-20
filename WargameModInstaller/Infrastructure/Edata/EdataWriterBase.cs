@@ -38,7 +38,7 @@ namespace WargameModInstaller.Infrastructure.Edata
         {
             var info = new DictionaryWriteInfo();
 
-            //WriteDictHeader
+            //Write Dict first empty entry
             target.Seek(dictOffset, SeekOrigin.Begin);
 
             byte[] buffer = { 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -82,12 +82,13 @@ namespace WargameModInstaller.Infrastructure.Edata
         {
             ContentWriteInfo info = new ContentWriteInfo();
 
+            //Dodane, spr:
+            target.Seek(contentOffset, SeekOrigin.Begin);
+
             byte[] spaceBuffer = null;
 
             foreach (var file in contentFiles)
             {
-                //long oldOffset = file.Offset;
-
                 byte[] fileBuffer = file.Content;
                 file.Checksum = MD5.Create().ComputeHash(fileBuffer);
                 file.Size = file.Content.Length;
@@ -113,7 +114,8 @@ namespace WargameModInstaller.Infrastructure.Edata
         {
             ContentWriteInfo info = new ContentWriteInfo();
 
-            source.Seek(contentOffset, SeekOrigin.Begin);
+            //Dodane, spr:
+            target.Seek(contentOffset, SeekOrigin.Begin);
 
             byte[] spaceBuffer = null;
 
@@ -278,7 +280,7 @@ namespace WargameModInstaller.Infrastructure.Edata
         }
 
         /// <summary>
-        /// Selects a list of paths to comparison from an another  list of paths. 
+        /// Selects a list of paths to comparison from an another list of paths. 
         /// Paths which can be compared have an equal SplitIndex value, and start with the same first character.
         /// </summary>
         /// <param name="remainingSplitPaths"></param>
@@ -311,7 +313,7 @@ namespace WargameModInstaller.Infrastructure.Edata
         }
 
         /// <summary>
-        /// Checks wheather paths in the given list, have the same character value at given index.
+        /// Checks wheather paths in the given list, have the same character value at the given index.
         /// </summary>
         /// <param name="comparedPaths"></param>
         /// <param name="matchIndex"></param>
@@ -376,6 +378,11 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
         }
 
+        protected virtual uint GetHeaderOffset()
+        {
+            return 0;
+        }
+
         protected virtual uint GetDictionaryLength(IEnumerable<EdataDictSubPath> entries)
         {
             uint dictHeaderSize = 10;
@@ -400,11 +407,6 @@ namespace WargameModInstaller.Infrastructure.Edata
             }
 
             return totalSize;
-        }
-
-        protected virtual uint GetHeaderOffset()
-        {
-            return 0;
         }
 
         protected virtual uint GetDictionaryOffset()

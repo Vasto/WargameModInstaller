@@ -38,6 +38,14 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
+        /// Gets the information whether the command requires to work an orginal content of target. 
+        /// </summary>
+        public bool UsesNestedTargetContent
+        {
+            get { return true; }
+        }
+
+        /// <summary>
         /// Gets or sets a zero based column index, which defines a column where the replacement area lays.
         /// </summary>
         public int? Column

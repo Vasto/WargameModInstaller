@@ -28,11 +28,13 @@ namespace WargameModInstaller.Infrastructure.Commands
         private readonly ISettingsProvider settingsProvider;
         private readonly bool defaultCriticalCmdsValue;
         private readonly bool defaultUseMipMapsValue;
+        private readonly bool defaultOverwriteIfExistValue;
 
         public InstallCmdReader(ISettingsProvider settingsProvider)
         {
             this.settingsProvider = settingsProvider;
             this.defaultUseMipMapsValue = false;
+            this.defaultOverwriteIfExistValue = true;
             this.defaultCriticalCmdsValue = settingsProvider
                 .GetGeneralSettings(GeneralSettingEntryType.CriticalCommands)
                 .Value
@@ -216,6 +218,8 @@ namespace WargameModInstaller.Infrastructure.Commands
             queries.Add(CmdEntryType.ReplaceImageTile, ReadReplaceImagePartCmds);
             queries.Add(CmdEntryType.ReplaceContent, ReadReplaceContentCmds);
             queries.Add(CmdEntryType.AlterDictionary, ReadAlterDictionaryCmds);
+            queries.Add(CmdEntryType.AddContent, ReadAddContentCmds);
+            queries.Add(CmdEntryType.AddImage, ReadAddImageCmds);
 
             return queries;
         }
@@ -228,14 +232,15 @@ namespace WargameModInstaller.Infrastructure.Commands
         protected virtual IEnumerable<GroupProductionRule> CreateGroupProductionRules()
         {
             var rules = new List<GroupProductionRule>();
-            rules.Add(new GroupProductionRule(3, MultiLevelCmdGroupProductionRule));
-            rules.Add(new GroupProductionRule(2, EdataCmdGroupProductionRule));
+            rules.Add(new GroupProductionRule(3, SharedNestedTargetCmdGroupProductionRule));
+            rules.Add(new GroupProductionRule(2, SharedTargetCmdGroupProductionRule));
             rules.Add(new GroupProductionRule(1, BasicCmdGroupProductionRule));
 
             return rules;
         }
 
-        private IEnumerable<ICmdGroup> BasicCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
+        private IEnumerable<ICmdGroup> BasicCmdGroupProductionRule(
+            IEnumerable<IInstallCmd> cmds)
         {
             var resultGroups = new List<BasicCmdGroup>();
 
@@ -249,18 +254,27 @@ namespace WargameModInstaller.Infrastructure.Commands
             return resultGroups;
         }
 
-        private IEnumerable<ICmdGroup> EdataCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
+        private IEnumerable<ICmdGroup> SharedTargetCmdGroupProductionRule(
+            IEnumerable<IInstallCmd> cmds)
         {
-            var edataCmds = new List<IInstallCmd>();
-            edataCmds.AddRange(cmds.OfType<ReplaceImageCmd>());
-            edataCmds.AddRange(cmds.OfType<ReplaceImagePartCmd>());
-            edataCmds.AddRange(cmds.OfType<ReplaceImageTileCmd>());
-            edataCmds.AddRange(cmds.OfType<ReplaceContentCmd>());
-            edataCmds.AddRange(cmds.OfType<AlterDictionaryCmd>());
+            //var validCmds = new List<IInstallCmd>();
+            //validCmds.AddRange(cmds.OfType<ReplaceImageCmd>());
+            //validCmds.AddRange(cmds.OfType<ReplaceImagePartCmd>());
+            //validCmds.AddRange(cmds.OfType<ReplaceImageTileCmd>());
+            //validCmds.AddRange(cmds.OfType<ReplaceContentCmd>());
+            //validCmds.AddRange(cmds.OfType<AlterDictionaryCmd>());
 
-            var groups = from cmd in edataCmds
+            var validCmds = cmds.Where(cmd =>
+                cmd is ReplaceImageCmd ||
+                cmd is ReplaceImagePartCmd ||
+                cmd is ReplaceImageTileCmd ||
+                cmd is ReplaceContentCmd ||
+                cmd is AlterDictionaryCmd ||
+                cmd is AddContentCmd ||
+                cmd is AddImageCmd);
+
+            var groups = from cmd in validCmds
                          group cmd by new { ((IHasTarget)cmd).TargetPath, cmd.Priority };
-
 
             var resultGroups = new List<SharedTargetCmdGroup>();
             foreach (var group in groups)
@@ -269,38 +283,53 @@ namespace WargameModInstaller.Infrastructure.Commands
                 resultGroups.Add(newGroup);
             }
 
+            //Jakimś cudem powstaję takie same grupy, z tym samym target path, i tym samym priority...
+            //Ok, wyglada na to że grupowanie jest case sensitive, i teraz pytanie czy to dobrze czy źle...
+
             return resultGroups;
         }
 
-        private IEnumerable<ICmdGroup> MultiLevelCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
+        private IEnumerable<ICmdGroup> SharedNestedTargetCmdGroupProductionRule(
+            IEnumerable<IInstallCmd> cmds)
         {
-            var multiLevelCmds = cmds
-                .OfType<IHasNestedTarget>()
-                .Where(cmd => cmd.NestedTargetPath.PathType == ContentPathType.MultipleNested);
+            var multipleNestedCmds = cmds
+                .Where(cmd => cmd is IHasNestedTarget && 
+                    ((IHasNestedTarget)cmd).NestedTargetPath.PathType == ContentPathType.MultipleNested);
 
-            var multiLevelEdataCmds = new List<IInstallCmd>();
-            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImageCmd>());
-            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImagePartCmd>());
-            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceImageTileCmd>());
-            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<ReplaceContentCmd>());
-            multiLevelEdataCmds.AddRange(multiLevelCmds.OfType<AlterDictionaryCmd>());
+            //new List<IInstallCmd>();
+            //validCmds.AddRange(multipleNestedCmds.OfType<ReplaceImageCmd>());
+            //validCmds.AddRange(multipleNestedCmds.OfType<ReplaceImagePartCmd>());
+            //validCmds.AddRange(multipleNestedCmds.OfType<ReplaceImageTileCmd>());
+            //validCmds.AddRange(multipleNestedCmds.OfType<ReplaceContentCmd>());
+            //validCmds.AddRange(multipleNestedCmds.OfType<AlterDictionaryCmd>());
+            //validCmds.AddRange(multipleNestedCmds.OfType<AddContentCmd>());
+            //validCmds.AddRange(multipleNestedCmds.OfType<AddImageCmd>());
 
-            var groups = from cmd in multiLevelEdataCmds
+            var validCmds = multipleNestedCmds.Where(cmd =>
+                cmd is ReplaceImageCmd ||
+                cmd is ReplaceImagePartCmd ||
+                cmd is ReplaceImageTileCmd ||
+                cmd is ReplaceContentCmd ||
+                cmd is AlterDictionaryCmd ||
+                cmd is AddContentCmd ||
+                cmd is AddImageCmd);
+                
+            var groups = from cmd in validCmds
                          group cmd by new { 
                              cmd.Priority,
                              ((IHasTarget)cmd).TargetPath, 
                              ((IHasNestedTarget)cmd).NestedTargetPath.PreLastPart 
                          };
 
-
             var resultGroups = new List<SharedNestedTargetCmdGroup>();
             foreach (var group in groups)
             {
-                var multilevelContentPath = new ContentPath(group.Key.PreLastPart);
+                var nestedTargetPath = new ContentPath(
+                    group.Key.PreLastPart);
                 var newGroup = new SharedNestedTargetCmdGroup(
                     group, 
                     group.Key.TargetPath,
-                    multilevelContentPath,
+                    nestedTargetPath,
                     group.Key.Priority);
                 resultGroups.Add(newGroup);
             }
@@ -319,7 +348,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
-                var priority = cmdElement.Attribute("priority").ValueOr<int>(3);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(4);
 
                 //Any validation here is not a good idea. Commands should be left over in an invalid state, 
                 //so eventually installation will fail if they are marked as critical.
@@ -346,7 +375,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
-                var priority = cmdElement.Attribute("priority").ValueOr<int>(4);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(5);
 
                 var newCmd = new CopyGameFileCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
@@ -391,7 +420,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var packageImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(defaultUseMipMapsValue);
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
@@ -399,7 +428,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceImageCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.NestedTargetPath = new ContentPath(edataImagePath);
+                newCmd.NestedTargetPath = new ContentPath(packageImagePath);
                 newCmd.UseMipMaps = useMipMaps;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
@@ -419,7 +448,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var packageImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var column = cmdElement.Attribute("column").ValueOrDefault<int?>();
                 var row = cmdElement.Attribute("row").ValueOrDefault<int?>();
                 var tileSize = cmdElement.Attribute("tileSize").ValueOr<int>(256);
@@ -430,7 +459,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceImageTileCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.NestedTargetPath = new ContentPath(edataImagePath);
+                newCmd.NestedTargetPath = new ContentPath(packageImagePath);
                 newCmd.Column = column;
                 newCmd.Row = row;
                 newCmd.TileSize = tileSize;
@@ -453,7 +482,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var edataImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var packageImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var xPos = cmdElement.Attribute("xPos").ValueOr<int>(0);
                 var yPos = cmdElement.Attribute("yPos").ValueOr<int>(0);
                 var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(defaultUseMipMapsValue);
@@ -463,7 +492,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var newCmd = new ReplaceImagePartCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.NestedTargetPath = new ContentPath(edataImagePath);
+                newCmd.NestedTargetPath = new ContentPath(packageImagePath);
                 newCmd.XPosition = xPos;
                 newCmd.YPosition = yPos;
                 newCmd.UseMipMaps = useMipMaps;
@@ -485,14 +514,14 @@ namespace WargameModInstaller.Infrastructure.Commands
             {
                 var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
-                var edataContentPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var packageContentPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 var newCmd = new ReplaceContentCmd();
                 newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
-                newCmd.NestedTargetPath = new ContentPath(edataContentPath);
+                newCmd.NestedTargetPath = new ContentPath(packageContentPath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -543,6 +572,64 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
                 newCmd.NestedTargetPath = new ContentPath(dictionaryPath);
                 newCmd.AlteredEntries = entries;
+                newCmd.IsCritical = isCritical;
+                newCmd.Priority = priority;
+
+                result.Add(newCmd);
+            }
+
+            return result;
+        }
+
+        private IEnumerable<AddContentCmd> ReadAddContentCmds(XElement source)
+        {
+            var result = new List<AddContentCmd>();
+
+            var cmdElementsCollection = source.Elements(CmdEntryType.AddContent.Name);
+            foreach (var cmdElement in cmdElementsCollection)
+            {
+                var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
+                var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
+                var packageContentPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var overwrite = cmdElement.Attribute("overwriteIfExist").ValueOr<bool>(defaultOverwriteIfExistValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(3);
+
+                var newCmd = new AddContentCmd();
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.NestedTargetPath = new ContentPath(packageContentPath);
+                newCmd.OverwriteIfExist = overwrite;
+                newCmd.IsCritical = isCritical;
+                newCmd.Priority = priority;
+
+                result.Add(newCmd);
+            }
+
+            return result;
+        }
+
+        private IEnumerable<AddImageCmd> ReadAddImageCmds(XElement source)
+        {
+            var result = new List<AddImageCmd>();
+
+            var cmdElementsCollection = source.Elements(CmdEntryType.AddImage.Name);
+            foreach (var cmdElement in cmdElementsCollection)
+            {
+                var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
+                var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
+                var packageImagePath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
+                var overwrite = cmdElement.Attribute("overwriteIfExist").ValueOr<bool>(defaultOverwriteIfExistValue);
+                var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(defaultUseMipMapsValue);
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(defaultCriticalCmdsValue);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(3);
+
+                var newCmd = new AddImageCmd();
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.NestedTargetPath = new ContentPath(packageImagePath);
+                newCmd.OverwriteIfExist = overwrite;
+                newCmd.UseMipMaps = useMipMaps;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

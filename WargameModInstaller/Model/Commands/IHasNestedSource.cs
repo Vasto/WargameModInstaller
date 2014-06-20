@@ -16,5 +16,10 @@ namespace WargameModInstaller.Model.Commands
         /// Gets or sets a path of the nested source file residing inside the target file.
         /// </summary>
         ContentPath NestedSourcePath { get; set; }
+
+        /// <summary>
+        /// Gets the information whether the command requires to work an orginal content of source. 
+        /// </summary>
+        bool UsesNestedSourceContent { get; }
     }
 }

@@ -146,12 +146,24 @@ namespace WargameModInstaller.Model.Edata
             }
         }
 
+        public bool ContainsContentFileWithPath(String path)
+        {
+            if (String.IsNullOrEmpty(path))
+            {
+                throw new ArgumentException(
+                    String.Format("Cannot vaerify existance of the file without the specified content path."), 
+                    "contentFile");
+            }
+
+            return contentFilesDictionary.ContainsKey(path);
+        }
+
         public void AddContentFile(EdataContentFile contentFile)
         {
             if(String.IsNullOrEmpty(contentFile.Path))
             {
                 throw new ArgumentException(
-                    String.Format("Cannot add a content file without the specified path."), 
+                    String.Format("Cannot add a content file without the specified content path."), 
                     "contentFile");
             }
 
@@ -160,7 +172,8 @@ namespace WargameModInstaller.Model.Edata
             if (contentFilesDictionary.ContainsKey(contentFile.Path))
             {
                 throw new ArgumentException(
-                    String.Format("Cannot add a content file with the follwing path \"{0}\", because a content file with this path already exists."), 
+                    String.Format("Cannot add a content file with the follwing path \"{0}\"" + 
+                    "because a content file with this path already exists.", contentFile.Path), 
                     "contentFile");
             }
 
@@ -174,7 +187,8 @@ namespace WargameModInstaller.Model.Edata
             if (!contentFilesDictionary.ContainsKey(contentFile.Path))
             {
                 throw new InvalidOperationException(
-                    String.Format("Cannot remove a content file with the follwing path \"{0}\", because it doesn't exist."));
+                    String.Format("Cannot remove a content file with the follwing path \"{0}\", because it doesn't exist.",
+                    contentFile.Path));
             }
 
             contentFilesDictionary.Remove(contentFile.Path);

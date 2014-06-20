@@ -13,12 +13,12 @@ using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceContentCmdExecutor : EdataTargetCmdExecutorBase<ReplaceContentCmd>
+    public class AddContentCmdExecutor : EdataTargetCmdExecutorBase<AddContentCmd>
     {
-        public ReplaceContentCmdExecutor(ReplaceContentCmd command)
+        public AddContentCmdExecutor(AddContentCmd command)
             : base(command)
         {
-            this.TotalSteps = 2;
+            this.TotalSteps = 1;
         }
 
         protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
@@ -34,7 +34,7 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     String.Format("Command's source file \"{0}\" doesn't exist.", Command.SourcePath),
-                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.AddContentErrorParamMsg, Command.SourcePath));
             }
 
             String targetfullPath = Command.TargetPath.GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
@@ -42,42 +42,52 @@ namespace WargameModInstaller.Services.Commands
             {
                 throw new CmdExecutionFailedException(
                     String.Format("Command's target file \"{0}\" doesn't exist.", Command.TargetPath),
-                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.AddContentErrorParamMsg, Command.SourcePath));
             }
 
+            //Może trzeba spr czy to jest poprawna ścieżka contentu? 
+            //Bo jeśli to będzie taka która przysporzy kłopotów to rozwali cały plik.
             String contentPath = Command.NestedTargetPath.LastPart;
             if (contentPath == null)
             {
                 throw new CmdExecutionFailedException(
-                    "Invalid command's TargetContentPath value.",
-                    String.Format(Properties.Resources.ReplaceImageErrorParametrizedMsg, Command.SourcePath));
+                    String.Format("Invalid value of command's TargetContentPath: \"{0}\"", Command.NestedTargetPath),                   
+                    String.Format(Properties.Resources.AddContentErrorParamMsg, Command.SourcePath));
             }
 
+            //Uniezależnić to od konkretnych typów kontenerów
             var edataFileReader = new EdataFileReader();
             var contentOwningEdata = CanGetEdataFromContext(context) ?
                 GetEdataFromContext(context) :
                 edataFileReader.Read(targetfullPath, false);
 
-            EdataContentFile contentFile = contentOwningEdata.GetContentFileByPath(contentPath);
-            if (!contentFile.IsContentLoaded)
+            if (!contentOwningEdata.ContainsContentFileWithPath(contentPath))
             {
-                edataFileReader.LoadContent(contentFile);
+                var newContentFile = new EdataContentFile();
+                newContentFile.Path = contentPath;
+                newContentFile.Content = (new ContentFileReader()).Read(sourceFullPath); ;
+
+                contentOwningEdata.AddContentFile(newContentFile);
+            }
+            else if (Command.OverwriteIfExist)
+            {
+                var contentFile = contentOwningEdata.GetContentFileByPath(contentPath);
+                //if (!contentFile.IsContentLoaded)
+                //{
+                //    edataFileReader.LoadContent(contentFile);
+                //}
+
+                contentFile.Content = (new ContentFileReader()).Read(sourceFullPath);
             }
 
-            CurrentStep++;
-
-            var contentFileReader = new ContentFileReader();
-            byte[] newContent = contentFileReader.Read(sourceFullPath);
-            contentFile.Content = newContent;
-
+            //This needs more appropriate name
             if (!CanGetEdataFromContext(context))
             {
                 SaveEdataFile(contentOwningEdata, token);
             }
 
-            CurrentStep = TotalSteps;
+            CurrentStep = TotalSteps;   
         }
 
     }
-
 }

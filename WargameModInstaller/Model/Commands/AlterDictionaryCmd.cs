@@ -48,6 +48,14 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
+        /// Gets the information whether the command requires to work an orginal content of target. 
+        /// </summary>
+        public bool UsesNestedTargetContent
+        {
+            get { return true; }
+        }
+
+        /// <summary>
         /// Gets the message which contains a descriptive text of command's execution.
         /// </summary>
         /// <returns></returns>

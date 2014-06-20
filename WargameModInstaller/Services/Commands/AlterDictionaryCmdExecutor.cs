@@ -15,7 +15,11 @@ using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class AlterDictionaryCmdExecutor : AlterEdataCmdExecutorBase<AlterDictionaryCmd>
+    //To do: Ponieważ, zdażało się że stare pliki słownikowe zostały usuwane przez nowe patche, wypadało by to
+    // uodpornić na takie sytuacje. Obecnie, gdy taka sytuacja ma miejsce, instalator sie wysypuje ponieważ nie 
+    // może znaleźć danego pliku, bo został usunięty.
+
+    public class AlterDictionaryCmdExecutor : EdataTargetCmdExecutorBase<AlterDictionaryCmd>
     {
         public AlterDictionaryCmdExecutor(AlterDictionaryCmd command)
             : base(command)

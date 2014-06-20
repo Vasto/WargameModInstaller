@@ -9,7 +9,7 @@ using WargameModInstaller.Model.Commands;
 namespace WargameModInstaller.Services.Commands
 {
     /// <summary>
-    /// 
+    /// Defines a command executor's behavior.
     /// </summary>
     public interface ICmdExecutor
     {

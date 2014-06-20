@@ -12,6 +12,8 @@ using WargameModInstaller.Model.Edata;
 
 namespace WargameModInstaller.Infrastructure.Edata
 {
+    //To do: do przeróbki odczytywanie słownika tak aby wykorzystywało nowe elementy modelu.
+
     public class EdataFileReader : EdataReaderBase, IEdataFileReader
     {
         private String lastEdataFilePath;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Model.Commands;
+using WargameModInstaller.Services.Commands.Base;
 
 namespace WargameModInstaller.Services.Commands
 {

@@ -72,12 +72,12 @@ namespace WargameModInstaller.Infrastructure.Edata
                     uint dictLength = GetDictionaryLength(dictEntries);
                     uint dictEnd = dictOffset + dictLength;
 
-                    //Clear the old part of file up to content.
-                    WritePadding(sourceEdata, 0, header.FileOffset);
-
                     WriteLoadedContentByReplace(sourceEdata, edataFile.ContentFiles);
 
                     AssignContentFilesInfoToDictEntries(edataFile.ContentFiles, dictEntries);
+
+                    //Clear the old part of file up to content.
+                    WritePadding(sourceEdata, 0, header.FileOffset);
 
                     var dictWriteInfo = WriteDictionary(sourceEdata, dictEntries, dictOffset);
 
@@ -118,11 +118,11 @@ namespace WargameModInstaller.Infrastructure.Edata
 
                     uint fileOffset = GetFileOffset(dictEnd);
 
-                    WritePadding(newEdata, 0, fileOffset);
-
                     var contentWriteInfo = WriteNotLoadedContent(sourceEdata, newEdata, edataFile.ContentFiles, fileOffset);
 
                     AssignContentFilesInfoToDictEntries(edataFile.ContentFiles, dictEntries);
+
+                    WritePadding(newEdata, 0, fileOffset);
 
                     var dictWriteInfo = WriteDictionary(newEdata, dictEntries, dictOffset);
 

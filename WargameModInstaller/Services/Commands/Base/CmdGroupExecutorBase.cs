@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Model.Commands;
 
-namespace WargameModInstaller.Services.Commands
+namespace WargameModInstaller.Services.Commands.Base
 {
     //To do: Make this class more friendly as a base class for eventual future executors, especially in context of progress notification
 

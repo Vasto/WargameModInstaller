@@ -10,6 +10,7 @@ using WargameModInstaller.Infrastructure.Content;
 using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Services.Commands.Base;
 using WargameModInstaller.Services.Edata;
 
 namespace WargameModInstaller.Services.Commands
@@ -34,15 +35,15 @@ namespace WargameModInstaller.Services.Commands
             //Ta metoda bez bloków łapania wyjątków, w przypadku ewentualnego wyjątku pochodzącego z kodu z poza execute, 
             //spowoduje wykrzaczenie się całej instalacji. Może trzeba zaimplementować IsCritical także dla CmdGroup...
 
-            String targetfullPath = CommandGroup
+            String targetFullPath = CommandGroup
                 .TargetPath
                 .GetAbsoluteOrPrependIfRelative(context.InstallerTargetDirectory);
-            if (!File.Exists(targetfullPath))
+            if (!File.Exists(targetFullPath))
             {
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
                 throw new CmdExecutionFailedException(
-                    String.Format("A specified target file: \"{0}\" doesn't exist", targetfullPath),
-                    String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
+                    String.Format("A specified target file: \"{0}\" doesn't exist", targetFullPath),
+                    String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetFullPath));
             }
 
             String rootContentPath = CommandGroup.NestedTargetPath.Parts.FirstOrDefault();
@@ -61,7 +62,7 @@ namespace WargameModInstaller.Services.Commands
 
                 //Tu wciąż brak komunikatu co się dzieje, tak więc wciąz jest wyświetlany poprzedni
                 //czyli backup lub initialization jeśli ta komenda jest pierwszą.
-                UnrollEdatas(targetfullPath, out temporaryCreatedEdatas, out edataHierarchy);
+                UnrollEdatas(targetFullPath, out temporaryCreatedEdatas, out edataHierarchy);
 
                 var lastEdataFile = edataHierarchy.Peek().EdataFile;
 
@@ -70,8 +71,8 @@ namespace WargameModInstaller.Services.Commands
                     context.InstallerTargetDirectory,
                     lastEdataFile);
 
-                //Interesuje nas tylko ostatni, bo to jego content bedzie ładowany, reszta jest tylko rozwinieta na dysk
-                //ale nia ma załadowane wiecej jak jeden plik
+                //Interesuje nas tylko ostatni, bo to jego content bedzie ładowany, 
+                //reszta jest tylko rozwinieta na dysku ale nia ma załadowane wiecej jak jeden plik.
                 EdataContentManager edataContentManager = new EdataContentManager(lastEdataFile);
                 edataContentManager.MaxLoadedContentReached += (sender, args) =>
                 {
@@ -85,7 +86,9 @@ namespace WargameModInstaller.Services.Commands
                 }
 
                 CurrentStep++;
-                CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.TargetPath);
+                CurrentMessage = String.Format(
+                    Properties.Resources.RebuildingParametrizedMsg, 
+                    CommandGroup.TargetPath);
 
                 RollEdatas(edataHierarchy, token);
             }
@@ -94,11 +97,6 @@ namespace WargameModInstaller.Services.Commands
                 if (temporaryCreatedEdatas != null)
                 {
                     temporaryCreatedEdatas.ForEach(x => File.Delete(x));
-
-                    //foreach (var tmpEdata in temporaryCreatedEdatas)
-                    //{
-                    //    File.Delete(tmpEdata);
-                    //}
                 }
             }
 
@@ -107,18 +105,18 @@ namespace WargameModInstaller.Services.Commands
         }
 
         private void UnrollEdatas(
-            String targetfullPath, 
-            out List<String> temporaryEdatas,
+            String targetPath, 
+            out List<String> tempEdatas,
             out Stack<EdataHierarchyEntity> edataHierarchy)
         {
-            temporaryEdatas = new List<String>();
+            tempEdatas = new List<String>();
             edataHierarchy = new Stack<EdataHierarchyEntity>();
 
             IEdataFileReader edataFileReader = new EdataFileReader();
             IEdataBinReader edataBinReader = new EdataBinReader();
             IContentFileWriter contentWriter = new ContentFileWriter();
 
-            EdataFile mainEdataFile = edataFileReader.Read(targetfullPath, false);
+            EdataFile mainEdataFile = edataFileReader.Read(targetPath, false);
             edataHierarchy.Push(new EdataHierarchyEntity(mainEdataFile));
 
             foreach (var edataPath in CommandGroup.NestedTargetPath.Parts)
@@ -132,13 +130,18 @@ namespace WargameModInstaller.Services.Commands
                     var virtualEdata = edataBinReader.Read(content, false);
 
                     //Tutaj mieć na uwadze, że ten sposób pozyskiwania ścieżki jest bardzo podatny na problemy, miejsce wolne itd.
-                    String lastPath = Path.Combine(Path.GetDirectoryName(targetfullPath), Path.GetFileName(contentFile.Path));
+                    String lastPath = Path.Combine(Path.GetDirectoryName(targetPath), Path.GetFileName(contentFile.Path));
                     contentWriter.Write(lastPath, content);
 
-                    var lastEdata = new EdataFile(lastPath, virtualEdata.Header, virtualEdata.PostHeaderData, virtualEdata.ContentFiles);
+                    var lastEdata = new EdataFile(
+                        lastPath, 
+                        virtualEdata.Header, 
+                        virtualEdata.PostHeaderData, 
+                        virtualEdata.ContentFiles);
+
                     edataHierarchy.Push(new EdataHierarchyEntity(lastEdata, edataPath));
 
-                    temporaryEdatas.Add(lastPath);
+                    tempEdatas.Add(lastPath);
                 }
             }
         }
@@ -156,8 +159,6 @@ namespace WargameModInstaller.Services.Commands
                 edataFileWriter.Write(currentEntity.EdataFile, token.Value);
                 if (parentEntity != null)
                 {
-                    //var holdingFileOfParentEdata = GetEdataContentFileByPath(parentEntity.EdataFile, currentEntity.OwnerPath);
-
                     var owner = parentEntity.EdataFile.GetContentFileByPath(currentEntity.OwnerPath);
                     owner.Content = contentFileReader.Read(currentEntity.EdataFile.Path);
                 }
@@ -166,7 +167,9 @@ namespace WargameModInstaller.Services.Commands
 
         private void SaveEdataChanges(EdataFile edataFile, CancellationToken? token = null)
         {
-            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, this.CommandGroup.TargetPath);
+            CurrentMessage = String.Format(
+                Properties.Resources.RebuildingParametrizedMsg, 
+                CommandGroup.TargetPath);
 
             IEdataFileWriter edataWriter = new EdataFileWriter();
             edataWriter.Write(edataFile, token.Value);

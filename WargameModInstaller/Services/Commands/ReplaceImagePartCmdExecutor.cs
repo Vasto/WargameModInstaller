@@ -9,7 +9,7 @@ using WargameModInstaller.Services.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceImagePartCmdExecutor : ReplaceImageCmdExecutorBase<ReplaceImagePartCmd>
+    public class ReplaceImagePartCmdExecutor : ImageTargetCmdExecutorBase<ReplaceImagePartCmd>
     {
         public ReplaceImagePartCmdExecutor(IImageComposerService imageComposer, ReplaceImagePartCmd command)
             : base(command)
@@ -25,12 +25,12 @@ namespace WargameModInstaller.Services.Commands
 
         protected override byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath)
         {
-            TgvImage oldTgv = GetTgvFromBytes(orginalImageContent);
-            TgvImage newtgv = GetTgvFromDDS(sourceImagePath, !Command.UseMipMaps);
+            TgvImage oldTgv = BytesToTgv(orginalImageContent);
+            TgvImage newtgv = DDSFileToTgv(sourceImagePath, !Command.UseMipMaps);
 
             ImageComposerService.ReplaceImagePart(oldTgv, newtgv, (uint)Command.XPosition.Value, (uint)Command.YPosition.Value);
 
-            byte[] rawOldTgv = ConvertTgvToBytes(oldTgv, !Command.UseMipMaps);
+            byte[] rawOldTgv = TgvToBytes(oldTgv, !Command.UseMipMaps);
             return rawOldTgv;
         }
 

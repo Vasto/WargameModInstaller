@@ -37,6 +37,14 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
+        /// Gets the information whether the command requires to work an orginal content of target. 
+        /// </summary>
+        public bool UsesNestedTargetContent
+        {
+            get { return true; }
+        }
+
+        /// <summary>
         /// Gets or sets an information wheather a MipMaps of the image 
         /// should be taken into consdieration during the replacement process.
         /// </summary>
