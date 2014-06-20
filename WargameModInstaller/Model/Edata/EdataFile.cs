@@ -142,7 +142,7 @@ namespace WargameModInstaller.Model.Edata
             else
             {
                 throw new InvalidOperationException(
-                    String.Format(Properties.Resources.ContentFileNotFoundParametrizedMsg, contentPath));
+                    String.Format(Properties.Resources.ContentFileNotFoundParamMsg, contentPath));
             }
         }
 

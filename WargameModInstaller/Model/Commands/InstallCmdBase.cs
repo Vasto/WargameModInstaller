@@ -38,10 +38,32 @@ namespace WargameModInstaller.Model.Commands
         }
 
         /// <summary>
+        /// Gets the command's name.
+        /// </summary>
+        public String Name
+        {
+            get { return GetCommandsName(); }
+        }
+
+        /// <summary>
+        /// Gets the message which contains a descriptive text of command's execution.
+        /// </summary>
+        public String ExecutionMessage
+        {
+            get { return GetExecutionMessage(); }
+        }
+
+        /// <summary>
+        /// Gets the command's name.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract String GetCommandsName();
+
+        /// <summary>
         /// Gets the message which contains a descriptive text of command's execution.
         /// </summary>
         /// <returns></returns>
-        public abstract String GetExecutionMessage();
+        protected abstract String GetExecutionMessage();
 
     }
 }

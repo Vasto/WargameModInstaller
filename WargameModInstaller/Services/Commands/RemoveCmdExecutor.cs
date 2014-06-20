@@ -23,12 +23,11 @@ namespace WargameModInstaller.Services.Commands
             this.TotalSteps = 1;
         }
 
-        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
+        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken token)
         {
-            CurrentStep = 0;
-            CurrentMessage = Command.GetExecutionMessage();
+            InitializeProgress();
 
-            token.ThrowIfCanceledAndNotNull();
+            token.ThrowIfCancellationRequested();
 
             String sourceFullPath = Path.Combine(context.InstallerTargetDirectory, Command.SourcePath);
             if (File.Exists(sourceFullPath))
@@ -36,9 +35,7 @@ namespace WargameModInstaller.Services.Commands
                 File.Delete(sourceFullPath);
             }
 
-            token.ThrowIfCanceledAndNotNull();
-
-            CurrentStep = TotalSteps;
+            SetMaxProgress();
         }
 
     }

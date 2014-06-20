@@ -17,13 +17,13 @@ namespace WargameModInstaller.Services.Commands
 
         }
 
-        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
+        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken token)
         {
             CurrentStep = 0;
 
             foreach (var executor in CommandExecutors)
             {
-                executor.Execute(context, token.Value);
+                executor.Execute(context, token);
             }
 
             CurrentStep = TotalSteps;

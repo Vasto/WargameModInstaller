@@ -17,6 +17,7 @@ namespace WargameModInstaller.Services.Commands.Base
         public CmdExecutorBase(T command)
         {
             this.Command = command;
+            this.DefaultExecutionErrorMsg = String.Format(Properties.Resources.CmdExecutionErrorParamMsg, command.Name);
         }
 
         /// <summary>
@@ -26,6 +27,15 @@ namespace WargameModInstaller.Services.Commands.Base
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets or sets a default message used when an execution error occurs.
+        /// </summary>
+        protected String DefaultExecutionErrorMsg
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -59,7 +69,7 @@ namespace WargameModInstaller.Services.Commands.Base
             }
         }
 
-        protected abstract void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null);
+        protected abstract void ExecuteInternal(CmdExecutionContext context, CancellationToken token);
 
         #region IProgressProvider
 
@@ -138,6 +148,30 @@ namespace WargameModInstaller.Services.Commands.Base
         }
 
         #endregion //IProgressProvider
+
+        #region ProgressHelpers
+
+        protected void InitializeProgress()
+        {
+            CurrentStep = 0;
+            CurrentMessage = Command.ExecutionMessage;
+        }
+
+        protected void IncreaseProgress()
+        {
+            CurrentStep = 
+                CurrentStep + 1 <= TotalSteps ?
+                CurrentStep + 1 :
+                TotalSteps;
+        }
+
+        protected void SetMaxProgress()
+        {
+            CurrentStep = TotalSteps;
+        }
+
+        #endregion //ProgressHelpers
     }
+
 
 }

@@ -21,11 +21,12 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
-        /// <summary>
-        /// Gets the message which contains a descriptive text of command's execution.
-        /// </summary>
-        /// <returns></returns>
-        public override String GetExecutionMessage()
+        protected override String GetCommandsName()
+        {
+            return "RemoveFileCmd";
+        }
+
+        protected override String GetExecutionMessage()
         {
             return String.Format(Properties.Resources.Removing + " {0}...",
                 System.IO.Path.GetFileName(SourcePath));

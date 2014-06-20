@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
+using WargameModInstaller.Model.Edata;
 using WargameModInstaller.Model.Image;
+using WargameModInstaller.Services.Commands.Base;
 using WargameModInstaller.Services.Image;
 
 namespace WargameModInstaller.Services.Commands
 {
-    public class ReplaceImagePartCmdExecutor : ImageTargetCmdExecutorBase<ReplaceImagePartCmd>
+    public class ReplaceImagePartCmdExecutor : ModImageBySourceCmdExecutor<ReplaceImagePartCmd>
     {
         public ReplaceImagePartCmdExecutor(IImageComposerService imageComposer, ReplaceImagePartCmd command)
             : base(command)
         {
             this.ImageComposerService = imageComposer;
+            this.DefaultExecutionErrorMsg = String.Format(
+                Properties.Resources.ReplaceContentErrorParamMsg,
+                Command.SourcePath);
         }
 
         protected IImageComposerService ImageComposerService
@@ -23,18 +29,32 @@ namespace WargameModInstaller.Services.Commands
             set;
         }
 
-        protected override byte[] ModifyImageContent(byte[] orginalImageContent, String sourceImagePath)
+        protected override void ExecuteCommandsLogic(CmdsExecutionData data)
         {
-            TgvImage oldTgv = BytesToTgv(orginalImageContent);
-            TgvImage newtgv = DDSFileToTgv(sourceImagePath, !Command.UseMipMaps);
+            var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
+            if (!contentFile.IsContentLoaded)
+            {
+                (new EdataFileReader()).LoadContent(contentFile);
+            }
 
-            ImageComposerService.ReplaceImagePart(oldTgv, newtgv, (uint)Command.XPosition.Value, (uint)Command.YPosition.Value);
+            if (contentFile.FileType != EdataContentFileType.Image)
+            {
+                throw new CmdExecutionFailedException(
+                    String.Format("Invalid TargetContentPath: \"{0}\". It doesn't target an image content file.", data.ContentPath),
+                    DefaultExecutionErrorMsg);
+            }
 
-            byte[] rawOldTgv = TgvToBytes(oldTgv, !Command.UseMipMaps);
-            return rawOldTgv;
+            TgvImage oldTgv = BytesToTgv(contentFile.Content);
+            TgvImage newtgv = DDSFileToTgv(data.SourcePath, !Command.UseMipMaps);
+
+            ImageComposerService.ReplaceImagePart(
+                oldTgv, 
+                newtgv, 
+                (uint)Command.XPosition.Value, 
+                (uint)Command.YPosition.Value);
+
+            contentFile.Content = TgvToBytes(oldTgv, !Command.UseMipMaps);
         }
 
-
     }
-
 }

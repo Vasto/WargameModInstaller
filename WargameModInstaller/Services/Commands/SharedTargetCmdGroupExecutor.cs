@@ -25,7 +25,7 @@ namespace WargameModInstaller.Services.Commands
             this.TotalSteps++;
         }
 
-        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
+        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken token)
         {
             //Ta metoda bez bloków łapania wyjątków, w przypadku ewentualnego wyjątku pochodzącego z kodu z poza execute, spowoduje 
             //wykrzaczenie się całej instalacji. Może trzeba zaimplementować IsCritical także dla CmdGroup...
@@ -36,7 +36,7 @@ namespace WargameModInstaller.Services.Commands
                 //Jeśli ten plik nie istnieje to szlag wszystkie komendy wewnętrzne.
                 throw new CmdExecutionFailedException(
                     String.Format("A specified target file: \"{0}\" doesn't exist", targetfullPath),
-                    String.Format(Properties.Resources.NotExistingFileOperationErrorParametrizedMsg, targetfullPath));
+                    String.Format(Properties.Resources.NotExistingFileOperationErrorParamMsg, targetfullPath));
             }
 
             CurrentStep = 0;
@@ -61,7 +61,7 @@ namespace WargameModInstaller.Services.Commands
 
             foreach (var executor in CommandExecutors)
             {
-                executor.Execute(newExecutionContext, token.Value);
+                executor.Execute(newExecutionContext, token);
             }
 
             SaveEdataChanges(edataFile, token);

@@ -38,7 +38,7 @@ namespace WargameModInstaller.Services.Commands.Base
 
         public virtual void Execute(CmdExecutionContext context)
         {
-            ExecuteInternal(context);
+            ExecuteInternal(context, CancellationToken.None);
         }
 
         public virtual void Execute(CmdExecutionContext context, CancellationToken token)
@@ -46,7 +46,7 @@ namespace WargameModInstaller.Services.Commands.Base
             ExecuteInternal(context, token);
         }
 
-        protected abstract void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null);
+        protected abstract void ExecuteInternal(CmdExecutionContext context, CancellationToken token);
 
         private IEnumerable<ICmdExecutor> CreateExecutorsForGroupCmds()
         {

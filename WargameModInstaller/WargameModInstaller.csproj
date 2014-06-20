@@ -199,8 +199,6 @@
     <Compile Include="Services\Commands\Base\CmdExecutorBase.cs" />
     <Compile Include="Services\Commands\CmdExecutionFailedException.cs" />
     <Compile Include="Services\Commands\SharedNestedTargetCmdGroupExecutor.cs" />
-    <Compile Include="Services\Commands\Base\EdataTargetCmdExecutorBase.cs" />
-    <Compile Include="Services\Commands\Base\ImageTargetCmdExecutorBase.cs" />
     <Compile Include="Services\Commands\ReplaceImagePartCmdExecutor.cs" />
     <Compile Include="Services\Commands\ReplaceContentCmdExecutor.cs" />
     <Compile Include="Services\Commands\SharedEdataCmdExecutionContext.cs" />

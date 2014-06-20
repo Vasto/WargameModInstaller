@@ -143,6 +143,15 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot execute the &quot;{0}&quot; command..
+        /// </summary>
+        internal static string CmdExecutionErrorParamMsg {
+            get {
+                return ResourceManager.GetString("CmdExecutionErrorParamMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select the components you want to install. Click Install to start the installation..
         /// </summary>
         internal static string ComponentScreenDetail {
@@ -181,18 +190,18 @@ namespace WargameModInstaller.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The installer was unable to find the following content file &quot;{0}&quot;.
         /// </summary>
-        internal static string ContentFileNotFoundParametrizedMsg {
+        internal static string ContentFileNotFoundParamMsg {
             get {
-                return ResourceManager.GetString("ContentFileNotFoundParametrizedMsg", resourceCulture);
+                return ResourceManager.GetString("ContentFileNotFoundParamMsg", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The installer was unable to copy the file &quot;{0}&quot;.
         /// </summary>
-        internal static string CopyFileErrorParametrizedMsg {
+        internal static string CopyFileErrorParamMsg {
             get {
-                return ResourceManager.GetString("CopyFileErrorParametrizedMsg", resourceCulture);
+                return ResourceManager.GetString("CopyFileErrorParamMsg", resourceCulture);
             }
         }
         
@@ -416,9 +425,9 @@ namespace WargameModInstaller.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Installer was unable to perform an operation on the following file: &quot;{0}&quot; because the file doesn&apos;t exist..
         /// </summary>
-        internal static string NotExistingFileOperationErrorParametrizedMsg {
+        internal static string NotExistingFileOperationErrorParamMsg {
             get {
-                return ResourceManager.GetString("NotExistingFileOperationErrorParametrizedMsg", resourceCulture);
+                return ResourceManager.GetString("NotExistingFileOperationErrorParamMsg", resourceCulture);
             }
         }
         
@@ -488,9 +497,9 @@ namespace WargameModInstaller.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The installer was unable to remove the file &quot;{0}&quot;.
         /// </summary>
-        internal static string RemoveFileErrorParametrizedMsg {
+        internal static string RemoveFileErrorParamMsg {
             get {
-                return ResourceManager.GetString("RemoveFileErrorParametrizedMsg", resourceCulture);
+                return ResourceManager.GetString("RemoveFileErrorParamMsg", resourceCulture);
             }
         }
         
@@ -506,9 +515,9 @@ namespace WargameModInstaller.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The installer was unable to copy the file &quot;{0}&quot;.
         /// </summary>
-        internal static string ReplaceImageErrorParametrizedMsg {
+        internal static string ReplaceContentErrorParamMsg {
             get {
-                return ResourceManager.GetString("ReplaceImageErrorParametrizedMsg", resourceCulture);
+                return ResourceManager.GetString("ReplaceContentErrorParamMsg", resourceCulture);
             }
         }
         

@@ -23,37 +23,29 @@ namespace WargameModInstaller.Services.Commands
             this.TotalSteps = 1;
         }
 
-        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken? token = null)
+        protected override void ExecuteInternal(CmdExecutionContext context, CancellationToken token)
         {
-            CurrentStep = 0;
-            CurrentMessage = Command.GetExecutionMessage();
+            InitializeProgress();
 
             String sourceFullPath = Path.Combine(context.InstallerTargetDirectory, Command.SourcePath);
             if (!File.Exists(sourceFullPath))
             {
                 throw new CmdExecutionFailedException("A file given by the sourcePath doesn't exist.",
-                    String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.CopyFileErrorParamMsg, Command.SourcePath));
             }
 
             String targetfullPath = Path.Combine(context.InstallerTargetDirectory, Command.TargetPath);
             if (!PathUtilities.IsValidPath(targetfullPath))
             {
                 throw new CmdExecutionFailedException("A given targetPath is not a valid path.",
-                    String.Format(Properties.Resources.CopyFileErrorParametrizedMsg, Command.SourcePath));
+                    String.Format(Properties.Resources.CopyFileErrorParamMsg, Command.SourcePath));
             }
 
             PathUtilities.CreateDirectoryIfNotExist(Path.GetDirectoryName(targetfullPath));
 
-            if (token.HasValue)
-            {
-                FileUtilities.CopyFileEx(sourceFullPath, targetfullPath, token.Value);
-            }
-            else
-            {
-                FileUtilities.CopyFileEx(sourceFullPath, targetfullPath);
-            }
+            FileUtilities.CopyFileEx(sourceFullPath, targetfullPath, token);
 
-            CurrentStep = TotalSteps;
+            SetMaxProgress();
         }
 
     }

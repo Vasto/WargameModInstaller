@@ -238,13 +238,13 @@ Click Next to continue.</value>
   <data name="ConfigFileNotFoundErrorMsg" xml:space="preserve">
     <value>Installer failed to found a configuration file.</value>
   </data>
-  <data name="CopyFileErrorParametrizedMsg" xml:space="preserve">
+  <data name="CopyFileErrorParamMsg" xml:space="preserve">
     <value>The installer was unable to copy the file "{0}"</value>
   </data>
-  <data name="RemoveFileErrorParametrizedMsg" xml:space="preserve">
+  <data name="RemoveFileErrorParamMsg" xml:space="preserve">
     <value>The installer was unable to remove the file "{0}"</value>
   </data>
-  <data name="ReplaceImageErrorParametrizedMsg" xml:space="preserve">
+  <data name="ReplaceContentErrorParamMsg" xml:space="preserve">
     <value>The installer was unable to copy the file "{0}"</value>
   </data>
   <data name="ConfigFileErrorHeader" xml:space="preserve">
@@ -253,13 +253,13 @@ Click Next to continue.</value>
   <data name="InstallerInitializing" xml:space="preserve">
     <value>Initializing installation...</value>
   </data>
-  <data name="NotExistingFileOperationErrorParametrizedMsg" xml:space="preserve">
+  <data name="NotExistingFileOperationErrorParamMsg" xml:space="preserve">
     <value>Installer was unable to perform an operation on the following file: "{0}" because the file doesn't exist.</value>
   </data>
   <data name="LoadEdataErrorMsg" xml:space="preserve">
     <value>The installer was unable to load the edata content</value>
   </data>
-  <data name="ContentFileNotFoundParametrizedMsg" xml:space="preserve">
+  <data name="ContentFileNotFoundParamMsg" xml:space="preserve">
     <value>The installer was unable to find the following content file "{0}"</value>
   </data>
   <data name="RebuildingParametrizedMsg" xml:space="preserve">
@@ -288,5 +288,8 @@ Click Next to continue.</value>
   </data>
   <data name="AddContentErrorParamMsg" xml:space="preserve">
     <value>The installer was unable to add the file "{0}"</value>
+  </data>
+  <data name="CmdExecutionErrorParamMsg" xml:space="preserve">
+    <value>Cannot execute the "{0}" command.</value>
   </data>
 </root>

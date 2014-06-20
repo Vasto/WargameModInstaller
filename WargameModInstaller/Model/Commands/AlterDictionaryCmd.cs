@@ -55,11 +55,12 @@ namespace WargameModInstaller.Model.Commands
             get { return true; }
         }
 
-        /// <summary>
-        /// Gets the message which contains a descriptive text of command's execution.
-        /// </summary>
-        /// <returns></returns>
-        public override String GetExecutionMessage()
+        protected override String GetCommandsName()
+        {
+            return "AlterDictionaryCmd";
+        }
+
+        protected override String GetExecutionMessage()
         {
             return String.Format(Properties.Resources.AlteringDictionary + " {0}...",
                 NestedTargetPath);

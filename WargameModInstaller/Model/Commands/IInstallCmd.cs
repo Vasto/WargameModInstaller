@@ -6,9 +6,9 @@ namespace WargameModInstaller.Model.Commands
     {
         int Id { get; set; }
         int Priority { get; set; }
-        bool IsCritical { get; set; } 
-
-        String GetExecutionMessage();
-
+        bool IsCritical { get; set; }
+        String Name { get; }
+        String ExecutionMessage { get; }
     }
+
 }
