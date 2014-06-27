@@ -17,13 +17,14 @@ namespace WargameModInstaller.Services.Commands.Base
         public CmdExecutorBase(T command)
         {
             this.Command = command;
-            this.DefaultExecutionErrorMsg = String.Format(Properties.Resources.CmdExecutionErrorParamMsg, command.Name);
+            this.DefaultExecutionErrorMsg = 
+                String.Format(Properties.Resources.CmdExecutionErrorParamMsg, command.Name);
         }
 
         /// <summary>
         /// Gets a command which has to be executed.
         /// </summary>
-        public T Command
+        protected T Command
         {
             get;
             private set;
@@ -159,10 +160,8 @@ namespace WargameModInstaller.Services.Commands.Base
 
         protected void IncreaseProgress()
         {
-            CurrentStep = 
-                CurrentStep + 1 <= TotalSteps ?
-                CurrentStep + 1 :
-                TotalSteps;
+            CurrentStep = CurrentStep + 1 <= TotalSteps ?
+                CurrentStep + 1 : TotalSteps;
         }
 
         protected void SetMaxProgress()

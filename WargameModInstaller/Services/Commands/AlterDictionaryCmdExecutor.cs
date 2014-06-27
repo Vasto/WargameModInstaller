@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Infrastructure.Dictionaries;
-using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Dictionaries;
 using WargameModInstaller.Services.Commands.Base;
@@ -28,10 +27,6 @@ namespace WargameModInstaller.Services.Commands
         protected override void ExecuteCommandsLogic(CmdsExecutionData data)
         {
             var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
-            if (!contentFile.IsContentLoaded)
-            {
-                (new EdataFileReader()).LoadContent(contentFile);
-            }
 
             var entries = (new TradDictBinReader()).Read(contentFile.Content);
             var hashToEntriesMap = entries.ToDictionary(key => key.Hash, new ByteArrayComparer());

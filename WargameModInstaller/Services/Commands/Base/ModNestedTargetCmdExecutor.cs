@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Extensions;
-using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
-using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Model.Containers;
 
 namespace WargameModInstaller.Services.Commands.Base
 {
@@ -44,24 +43,25 @@ namespace WargameModInstaller.Services.Commands.Base
                     DefaultExecutionErrorMsg);
             }
 
-            var containerFileReader = new EdataFileReader();
-            var containerFile = CanGetTargetContainerFromContext(context) ?
-                GetTargetContainerFromContext(context) :
-                containerFileReader.Read(targetfullPath, false);
+            //if(!CanGetTargetContainerFromContext(context))
+            //{
+            //    GetTargetContainerFromContext(context);
+            //}
 
+            var containerFile = GetTargetContainerFromContext(context);
             var data = new CmdsExecutionData
             {
                 ContainerFile = containerFile,
-                ContainerPath = targetfullPath,
+                //ContainerPath = targetfullPath,
                 ContentPath = contentPath,
             };
 
             ExecuteCommandsLogic(data);
 
-            if (!CanGetTargetContainerFromContext(context))
-            {
-                SaveTargetContainerFile(containerFile, token);
-            }
+            //if (!CanGetTargetContainerFromContext(context))
+            //{
+            //    SaveTargetContainerFile(containerFile, token);
+            //}
 
             SetMaxProgress();
         }
@@ -74,43 +74,44 @@ namespace WargameModInstaller.Services.Commands.Base
         /// </summary>
         protected class CmdsExecutionData
         {
-            public EdataFile ContainerFile { get; set; }
-            public String ContainerPath { get; set; }
+            public IContainerFile ContainerFile { get; set; }
+            //public String ContainerPath { get; set; }
             public String ContentPath { get; set;}
         }
 
         //To zamienić na abstrakcje pakietu w przyszłości
-        protected virtual bool CanGetTargetContainerFromContext(CmdExecutionContext context)
+        //protected virtual bool CanGetTargetContainerFromContext(CmdExecutionContext context)
+        //{
+        //    var sharedEdataContext = context as SharedContainerCmdExecContext;
+        //    if (sharedEdataContext != null)
+        //    {
+        //        return sharedEdataContext.ContainerFile != null;
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        protected IContainerFile GetTargetContainerFromContext(CmdExecutionContext context)
         {
-            var sharedEdataContext = context as SharedEdataCmdExecutionContext;
-            if (sharedEdataContext != null)
+            var sharedContainerContext = context as SharedContainerCmdExecContext;
+            if (sharedContainerContext == null ||
+                sharedContainerContext.ContainerFile == null)
             {
-                return sharedEdataContext.EdataFile != null;
+                throw new InvalidOperationException("Cannot obtain a container file from the given execution context");
             }
-            else
-            {
-                return false;
-            }
+
+            return sharedContainerContext.ContainerFile;
         }
 
         //To zamienić na abstrakcje pakietu w przyszłości
-        protected virtual EdataFile GetTargetContainerFromContext(CmdExecutionContext context)
-        {
-            var sharedEdataContext = context as SharedEdataCmdExecutionContext;
-            if (sharedEdataContext == null)
-            {
-                throw new InvalidOperationException("Cannot obtain the container file from the given execution context");
-            }
-
-            return sharedEdataContext.EdataFile;
-        }
-
-        //To zamienić na abstrakcje pakietu w przyszłości
-        protected virtual void SaveTargetContainerFile(EdataFile edataFile, CancellationToken token)
-        {
-            IEdataFileWriter edataWriter = new EdataFileWriter();
-            edataWriter.Write(edataFile, token);
-        }
+        //Update to wywalić, i wogole cała otoczke zapisu odczytu pliku kontenera przenieśc do egzekutora grupy.
+        //protected virtual void SaveTargetContainerFile(IContainerFile containerFile, CancellationToken token)
+        //{
+        //    IContainerWriterService writer = new ContainerWriterService();
+        //    writer.WriteFile(containerFile, token);
+        //}
 
     }
 }

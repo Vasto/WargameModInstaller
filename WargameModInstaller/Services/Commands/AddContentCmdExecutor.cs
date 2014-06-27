@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Infrastructure.Content;
 using WargameModInstaller.Model.Commands;
-using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Model.Containers.Edata;
 using WargameModInstaller.Services.Commands.Base;
 
 namespace WargameModInstaller.Services.Commands
@@ -27,14 +27,14 @@ namespace WargameModInstaller.Services.Commands
             {
                 var newContentFile = new EdataContentFile();
                 newContentFile.Path = data.ContentPath;
-                newContentFile.Content = (new ContentFileReader()).Read(data.SourcePath); ;
+                newContentFile.Content = (new ContentFileReader()).Read(data.ModificationSourcePath); ;
 
                 data.ContainerFile.AddContentFile(newContentFile);
             }
             else if (Command.OverwriteIfExist)
             {
                 var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
-                contentFile.Content = (new ContentFileReader()).Read(data.SourcePath);
+                contentFile.Content = (new ContentFileReader()).Read(data.ModificationSourcePath);
             }
         }
 

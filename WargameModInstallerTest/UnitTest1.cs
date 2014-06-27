@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Model.Containers.Edata;
 
 namespace WargameSkinInstallerTest
 {

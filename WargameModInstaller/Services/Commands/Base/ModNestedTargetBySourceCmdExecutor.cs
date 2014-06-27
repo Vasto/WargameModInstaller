@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Extensions;
-using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
-using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Model.Containers;
 
 namespace WargameModInstaller.Services.Commands.Base
 {
@@ -52,25 +51,26 @@ namespace WargameModInstaller.Services.Commands.Base
                     DefaultExecutionErrorMsg);
             }
 
-            var containerFileReader = new EdataFileReader();
-            var containerFile = CanGetTargetContainerFromContext(context) ?
-                GetTargetContainerFromContext(context) :
-                containerFileReader.Read(targetfullPath, false);
+            //var containerFileReader = new EdataFileReader();
+            //var containerFile = CanGetTargetContainerFromContext(context) ?
+            //    GetTargetContainerFromContext(context) :
+            //    containerFileReader.Read(targetfullPath, false);
 
+            var containerFile = GetTargetContainerFromContext(context);
             var data = new CmdsExecutionData
             {
                 ContainerFile = containerFile,
-                ContainerPath = targetfullPath,
+                //ContainerPath = targetfullPath,
                 ContentPath = contentPath,
-                SourcePath = sourceFullPath,
+                ModificationSourcePath = sourceFullPath,
             };
 
             ExecuteCommandsLogic(data);
 
-            if (!CanGetTargetContainerFromContext(context))
-            {
-                SaveTargetContainerFile(containerFile, token);
-            }
+            //if (!CanGetTargetContainerFromContext(context))
+            //{
+            //    SaveTargetContainerFile(containerFile, token);
+            //}
 
             SetMaxProgress();
         }
@@ -83,43 +83,23 @@ namespace WargameModInstaller.Services.Commands.Base
         /// </summary>
         protected class CmdsExecutionData
         {
-            public EdataFile ContainerFile { get; set; }
-            public String ContainerPath { get; set; }
+            public IContainerFile ContainerFile { get; set; }
+            //public String ContainerPath { get; set; }
             public String ContentPath { get; set; }
-            public String SourcePath { get; set; }
+            public String ModificationSourcePath { get; set; }
         }
 
-        //To zamienić na abstrakcje pakietu w przyszłości
-        protected virtual bool CanGetTargetContainerFromContext(CmdExecutionContext context)
+        protected IContainerFile GetTargetContainerFromContext(CmdExecutionContext context)
         {
-            var sharedEdataContext = context as SharedEdataCmdExecutionContext;
-            if (sharedEdataContext != null)
+            var sharedContainerContext = context as SharedContainerCmdExecContext;
+            if (sharedContainerContext == null || 
+                sharedContainerContext.ContainerFile == null)
             {
-                return sharedEdataContext.EdataFile != null;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        //To zamienić na abstrakcje pakietu w przyszłości
-        protected virtual EdataFile GetTargetContainerFromContext(CmdExecutionContext context)
-        {
-            var sharedEdataContext = context as SharedEdataCmdExecutionContext;
-            if (sharedEdataContext == null)
-            {
-                throw new InvalidOperationException("Cannot obtain the container file from the given execution context");
+                throw new InvalidOperationException("Cannot obtain a container file from the given execution context");
             }
 
-            return sharedEdataContext.EdataFile;
+            return sharedContainerContext.ContainerFile;
         }
 
-        //To zamienić na abstrakcje pakietu w przyszłości
-        protected virtual void SaveTargetContainerFile(EdataFile edataFile, CancellationToken token)
-        {
-            IEdataFileWriter edataWriter = new EdataFileWriter();
-            edataWriter.Write(edataFile, token);
-        }
     }
 }

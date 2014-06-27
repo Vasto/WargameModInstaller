@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WargameModInstaller.Infrastructure.Edata;
 using WargameModInstaller.Model.Commands;
-using WargameModInstaller.Model.Edata;
+using WargameModInstaller.Model.Containers;
 using WargameModInstaller.Model.Image;
 using WargameModInstaller.Services.Commands.Base;
 using WargameModInstaller.Services.Image;
@@ -32,12 +31,8 @@ namespace WargameModInstaller.Services.Commands
         protected override void ExecuteCommandsLogic(CmdsExecutionData data)
         {
             var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
-            if (!contentFile.IsContentLoaded)
-            {
-                (new EdataFileReader()).LoadContent(contentFile);
-            }
 
-            if (contentFile.FileType != EdataContentFileType.Image)
+            if (contentFile.FileType != ContentFileType.Tgv)
             {
                 throw new CmdExecutionFailedException(
                     String.Format("Invalid TargetContentPath: \"{0}\". It doesn't target an image content file.", data.ContentPath),
@@ -45,7 +40,7 @@ namespace WargameModInstaller.Services.Commands
             }
 
             TgvImage oldTgv = BytesToTgv(contentFile.Content);
-            TgvImage newtgv = DDSFileToTgv(data.SourcePath, !Command.UseMipMaps);
+            TgvImage newtgv = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
 
             ImageComposerService.ReplaceImageTile(
                 oldTgv, 

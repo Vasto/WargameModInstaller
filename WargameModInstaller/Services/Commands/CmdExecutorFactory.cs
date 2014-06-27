@@ -41,7 +41,7 @@ namespace WargameModInstaller.Services.Commands
         {
             foreach (var pair in CommandToExecutorsMap)
             {
-                if (pair.Key.IsAssignableFrom(commandGroup.GetType()))
+                if (pair.Key.IsInstanceOfType(commandGroup))
                 {
                     var argument = new ConstructorArgument("cmdGroup", commandGroup);
                     var executorInstance = (ICmdExecutor)kernel.Get(pair.Value, argument);
@@ -57,7 +57,7 @@ namespace WargameModInstaller.Services.Commands
         {
             foreach (var pair in CommandToExecutorsMap)
             {
-                if (pair.Key.IsAssignableFrom(command.GetType()))
+                if (pair.Key.IsInstanceOfType(command))
                 {
                     var argument = new ConstructorArgument("command", command);
                     var executorInstance = (ICmdExecutor)kernel.Get(pair.Value, argument);
@@ -82,9 +82,9 @@ namespace WargameModInstaller.Services.Commands
             map.Add(typeof(AlterDictionaryCmd), typeof(AlterDictionaryCmdExecutor));
             map.Add(typeof(AddContentCmd), typeof(AddContentCmdExecutor));
             map.Add(typeof(AddImageCmd), typeof(AddImageCmdExecutor));
-            map.Add(typeof(BasicCmdGroup), typeof(BasicCmdGroupExecutor));
-            map.Add(typeof(SharedTargetCmdGroup), typeof(SharedTargetCmdGroupExecutor));
-            map.Add(typeof(SharedNestedTargetCmdGroup), typeof(SharedNestedTargetCmdGroupExecutor));
+            map.Add(typeof(BasicCmdGroup), typeof(BasicCmdsExecutor));
+            map.Add(typeof(SharedTargetCmdGroup), typeof(SharedTargetCmdsExecutor));
+            map.Add(typeof(SharedNestedTargetCmdGroup), typeof(SharedNestedTargetCmdsExecutor));
 
             return map;
         }

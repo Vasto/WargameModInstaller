@@ -91,6 +91,28 @@ namespace WargameModInstaller.Common.Extensions
             return result;
         }
 
+        public static String ValueToLowerNullSafe(this XElement obj)
+        {
+            String result = null;
+            if (obj != null)
+            {
+                result = obj.Value.ToLower();
+            }
+
+            return result;
+        }
+
+        public static String ValueToLowerNullSafe(this XAttribute obj)
+        {
+            String result = null;
+            if (obj != null)
+            {
+                result = obj.Value.ToLower();
+            }
+
+            return result;
+        }
+
     }
 
 }

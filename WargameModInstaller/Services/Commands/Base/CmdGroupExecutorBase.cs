@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
+using WargameModInstaller.Infrastructure.Containers;
 using WargameModInstaller.Model.Commands;
 
 namespace WargameModInstaller.Services.Commands.Base
@@ -13,13 +14,15 @@ namespace WargameModInstaller.Services.Commands.Base
 
     public abstract class CmdGroupExecutorBase<T> : ICmdExecutor, IProgressProvider where T : ICmdGroup
     {
-        private readonly ICmdExecutorFactory executorsFactory;
+        private List<Tuple<IInstallCmd, ICmdExecutor>> cmdExecutorPairs;
 
-        public CmdGroupExecutorBase(T cmdGroup, ICmdExecutorFactory executorsFactory)
+        public CmdGroupExecutorBase(
+            T cmdGroup, 
+            ICmdExecutorFactory executorsFactory)
         {
             this.CommandGroup = cmdGroup;
-            this.executorsFactory = executorsFactory;
-            this.CommandExecutors = CreateExecutorsForGroupCmds();
+            this.ExecutorFactory = executorsFactory;
+            this.cmdExecutorPairs = CreateCommandExecutorPairs();
 
             this.InitializeProgressProviding();
         }
@@ -30,40 +33,44 @@ namespace WargameModInstaller.Services.Commands.Base
             private set;
         }
 
-        protected IEnumerable<ICmdExecutor> CommandExecutors
+        protected ICmdExecutorFactory ExecutorFactory
         {
             get;
             private set;
         }
 
+        protected IEnumerable<ICmdExecutor> Executors
+        {
+            get { return cmdExecutorPairs.Select(x => x.Item2); }
+        }
+
         public virtual void Execute(CmdExecutionContext context)
         {
-            ExecuteInternal(context, CancellationToken.None);
+            Execute(context, CancellationToken.None);
         }
 
-        public virtual void Execute(CmdExecutionContext context, CancellationToken token)
+        public abstract void Execute(CmdExecutionContext context, CancellationToken token);
+
+        protected IInstallCmd GetExecutorsAssociatedCommand(ICmdExecutor executor)
         {
-            ExecuteInternal(context, token);
+            return cmdExecutorPairs.Single(x => x.Item2 == executor).Item1;
         }
 
-        protected abstract void ExecuteInternal(CmdExecutionContext context, CancellationToken token);
-
-        private IEnumerable<ICmdExecutor> CreateExecutorsForGroupCmds()
+        private List<Tuple<IInstallCmd, ICmdExecutor>> CreateCommandExecutorPairs()
         {
-            var executorsList = new List<ICmdExecutor>();
+            var results = new List<Tuple<IInstallCmd, ICmdExecutor>>();
             foreach (var cmd in CommandGroup.Commands)
             {
-                var executor = executorsFactory.CreateForCommand(cmd);
-
-                executorsList.Add(executor);
+                var executor = ExecutorFactory.CreateForCommand(cmd);
+                results.Add(new Tuple<IInstallCmd, ICmdExecutor>(cmd, executor));
             }
 
-            return executorsList;
+            return results;
         }
 
         private void InitializeProgressProviding()
         {
-            foreach (var executor in CommandExecutors)
+            foreach (var executor in Executors)
             {
                 var progressProvider = executor as IProgressProvider;
                 if (progressProvider != null)

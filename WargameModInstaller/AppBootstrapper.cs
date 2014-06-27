@@ -8,6 +8,7 @@ using System.Windows.Threading;
 using WargameModInstaller.Common.Logging;
 using WargameModInstaller.Infrastructure.Commands;
 using WargameModInstaller.Infrastructure.Config;
+using WargameModInstaller.Infrastructure.Containers;
 using WargameModInstaller.Model.Config;
 using WargameModInstaller.Services.Commands;
 using WargameModInstaller.Services.Config;
@@ -82,6 +83,8 @@ namespace WargameModInstaller
             kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
             kernel.Bind<IWargameInstallDirService>().To<ALBInstallDirProvider>().InSingletonScope();
             kernel.Bind<IImageComposerService>().To<ImageComposerService>();
+            kernel.Bind<IContainerReaderService>().To<ContainerReaderService>().InSingletonScope();
+            kernel.Bind<IContainerWriterService>().To<ContainerWriterService>().InSingletonScope();
         }
 
         protected virtual void ConfigureForRD(IKernel kernel)
@@ -90,6 +93,8 @@ namespace WargameModInstaller
             kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
             kernel.Bind<IWargameInstallDirService>().To<RDInstallDirProvider>().InSingletonScope();
             kernel.Bind<IImageComposerService>().To<ImageComposerService>();
+            kernel.Bind<IContainerReaderService>().To<ContainerReaderService>().InSingletonScope();
+            kernel.Bind<IContainerWriterService>().To<ContainerWriterService>().InSingletonScope();
         }
 
         protected override object GetInstance(Type service, String key)
