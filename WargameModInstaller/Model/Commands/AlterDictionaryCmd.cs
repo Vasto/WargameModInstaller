@@ -57,7 +57,7 @@ namespace WargameModInstaller.Model.Commands
 
         protected override String GetCommandsName()
         {
-            return "AlterDictionaryCmd";
+            return "AlterDictionaryCommand";
         }
 
         protected override String GetExecutionMessage()

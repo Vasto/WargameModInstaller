@@ -32,7 +32,7 @@ namespace WargameModInstaller.Services.Commands
         {
             var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
 
-            if (contentFile.FileType != ContentFileType.Tgv)
+            if (contentFile.FileType != ContentFileType.Image)
             {
                 throw new CmdExecutionFailedException(
                     String.Format("Invalid TargetContentPath: \"{0}\". It doesn't target an image content file.", data.ContentPath),

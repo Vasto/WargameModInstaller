@@ -108,6 +108,7 @@
     <Compile Include="Infrastructure\Components\ComponentReader.cs" />
     <Compile Include="Infrastructure\Containers\ContainerReaderService.cs" />
     <Compile Include="Infrastructure\Containers\ContainerWriterService.cs" />
+    <Compile Include="Infrastructure\Containers\Edata\EdataDictStringComparer.cs" />
     <Compile Include="Infrastructure\Containers\IContainerReaderService.cs" />
     <Compile Include="Infrastructure\Containers\IContainerWriterService.cs" />
     <Compile Include="Infrastructure\Content\ContentFileReader.cs" />
@@ -152,10 +153,10 @@
     <Compile Include="Model\Containers\IContainerFile.cs" />
     <Compile Include="Model\Containers\IContentFile.cs" />
     <Compile Include="Model\Dictionaries\TradDictEntry.cs" />
-    <Compile Include="Model\Containers\Edata\EdataDictSubPath.cs" />
-    <Compile Include="Model\Containers\Edata\EdataDictDirSubPath.cs" />
-    <Compile Include="Model\Containers\Edata\EdataDictFileSubPath.cs" />
-    <Compile Include="Model\Containers\Edata\EdataDictRootDirSubPath.cs" />
+    <Compile Include="Model\Containers\Edata\EdataSubPath.cs" />
+    <Compile Include="Model\Containers\Edata\EdataDirSubPath.cs" />
+    <Compile Include="Model\Containers\Edata\EdataFileSubPath.cs" />
+    <Compile Include="Model\Containers\Edata\EdataRootDirSubPath.cs" />
     <Compile Include="Model\WMIEntryType.cs" />
     <Compile Include="Infrastructure\Containers\Edata\EdataFileReader.cs" />
     <Compile Include="Infrastructure\Containers\Edata\IEdataFileReader.cs" />

@@ -384,7 +384,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Trad, ContentFileType.Trad.MagicBytes));
             knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Save, ContentFileType.Save.MagicBytes));
             knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Prxypcpc, ContentFileType.Prxypcpc.MagicBytes));
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Tgv, ContentFileType.Tgv.MagicBytes));
+            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Image, ContentFileType.Image.MagicBytes));
 
             foreach (var knownHeader in knownHeaders)
             {
@@ -401,6 +401,61 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
             return ContentFileType.Unknown;
         }
+
+        //protected void ReadAndWriteDictionaryStats(
+        //    Stream readStream,
+        //    EdataHeader header,
+        //    String filePath)
+        //{
+        //    readStream.Seek(header.DictOffset, SeekOrigin.Begin);
+        //    readStream.Seek(10, SeekOrigin.Current);
+
+        //    long dirEnd = header.DictOffset + header.DictLength;
+
+        //    using (var writeStream = File.CreateText(filePath))
+        //    {
+        //        while (readStream.Position < dirEnd)
+        //        {
+        //            var buffer = new byte[4];
+        //            readStream.Read(buffer, 0, 4);
+        //            int fileGroupId = BitConverter.ToInt32(buffer, 0);
+
+        //            if (fileGroupId == 0)
+        //            {
+        //                readStream.Read(buffer, 0, 4);
+        //                int entrySize = BitConverter.ToInt32(buffer, 0);
+
+        //                //skip ofsset 8, size 8, checsum 16
+        //                readStream.Seek(32, SeekOrigin.Current);
+
+        //                String name = MiscUtilities.ReadString(readStream);
+
+        //                if (name.Length % 2 == 0)
+        //                {
+        //                    readStream.Seek(1, SeekOrigin.Current);
+        //                }
+
+        //                writeStream.WriteLine(String.Format("File, {0}, {1}, ", name, entrySize));
+        //            }
+        //            else
+        //            {
+        //                int entrySize = fileGroupId;
+
+        //                readStream.Read(buffer, 0, 4);
+        //                int relevance = BitConverter.ToInt32(buffer, 0);
+
+        //                String name = MiscUtilities.ReadString(readStream);
+
+        //                if (name.Length % 2 == 0)
+        //                {
+        //                    readStream.Seek(1, SeekOrigin.Current);
+        //                }
+
+        //                writeStream.WriteLine(String.Format("Dir, {0}, {1}, {2}", name, entrySize, relevance));
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 

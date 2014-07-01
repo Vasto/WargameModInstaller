@@ -11,11 +11,11 @@ namespace WargameModInstaller.Model.Containers.Edata
     /// <summary>
     /// Represents a hierarchical entry in the EDATa's file dictionary.
     /// </summary>
-    public abstract class EdataDictSubPath
+    public abstract class EdataSubPath
     {
-        protected List<EdataDictSubPath> followingSubPaths;
+        protected List<EdataSubPath> followingSubPaths;
 
-        public EdataDictSubPath(String subPath)
+        public EdataSubPath(String subPath)
         {
             if (String.IsNullOrEmpty(subPath))
             {
@@ -23,14 +23,14 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
 
             this.SubPath = subPath;
-            this.followingSubPaths = new List<EdataDictSubPath>();
+            this.followingSubPaths = new List<EdataSubPath>();
 
         }
 
         /// <summary>
         /// Gets or sets the parent entry in the hierarchy.
         /// </summary>
-        public EdataDictDirSubPath PrecedingSubPath
+        public EdataDirSubPath PrecedingSubPath
         {
             get;
             set;
@@ -39,7 +39,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         /// <summary>
         /// Gets or sets the children dictionary entries.
         /// </summary>
-        public IReadOnlyList<EdataDictSubPath> FollowingSubPaths
+        public IReadOnlyList<EdataSubPath> FollowingSubPaths
         {
             get
             {
@@ -58,7 +58,6 @@ namespace WargameModInstaller.Model.Containers.Edata
 
         /// <summary>
         /// Gets or sets the length of entry in bytes.
-        /// //Może to obliczać na twardo?
         /// </summary>
         public uint Length
         {
@@ -68,23 +67,11 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
-        /// <summary>
-        /// Gets a total length in bytes of entry. This is a total length, 
-        /// which includes all additional bytes which belong to the entry, not only the data length.
-        /// </summary>
-        public uint TotalLength
-        {
-            get
-            {
-                return GetTotalLengthInBytes();
-            }
-        }
-
         //wyniesc to z tad bo to no chyba ze pominiemy koniecznosc odnoszenia sie do pliku czyli podklasy bo to jest zło
         //Wywalić to pozniej fo extension method, wtedy sobie moze operowac pojeciem pliku
-        public EdataDictSubPath SelectEntryByPath(String path)
+        public EdataSubPath SelectEntryByPath(String path)
         {
-            EdataDictSubPath result = null;
+            EdataSubPath result = null;
 
             //Działanie tego algorytmu zakłąda, 
             //że nie mogą istnieć 2 ścieżki o tych samych SubPathach, dla tego samego rodzica.
@@ -135,9 +122,23 @@ namespace WargameModInstaller.Model.Containers.Edata
 
         public abstract byte[] ToBytes();
 
-        protected abstract uint GetTotalLengthInBytes();
+        //protected abstract uint GetTotalLengthInBytes();
 
         protected abstract uint GetLengthInBytes();
+
+        protected virtual bool IsEndingSubPath()
+        {
+            if (PrecedingSubPath != null)
+            {
+                var lastSubPath = PrecedingSubPath.FollowingSubPaths.LastOrDefault();
+                if (lastSubPath != null && lastSubPath == this)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
 
     }
 }

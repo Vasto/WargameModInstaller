@@ -49,7 +49,7 @@ namespace WargameModInstaller.Model.Commands
 
         protected override String GetCommandsName()
         {
-            return "ReplaceContentCmd";
+            return "ReplaceContentCommand";
         }
 
         protected override String GetExecutionMessage()

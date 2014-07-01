@@ -18,8 +18,8 @@ namespace WargameModInstaller.Model.Containers
             new ContentFileType(1, "Ndfbin", new byte[] { 0x45, 0x55, 0x47, 0x30, 0x00, 0x00, 0x00, 0x00, 0x43, 0x4E, 0x44, 0x46 });
         public static readonly ContentFileType Trad =
             new ContentFileType(2, "Trad", new byte[] { 0x54, 0x52, 0x41, 0x44 });
-        public static readonly ContentFileType Tgv = 
-            new ContentFileType(4, "Tgv", new byte[] { 0x02 });
+        public static readonly ContentFileType Image = 
+            new ContentFileType(4, "Image", new byte[] { 0x02 });
         public static readonly ContentFileType Edata =
             new ContentFileType(5, "Edata", new byte[] { 0x65, 0x64, 0x61, 0x74 });
         public static readonly ContentFileType Save = 
@@ -36,7 +36,7 @@ namespace WargameModInstaller.Model.Containers
             knownTypes = new HashSet<ContentFileType>();
             knownTypes.Add(Ndfbin);
             knownTypes.Add(Trad);
-            knownTypes.Add(Tgv);
+            knownTypes.Add(Image);
             knownTypes.Add(Edata);
             knownTypes.Add(Save);
             knownTypes.Add(Prxypcpc);

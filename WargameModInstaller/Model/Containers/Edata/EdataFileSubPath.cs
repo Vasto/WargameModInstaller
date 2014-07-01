@@ -9,9 +9,9 @@ namespace WargameModInstaller.Model.Containers.Edata
 {
     //To do: pomyśleć nad nazwą tej klasy
 
-    public class EdataDictFileSubPath : EdataDictSubPath
+    public class EdataFileSubPath : EdataSubPath
     {
-        public EdataDictFileSubPath(String subPath) : base (subPath)
+        public EdataFileSubPath(String subPath) : base (subPath)
         {
             this.FileChecksum = new byte[16];
         }
@@ -50,7 +50,8 @@ namespace WargameModInstaller.Model.Containers.Edata
                 byte[] buffer = new byte[4];
                 ms.Write(buffer, 0, buffer.Length);
 
-                buffer = BitConverter.GetBytes(Length);
+                uint length = IsEndingSubPath() ? 0 : Length;
+                buffer = BitConverter.GetBytes(length);
                 ms.Write(buffer, 0, buffer.Length);
 
                 buffer = BitConverter.GetBytes(FileOffset);
@@ -79,7 +80,7 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
-        protected override uint GetTotalLengthInBytes()
+        protected override uint GetLengthInBytes()
         {
             uint totalLength = 0;
 
@@ -108,18 +109,6 @@ namespace WargameModInstaller.Model.Containers.Edata
             totalLength += (uint)(totalLength % 2 == 0 ? 0 : 1);
 
             return totalLength;
-        }
-
-        protected override uint GetLengthInBytes()
-        {
-            uint length = GetTotalLengthInBytes();
-
-            //chyba jednak jest ten nagłówek wliczony
-            //length -= 4;
-
-            //update: działa z tym nagłowkiem, czyli na dobra sprawe ta totalna długoś wpisu jest zbedna, bo ta normalna zwiera tą samą wartośc
-
-            return length;
         }
 
     }

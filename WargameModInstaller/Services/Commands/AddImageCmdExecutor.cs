@@ -28,7 +28,7 @@ namespace WargameModInstaller.Services.Commands
                 TgvImage image = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
                 //Trzeba mieć na to oko, czy nie powoduje problemów, bo przy replace była używana checksuma starego obrazka.
                 image.SourceChecksum = image.ComputeContentChecksum();
-                image.IsCompressed = true;
+                image.IsCompressed = Command.UseCompression;
 
                 var newContentFile = new EdataContentFile()
                 {
@@ -43,7 +43,7 @@ namespace WargameModInstaller.Services.Commands
                 var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
 
                 //To nie będzie potrzebne tutaj jeśli nie bedzie trzeba ładować i wykorzystywać starego obrazka.
-                if (contentFile.FileType != ContentFileType.Tgv)
+                if (contentFile.FileType != ContentFileType.Image)
                 {
                     throw new CmdExecutionFailedException(
                         String.Format("Invalid TargetContentPath: \"{0}\". It doesn't target an image content file.", data.ContentPath),
@@ -58,7 +58,7 @@ namespace WargameModInstaller.Services.Commands
                 //TgvImage oldTgv = BytesToTgv(contentFile.Content);
                 TgvImage newtgv = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
                 newtgv.SourceChecksum = newtgv.ComputeContentChecksum();
-                newtgv.IsCompressed = true;
+                newtgv.IsCompressed = Command.UseCompression;
 
                 contentFile.Content = TgvToBytes(newtgv, !Command.UseMipMaps);
             }

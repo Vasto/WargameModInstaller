@@ -56,7 +56,7 @@ namespace WargameModInstaller.Model.Commands
 
         /// <summary>
         /// Gets or sets an information wheather a MipMaps of the image 
-        /// should be taken into consdieration during the adding process.
+        /// should be taken into consdieration during the image addition process.
         /// </summary>
         public bool UseMipMaps
         {
@@ -64,9 +64,19 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
+        /// <summary>
+        /// Gets or sets an information wheather the content 
+        /// of the image has to be compressed during the image addition procces.
+        /// </summary>
+        public bool UseCompression
+        {
+            get;
+            set;
+        }
+
         protected override String GetCommandsName()
         {
-            return "AddImageCmd";
+            return "AddImageCommand";
         }
 
         protected override String GetExecutionMessage()

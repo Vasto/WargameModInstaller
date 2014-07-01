@@ -53,6 +53,11 @@ namespace WargameModInstaller.Model.Commands
             get { return GetExecutionMessage(); }
         }
 
+        public override string ToString()
+        {
+            return Name;
+        } 
+
         /// <summary>
         /// Gets the command's name.
         /// </summary>

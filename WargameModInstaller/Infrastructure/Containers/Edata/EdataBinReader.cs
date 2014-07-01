@@ -44,10 +44,12 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
                 if (header.Version == 1)
                 {
+                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
                     contentFiles = ReadEdatV1Dictionary(stream, header, loadContent);
                 }
                 else if (header.Version == 2)
                 {
+                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
                     contentFiles = ReadEdatV2Dictionary(stream, header, loadContent);
                 }
                 else

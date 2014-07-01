@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -98,10 +99,12 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 //postHeaderData = ReadPostHeaderData(stream, header);
                 if (header.Version == 1)
                 {
+                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
                     contentFiles = ReadEdatV1Dictionary(stream, header, loadContent);
                 }
                 else if (header.Version == 2)
                 {
+                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
                     contentFiles = ReadEdatV2Dictionary(stream, header, loadContent);
                 }
                 else
@@ -118,8 +121,26 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 contentFile.Owner = edataFile;
             }
 
+            //WriteContentFiles("C:\\cf_mod_sorted.txt", contentFiles);
+
             return edataFile;
         }
+
+        //private void WriteContentFiles(String path, IEnumerable<EdataContentFile> files)
+        //{
+        //    var paths = files
+        //        .Select(f => f.Path)
+        //        .OrderBy(x => x, new EdataDictStringComparer())
+        //        .ToList();
+
+        //    using (var stream = File.CreateText(path))
+        //    {
+        //        foreach (var p in paths)
+        //        {
+        //            stream.WriteLine(p);
+        //        }
+        //    }
+        //}
 
     }
 }

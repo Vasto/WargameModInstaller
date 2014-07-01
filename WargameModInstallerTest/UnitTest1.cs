@@ -12,19 +12,19 @@ namespace WargameSkinInstallerTest
         {
             string path = @"pc\textures\assets\file1.tgv";
 
-            EdataDictDirSubPath a1 = new EdataDictDirSubPath(@"pc\");
+            EdataDirSubPath a1 = new EdataDirSubPath(@"pc\");
 
-            EdataDictDirSubPath a2 = new EdataDictDirSubPath(@"textures\");
+            EdataDirSubPath a2 = new EdataDirSubPath(@"textures\");
 
-            EdataDictDirSubPath a2a = new EdataDictDirSubPath(@"textures2\");
+            EdataDirSubPath a2a = new EdataDirSubPath(@"textures2\");
 
-            EdataDictDirSubPath a3a = new EdataDictDirSubPath(@"assets2\");
+            EdataDirSubPath a3a = new EdataDirSubPath(@"assets2\");
 
-            EdataDictDirSubPath a3 = new EdataDictDirSubPath(@"assets\");
+            EdataDirSubPath a3 = new EdataDirSubPath(@"assets\");
 
-            EdataDictFileSubPath a4 = new EdataDictFileSubPath(@"file1.tgv");
+            EdataFileSubPath a4 = new EdataFileSubPath(@"file1.tgv");
 
-            EdataDictFileSubPath a4a = new EdataDictFileSubPath(@"file1.tgv");
+            EdataFileSubPath a4a = new EdataFileSubPath(@"file1.tgv");
 
             a1.AddFollowingSubPath(a2a);
             a1.AddFollowingSubPath(a2);
@@ -33,8 +33,8 @@ namespace WargameSkinInstallerTest
             a3.AddFollowingSubPath(a4);
             a3a.AddFollowingSubPath(a4a);
 
-            EdataDictSubPath expected1 = a4;
-            EdataDictSubPath value1 = a1.SelectEntryByPath(path);
+            EdataSubPath expected1 = a4;
+            EdataSubPath value1 = a1.SelectEntryByPath(path);
             Assert.AreEqual(value1, expected1);
 
             String expected2 = "file1.tgv";

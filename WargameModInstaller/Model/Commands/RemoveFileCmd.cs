@@ -23,7 +23,7 @@ namespace WargameModInstaller.Model.Commands
 
         protected override String GetCommandsName()
         {
-            return "RemoveFileCmd";
+            return "RemoveFileCommand";
         }
 
         protected override String GetExecutionMessage()

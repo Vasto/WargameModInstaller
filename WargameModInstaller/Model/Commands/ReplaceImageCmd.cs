@@ -54,9 +54,19 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
+        /// <summary>
+        /// Gets or sets an information wheather the content
+        /// of the image has to be compressed during the replacement procces..
+        /// </summary>
+        public bool UseCompression
+        {
+            get;
+            set;
+        }
+
         protected override String GetCommandsName()
         {
-            return "ReplaceImageCmd";
+            return "ReplaceImageCommand";
         }
 
         protected override String GetExecutionMessage()

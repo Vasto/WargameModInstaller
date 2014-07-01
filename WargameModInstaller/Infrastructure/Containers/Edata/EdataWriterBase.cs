@@ -33,7 +33,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
         protected virtual DictionaryWriteInfo WriteDictionary(
             Stream target,
-            IEnumerable<EdataDictSubPath> entries,
+            IEnumerable<EdataSubPath> entries,
             uint dictOffset)
         {
             var info = new DictionaryWriteInfo();
@@ -48,7 +48,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             foreach (var rootEntry in entries)
             {
                 //Need to use depth-traversal
-                var entriesStack = new Stack<EdataDictSubPath>();
+                var entriesStack = new Stack<EdataSubPath>();
                 entriesStack.Push(rootEntry);
 
                 while (entriesStack.Count > 0)
@@ -191,14 +191,14 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
         protected virtual void AssignContentFilesInfoToDictEntries(
             IEnumerable<EdataContentFile> contentFiles,
-            IEnumerable<EdataDictSubPath> dictEntries)
+            IEnumerable<EdataSubPath> dictEntries)
         {
             foreach (var file in contentFiles)
             {
-                EdataDictFileSubPath matchingFileEntry = null;
+                EdataFileSubPath matchingFileEntry = null;
                 foreach (var entry in dictEntries)
                 {
-                    matchingFileEntry = (entry.SelectEntryByPath(file.Path) as EdataDictFileSubPath);
+                    matchingFileEntry = (entry.SelectEntryByPath(file.Path) as EdataFileSubPath);
                     if (matchingFileEntry != null)
                     {
                         break;
@@ -219,18 +219,18 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// </summary>
         /// <param name="contentFiles"></param>
         /// <returns></returns>
-        protected virtual IEnumerable<EdataDictSubPath> CreateDictionaryEntriesOfContentFiles(
+        protected virtual IEnumerable<EdataSubPath> CreateDictionaryEntriesOfContentFiles(
             IEnumerable<EdataContentFile> contentFiles)
         {
             //This alghoritm assumes that there are no two content files with the same paths.
 
             ///Uses an ordinal comparison for correct ordering of names with hyphens
             var pathsToSplit = contentFiles
-                .OrderBy(file => file.Path, StringComparer.Ordinal)
+                .OrderBy(file => file.Path, new EdataDictStringComparer())
                 .Select(file => new ContentPathSplitInfo() { Path = file.Path })
                 .ToList();
 
-            var dictionaryEntries = new List<EdataDictSubPath>();
+            var dictionaryEntries = new List<EdataSubPath>();
 
             //Wide match can't be picked over a long match.
             while (pathsToSplit.Count > 0)
@@ -238,7 +238,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 var pathsToCompare = GetPathsToCompare(pathsToSplit);
                 if (pathsToCompare.Count == 1)
                 {
-                    var newEntry = new EdataDictFileSubPath(pathsToCompare[0].GetPathFromSplitIndex());
+                    var newEntry = new EdataFileSubPath(pathsToCompare[0].GetPathFromSplitIndex());
                     AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryEntries);
 
                     pathsToSplit.Remove(pathsToCompare[0]);
@@ -256,14 +256,14 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                         }
                         else
                         {
-                            EdataDictDirSubPath newEntry = null;
+                            EdataDirSubPath newEntry = null;
                             if (String.IsNullOrEmpty(pathsToCompare[0].GetPathToSplitIndex()))
                             {
-                                newEntry = new EdataDictRootDirSubPath(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
+                                newEntry = new EdataRootDirSubPath(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
                             }
                             else
                             {
-                                newEntry = new EdataDictDirSubPath(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
+                                newEntry = new EdataDirSubPath(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
                             }
                             AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryEntries);
 
@@ -341,9 +341,9 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         }
 
         private void AddEntryToDictionary(
-            EdataDictSubPath entry,
+            EdataSubPath entry,
             ContentPathSplitInfo entryPathSplitInfo,
-            List<EdataDictSubPath> dictionaryEntries)
+            List<EdataSubPath> dictionaryEntries)
         {
             //It's a first one so no need to search for a predecessor.
             if (dictionaryEntries.Count == 0)
@@ -353,7 +353,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             }
 
             var precedingPath = entryPathSplitInfo.GetPathToSplitIndex();
-            EdataDictSubPath precedingPathEntry = null;
+            EdataSubPath precedingPathEntry = null;
             foreach (var e in dictionaryEntries)
             {
                 var matchingEntry = e.SelectEntryByPath(precedingPath);
@@ -364,7 +364,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 }
             }
 
-            var pp = precedingPathEntry as EdataDictDirSubPath;
+            var pp = precedingPathEntry as EdataDirSubPath;
             if (precedingPathEntry != null)
             {
                 pp.AddFollowingSubPath(entry);
@@ -383,21 +383,21 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             return 0;
         }
 
-        protected virtual uint GetDictionaryLength(IEnumerable<EdataDictSubPath> entries)
+        protected virtual uint GetDictionaryLength(IEnumerable<EdataSubPath> entries)
         {
             uint dictHeaderSize = 10;
             uint totalSize = dictHeaderSize;
 
             foreach (var rootEntry in entries)
             {
-                var entriesQueue = new Queue<EdataDictSubPath>();
+                var entriesQueue = new Queue<EdataSubPath>();
                 entriesQueue.Enqueue(rootEntry);
 
                 while (entriesQueue.Count > 0)
                 {
                     var entry = entriesQueue.Dequeue();
 
-                    totalSize += entry.TotalLength;
+                    totalSize += entry.Length;
 
                     foreach (var subEntry in entry.FollowingSubPaths)
                     {

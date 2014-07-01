@@ -56,7 +56,7 @@ namespace WargameModInstaller.Model.Commands
 
         protected override String GetCommandsName()
         {
-            return "AddContentCmd";
+            return "AddContentCommand";
         }
 
         protected override String GetExecutionMessage()

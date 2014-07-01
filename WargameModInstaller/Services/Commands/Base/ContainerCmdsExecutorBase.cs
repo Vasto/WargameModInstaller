@@ -77,7 +77,9 @@ namespace WargameModInstaller.Services.Commands.Base
                 }
                 else
                 {
-                    //Może by to od razu zamienić na throw, albo od olać ten if, tak aby metoda Get wywaliła wyjatek...
+                    //Wygląda na to że nie można tu chyba użyć wyjątku na tym etapie, jako że niektóre ścieżki,
+                    //które trafia do tej metody mogą pochodzić od komend które dopiero tworzą content, 
+                    //więc wystąpił by wyjatek w teoretycznie poprawnej sytuacji.
                     var warning = String.Format("The following content file: \"{0}\"" +
                     "cannot be get from the specified container file.", path);
                     Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
