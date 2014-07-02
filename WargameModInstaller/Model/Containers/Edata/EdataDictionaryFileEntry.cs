@@ -9,9 +9,10 @@ namespace WargameModInstaller.Model.Containers.Edata
 {
     //To do: pomyśleć nad nazwą tej klasy
 
-    public class EdataFileSubPath : EdataSubPath
+    public class EdataDictionaryFileEntry : EdataDictionaryPathEntry
     {
-        public EdataFileSubPath(String subPath) : base (subPath)
+        public EdataDictionaryFileEntry(String pathPart)
+            : base(pathPart)
         {
             this.FileChecksum = new byte[16];
         }
@@ -50,7 +51,7 @@ namespace WargameModInstaller.Model.Containers.Edata
                 byte[] buffer = new byte[4];
                 ms.Write(buffer, 0, buffer.Length);
 
-                uint length = IsEndingSubPath() ? 0 : Length;
+                uint length = IsPathEndingEntry() ? 0 : Length;
                 buffer = BitConverter.GetBytes(length);
                 ms.Write(buffer, 0, buffer.Length);
 
@@ -63,7 +64,7 @@ namespace WargameModInstaller.Model.Containers.Edata
                 buffer = FileChecksum;
                 ms.Write(buffer, 0, buffer.Length);
 
-                buffer = Encoding.ASCII.GetBytes(SubPath);
+                buffer = Encoding.ASCII.GetBytes(PathPart);
                 ms.Write(buffer, 0, buffer.Length);
 
                 buffer = new byte[1];
@@ -100,7 +101,7 @@ namespace WargameModInstaller.Model.Containers.Edata
             totalLength += (uint)FileChecksum.Length;
 
             //SubPath
-            totalLength += (uint)SubPath.Length;
+            totalLength += (uint)PathPart.Length;
 
             //zero ended string
             totalLength += 1;

@@ -6,31 +6,28 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Model.Containers.Edata
 {
-    //To do: pomyśleć nad nazwą tej klasy
-
     /// <summary>
-    /// Represents a hierarchical entry in the EDATa's file dictionary.
+    /// Represents a hierarchical entry in the EDATa's file dictionary which holds a part of the content's path.
     /// </summary>
-    public abstract class EdataSubPath
+    public abstract class EdataDictionaryPathEntry
     {
-        protected List<EdataSubPath> followingSubPaths;
+        protected List<EdataDictionaryPathEntry> followingEntries;
 
-        public EdataSubPath(String subPath)
+        public EdataDictionaryPathEntry(String pathPart)
         {
-            if (String.IsNullOrEmpty(subPath))
+            if (pathPart == null)
             {
-                throw new ArgumentException("Edata dictionary path entry cannot be empty or null.", "subPath");
+                throw new ArgumentNullException("Edata dictionary entry cannot have null path.", "subPath");
             }
 
-            this.SubPath = subPath;
-            this.followingSubPaths = new List<EdataSubPath>();
-
+            this.PathPart = pathPart;
+            this.followingEntries = new List<EdataDictionaryPathEntry>();
         }
 
         /// <summary>
         /// Gets or sets the parent entry in the hierarchy.
         /// </summary>
-        public EdataDirSubPath PrecedingSubPath
+        public EdataDictionaryPathEntry PrecedingEntries
         {
             get;
             set;
@@ -39,18 +36,18 @@ namespace WargameModInstaller.Model.Containers.Edata
         /// <summary>
         /// Gets or sets the children dictionary entries.
         /// </summary>
-        public IReadOnlyList<EdataSubPath> FollowingSubPaths
+        public IReadOnlyList<EdataDictionaryPathEntry> FollowingEntries
         {
             get
             {
-                return followingSubPaths;
+                return followingEntries;
             }
         }
 
         /// <summary>
-        /// Gets or sets the textual content of the current dictioanry entry.
+        /// Gets or sets the path fragment hold by the current entry.
         /// </summary>
-        public String SubPath
+        public String PathPart
         {
             get;
             private set;
@@ -69,29 +66,28 @@ namespace WargameModInstaller.Model.Containers.Edata
 
         //wyniesc to z tad bo to no chyba ze pominiemy koniecznosc odnoszenia sie do pliku czyli podklasy bo to jest zło
         //Wywalić to pozniej fo extension method, wtedy sobie moze operowac pojeciem pliku
-        public EdataSubPath SelectEntryByPath(String path)
+        public virtual EdataDictionaryPathEntry SelectEntryByPath(String path)
         {
-            EdataSubPath result = null;
+            EdataDictionaryPathEntry result = null;
 
-            //Działanie tego algorytmu zakłąda, 
-            //że nie mogą istnieć 2 ścieżki o tych samych SubPathach, dla tego samego rodzica.
-            if (path == SubPath)
+            //This alghoritm assumes that there are no two child entries with the same sub paths.
+            if (path == PathPart)
             {
                 result = this;
             }
-            else if (path.StartsWith(SubPath))
+            else if (path.StartsWith(PathPart))
             {
-                int startIndex = SubPath.Length;
+                int startIndex = PathPart.Length;
                 var currentMatch = this;
                 bool matchFound = true;
                 while (matchFound)
                 {
                     matchFound = false;
 
-                    for (int i = 0; i < currentMatch.followingSubPaths.Count; ++i)
+                    for (int i = 0; i < currentMatch.followingEntries.Count; ++i)
                     {
-                        var potentialMatch = currentMatch.followingSubPaths[i];
-                        var subPath = potentialMatch.SubPath;
+                        var potentialMatch = currentMatch.followingEntries[i];
+                        var subPath = potentialMatch.PathPart;
 
                         if ((startIndex < path.Length) &&
                             (startIndex + subPath.Length <= path.Length) &&
@@ -117,20 +113,18 @@ namespace WargameModInstaller.Model.Containers.Edata
 
         public override String ToString()
         {
-            return SubPath.ToString(System.Globalization.CultureInfo.CurrentCulture);
+            return PathPart.ToString(System.Globalization.CultureInfo.CurrentCulture);
         }
 
         public abstract byte[] ToBytes();
 
-        //protected abstract uint GetTotalLengthInBytes();
-
         protected abstract uint GetLengthInBytes();
 
-        protected virtual bool IsEndingSubPath()
+        protected virtual bool IsPathEndingEntry()
         {
-            if (PrecedingSubPath != null)
+            if (PrecedingEntries != null)
             {
-                var lastSubPath = PrecedingSubPath.FollowingSubPaths.LastOrDefault();
+                var lastSubPath = PrecedingEntries.FollowingEntries.LastOrDefault();
                 if (lastSubPath != null && lastSubPath == this)
                 {
                     return true;

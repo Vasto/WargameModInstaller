@@ -12,33 +12,33 @@ namespace WargameSkinInstallerTest
         {
             string path = @"pc\textures\assets\file1.tgv";
 
-            EdataDirSubPath a1 = new EdataDirSubPath(@"pc\");
+            EdataDictionaryDirEntry a1 = new EdataDictionaryDirEntry(@"pc\");
 
-            EdataDirSubPath a2 = new EdataDirSubPath(@"textures\");
+            EdataDictionaryDirEntry a2 = new EdataDictionaryDirEntry(@"textures\");
 
-            EdataDirSubPath a2a = new EdataDirSubPath(@"textures2\");
+            EdataDictionaryDirEntry a2a = new EdataDictionaryDirEntry(@"textures2\");
 
-            EdataDirSubPath a3a = new EdataDirSubPath(@"assets2\");
+            EdataDictionaryDirEntry a3a = new EdataDictionaryDirEntry(@"assets2\");
 
-            EdataDirSubPath a3 = new EdataDirSubPath(@"assets\");
+            EdataDictionaryDirEntry a3 = new EdataDictionaryDirEntry(@"assets\");
 
-            EdataFileSubPath a4 = new EdataFileSubPath(@"file1.tgv");
+            EdataDictionaryFileEntry a4 = new EdataDictionaryFileEntry(@"file1.tgv");
 
-            EdataFileSubPath a4a = new EdataFileSubPath(@"file1.tgv");
+            EdataDictionaryFileEntry a4a = new EdataDictionaryFileEntry(@"file1.tgv");
 
-            a1.AddFollowingSubPath(a2a);
-            a1.AddFollowingSubPath(a2);
-            a2.AddFollowingSubPath(a3);
-            a2a.AddFollowingSubPath(a3a);
-            a3.AddFollowingSubPath(a4);
-            a3a.AddFollowingSubPath(a4a);
+            a1.AddFollowingEntry(a2a);
+            a1.AddFollowingEntry(a2);
+            a2.AddFollowingEntry(a3);
+            a2a.AddFollowingEntry(a3a);
+            a3.AddFollowingEntry(a4);
+            a3a.AddFollowingEntry(a4a);
 
-            EdataSubPath expected1 = a4;
-            EdataSubPath value1 = a1.SelectEntryByPath(path);
+            EdataDictionaryPathEntry expected1 = a4;
+            EdataDictionaryPathEntry value1 = a1.SelectEntryByPath(path);
             Assert.AreEqual(value1, expected1);
 
             String expected2 = "file1.tgv";
-            String value2 = a1.SelectEntryByPath(path).SubPath;
+            String value2 = a1.SelectEntryByPath(path).PathPart;
             Assert.AreEqual(value2, expected2);
         }
     }

@@ -12,11 +12,12 @@ namespace WargameModInstaller.Model.Containers.Edata
     /// <summary>
     /// Represents the Edata file's dictionary entry.
     /// </summary>
-    public class EdataDirSubPath : EdataSubPath
+    public class EdataDictionaryDirEntry : EdataDictionaryPathEntry
     {
-        public EdataDirSubPath(String subPath) : base(subPath)
+        public EdataDictionaryDirEntry(String pathPart)
+            : base(pathPart)
         {
-
+           
         }
 
         /// <summary>
@@ -32,25 +33,20 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
-        public void AddFollowingSubPath(EdataSubPath path)
+        public void AddFollowingEntry(EdataDictionaryPathEntry entry)
         {
-            if (!followingSubPaths.Contains(path))
+            if (!followingEntries.Contains(entry))
             {
-                followingSubPaths.Add(path);
+                followingEntries.Add(entry);
             }
         }
 
-        public void RemoveFollowingSubPath(EdataSubPath path)
+        public void RemoveFollowingEntry(EdataDictionaryPathEntry entry)
         {
-            if (followingSubPaths.Contains(path))
+            if (followingEntries.Contains(entry))
             {
-                followingSubPaths.Remove(path);
+                followingEntries.Remove(entry);
             }
-        }
-
-        public void RemoveAllFollowingSubPaths()
-        {
-            followingSubPaths.Clear();
         }
 
         public override byte[] ToBytes()
@@ -61,11 +57,11 @@ namespace WargameModInstaller.Model.Containers.Edata
                 buffer = BitConverter.GetBytes(Length);
                 ms.Write(buffer, 0, buffer.Length);
 
-                uint relevancelength = IsEndingSubPath() ? 0 : RelevanceLength;
+                uint relevancelength = IsPathEndingEntry() ? 0 : RelevanceLength;
                 buffer = BitConverter.GetBytes(relevancelength);
                 ms.Write(buffer, 0, buffer.Length);
 
-                buffer = Encoding.ASCII.GetBytes(SubPath);
+                buffer = Encoding.ASCII.GetBytes(PathPart);
                 ms.Write(buffer, 0, buffer.Length);
 
                 buffer = new byte[1];
@@ -85,11 +81,11 @@ namespace WargameModInstaller.Model.Containers.Edata
         protected virtual uint GetRelevanceLength()
         {
             uint relevance = Length;
-            foreach (var entry in FollowingSubPaths)
+            foreach (var entry in FollowingEntries)
             {
-                if (entry is EdataDirSubPath)
+                if (entry is EdataDictionaryDirEntry)
                 {
-                    relevance += ((EdataDirSubPath)entry).RelevanceLength;
+                    relevance += ((EdataDictionaryDirEntry)entry).RelevanceLength;
                 }
                 else
                 {
@@ -111,7 +107,7 @@ namespace WargameModInstaller.Model.Containers.Edata
             totalLength += sizeof(uint);
 
             //SubPath
-            totalLength += (uint)SubPath.Length;
+            totalLength += (uint)PathPart.Length;
 
             //zero ended string
             totalLength += 1;

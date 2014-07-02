@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Containers;
 using WargameModInstaller.Model.Containers.Edata;
@@ -24,10 +23,10 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// Credits to enohka for this method.
         /// See more at: http://github.com/enohka/moddingSuite
         /// </remarks>
-        protected virtual EdataHeader ReadHeader(Stream stream, CancellationToken? token = null)
+        protected virtual EdataHeader ReadHeader(Stream stream, CancellationToken token)
         {
             //Cancel if requested;
-            token.ThrowIfCanceledAndNotNull();
+            token.ThrowIfCancellationRequested();
 
             EdataHeader header;
 
@@ -45,20 +44,6 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             return header;
         }
 
-        //protected virtual byte[] ReadPostHeaderData(Stream stream, EdataHeader header, CancellationToken? token = null)
-        //{
-        //    //Cancel if requested;
-        //    token.ThrowIfCanceledAndNotNull();
-
-        //    int headerSize = Marshal.SizeOf(typeof(EdataHeader)); //Marshal.SizeOf(header);
-        //    byte[] buffer = new byte[header.FileOffset - headerSize];
-
-        //    stream.Seek(headerSize, SeekOrigin.Begin);
-        //    stream.Read(buffer, 0, buffer.Length);
-
-        //    return buffer;
-        //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -74,8 +59,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         protected virtual IEnumerable<EdataContentFile> ReadEdatV2Dictionary(
             Stream stream,
             EdataHeader header,
-            bool loadContent = false,
-            CancellationToken? token = null)
+            bool loadContent,
+            CancellationToken token)
         {
             var files = new List<EdataContentFile>();
             var dirs = new List<EdataContentDirectory>();
@@ -89,7 +74,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             while (stream.Position < dirEnd)
             {
                 //Cancel if requested;
-                token.ThrowIfCanceledAndNotNull();
+                token.ThrowIfCancellationRequested();
 
 
                 var buffer = new byte[4];
@@ -190,8 +175,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         protected virtual IEnumerable<EdataContentFile> ReadEdatV1Dictionary(
             Stream stream,
             EdataHeader header,
-            bool loadContent = false,
-            CancellationToken? token = null)
+            bool loadContent,
+            CancellationToken token )
         {
             var files = new List<EdataContentFile>();
             var dirs = new List<EdataContentDirectory>();
@@ -205,7 +190,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             while (stream.Position < dirEnd)
             {
                 //Cancel if requested;
-                token.ThrowIfCanceledAndNotNull();
+                token.ThrowIfCancellationRequested();
 
 
                 var buffer = new byte[4];
@@ -355,7 +340,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// Credits to enohka for this method.
         /// See more at: http://github.com/enohka/moddingSuite
         /// </remarks>
-        protected virtual String MergePath(IEnumerable<EdataContentDirectory> dirs, string fileName)
+        protected virtual String MergePath(IEnumerable<EdataContentDirectory> dirs, String fileName)
         {
             var b = new StringBuilder();
             foreach (EdataContentDirectory dir in dirs)
@@ -401,6 +386,24 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
             return ContentFileType.Unknown;
         }
+
+        #region Helpers
+
+        //protected void WriteContentFiles(String path, IEnumerable<EdataContentFile> files)
+        //{
+        //    var paths = files
+        //        .Select(f => f.Path)
+        //        .OrderBy(x => x, new EdataDictStringComparer())
+        //        .ToList();
+
+        //    using (var stream = File.CreateText(path))
+        //    {
+        //        foreach (var p in paths)
+        //        {
+        //            stream.WriteLine(p);
+        //        }
+        //    }
+        //}
 
         //protected void ReadAndWriteDictionaryStats(
         //    Stream readStream,
@@ -455,7 +458,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         //            }
         //        }
         //    }
-        //}
+        //} 
+        #endregion
 
     }
 

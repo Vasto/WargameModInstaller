@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Containers.Edata;
 
@@ -15,22 +14,13 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
     {
         public EdataFile Read(byte[] rawEdata, bool loadContent = true)
         {
-            return ReadInternal(rawEdata, loadContent);
+            return Read(rawEdata, loadContent, CancellationToken.None);
         }
 
         public EdataFile Read(byte[] rawEdata, bool loadContent, CancellationToken token)
         {
-            return ReadInternal(rawEdata, loadContent, token);
-        }
-
-        /// <remarks>
-        /// Method based on enohka's code.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        protected EdataFile ReadInternal(byte[] rawEdata, bool loadContent, CancellationToken? token = null)
-        {
             //Cancel if requested;
-            token.ThrowIfCanceledAndNotNull();
+            token.ThrowIfCancellationRequested();
 
             EdataHeader header;
             //byte[] postHeaderData;
@@ -38,19 +28,19 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
             using (MemoryStream stream = new MemoryStream(rawEdata))
             {
-                header = ReadHeader(stream);
+                header = ReadHeader(stream, token);
 
                 //postHeaderData = ReadPostHeaderData(stream, header);
 
                 if (header.Version == 1)
                 {
                     //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
-                    contentFiles = ReadEdatV1Dictionary(stream, header, loadContent);
+                    contentFiles = ReadEdatV1Dictionary(stream, header, loadContent, token);
                 }
                 else if (header.Version == 2)
                 {
                     //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
-                    contentFiles = ReadEdatV2Dictionary(stream, header, loadContent);
+                    contentFiles = ReadEdatV2Dictionary(stream, header, loadContent, token);
                 }
                 else
                 {

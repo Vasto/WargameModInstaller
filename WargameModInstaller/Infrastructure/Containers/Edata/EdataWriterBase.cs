@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Containers.Edata;
@@ -23,6 +24,12 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             get { return 256; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="header"></param>
+        /// <param name="offset"></param>
         protected virtual void WriteHeader(Stream target, EdataHeader header, uint offset)
         {
             target.Seek(offset, SeekOrigin.Begin);
@@ -31,38 +38,37 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             target.Write(rawHeader, 0, rawHeader.Length);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="dictionaryRoot"></param>
+        /// <param name="dictOffset"></param>
+        /// <returns></returns>
         protected virtual DictionaryWriteInfo WriteDictionary(
             Stream target,
-            IEnumerable<EdataSubPath> entries,
+            EdataDictionaryRootEntry dictionaryRoot,
             uint dictOffset)
         {
             var info = new DictionaryWriteInfo();
 
-            //Write Dict first empty entry
             target.Seek(dictOffset, SeekOrigin.Begin);
 
-            byte[] buffer = { 0x0A, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            target.Write(buffer, 0, buffer.Length);
-            info.Length += (uint)buffer.Length;
+            //Need to use depth-traversal
+            var entriesStack = new Stack<EdataDictionaryPathEntry>();
+            entriesStack.Push(dictionaryRoot);
 
-            foreach (var rootEntry in entries)
+            while (entriesStack.Count > 0)
             {
-                //Need to use depth-traversal
-                var entriesStack = new Stack<EdataSubPath>();
-                entriesStack.Push(rootEntry);
+                var entry = entriesStack.Pop();
 
-                while (entriesStack.Count > 0)
+                var entryBuffer = entry.ToBytes();
+                target.Write(entryBuffer, 0, entryBuffer.Length);
+                info.Length += (uint)entryBuffer.Length;
+
+                foreach (var subEntry in entry.FollowingEntries.Reverse())
                 {
-                    var entry = entriesStack.Pop();
-
-                    var entryBuffer = entry.ToBytes();
-                    target.Write(entryBuffer, 0, entryBuffer.Length);
-                    info.Length += (uint)entryBuffer.Length;
-
-                    foreach (var subEntry in entry.FollowingSubPaths.Reverse())
-                    {
-                        entriesStack.Push(subEntry);
-                    }
+                    entriesStack.Push(subEntry);
                 }
             }
 
@@ -75,10 +81,18 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             return info;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="contentFiles"></param>
+        /// <param name="contentOffset"></param>
+        /// <returns></returns>
         protected virtual ContentWriteInfo WriteLoadedContent(
             Stream target,
             IEnumerable<EdataContentFile> contentFiles,
-            uint contentOffset)
+            uint contentOffset,
+            CancellationToken token)
         {
             ContentWriteInfo info = new ContentWriteInfo();
 
@@ -101,16 +115,27 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 target.Write(spaceBuffer, 0, (int)spaceSize);
 
                 info.Length += (uint)fileBuffer.Length + (uint)spaceSize;
+
+                token.ThrowIfCancellationRequested();
             }
 
             return info;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="target"></param>
+        /// <param name="contentFiles"></param>
+        /// <param name="contentOffset"></param>
+        /// <returns></returns>
         protected virtual ContentWriteInfo WriteNotLoadedContent(
             Stream source,
             Stream target,
             IEnumerable<EdataContentFile> contentFiles,
-            uint contentOffset)
+            uint contentOffset,
+            CancellationToken token)
         {
             ContentWriteInfo info = new ContentWriteInfo();
 
@@ -146,16 +171,25 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 target.Write(spaceBuffer, 0, (int)spaceSize);
 
                 info.Length += (uint)fileBuffer.Length + (uint)spaceSize;
+
+                token.ThrowIfCancellationRequested();
             }
 
             return info;
         }
 
-        //Nie zmienia długości contentu
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="contentFiles"></param>
         protected virtual void WriteLoadedContentByReplace(
             Stream source,
-            IEnumerable<EdataContentFile> contentFiles)
+            IEnumerable<EdataContentFile> contentFiles,
+            CancellationToken token)
         {
+            //Nie zmienia długości contentu
+
             byte[] spaceBuffer = null;
 
             foreach (var contentFile in contentFiles)
@@ -178,9 +212,17 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                         source.Write(spaceBuffer, 0, (int)contentSizeDffierence);
                     }
                 }
+
+                token.ThrowIfCancellationRequested();
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="offset"></param>
+        /// <param name="length"></param>
         protected virtual void WritePadding(Stream target, uint offset, uint length)
         {
             byte[] buffer = new byte[length];
@@ -189,57 +231,52 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             target.Write(buffer, 0, buffer.Length);
         }
 
+        /// <summary>
+        /// Assigns a dictionary data of the content files to the corresponding dictionary entries.
+        /// </summary>
+        /// <param name="contentFiles"></param>
+        /// <param name="dictionaryRoot"></param>
         protected virtual void AssignContentFilesInfoToDictEntries(
             IEnumerable<EdataContentFile> contentFiles,
-            IEnumerable<EdataSubPath> dictEntries)
+            EdataDictionaryRootEntry dictionaryRoot)
         {
             foreach (var file in contentFiles)
             {
-                EdataFileSubPath matchingFileEntry = null;
-                foreach (var entry in dictEntries)
+                var matchingEntry = dictionaryRoot.SelectEntryByPath(file.Path);
+                EdataDictionaryFileEntry fileEntry = matchingEntry as EdataDictionaryFileEntry;
+                if (fileEntry != null)
                 {
-                    matchingFileEntry = (entry.SelectEntryByPath(file.Path) as EdataFileSubPath);
-                    if (matchingFileEntry != null)
-                    {
-                        break;
-                    }
-                }
-
-                if (matchingFileEntry != null)
-                {
-                    matchingFileEntry.FileOffset = file.Offset;
-                    matchingFileEntry.FileLength = file.Size;
-                    matchingFileEntry.FileChecksum = file.Checksum;
+                    fileEntry.FileOffset = file.Offset;
+                    fileEntry.FileLength = file.Size;
+                    fileEntry.FileChecksum = file.Checksum;
                 }
             }
         }
 
         /// <summary>
-        /// 
+        /// Creates a hierarchy of the dictionary content entries based on the provided collection of content files.
         /// </summary>
         /// <param name="contentFiles"></param>
         /// <returns></returns>
-        protected virtual IEnumerable<EdataSubPath> CreateDictionaryEntriesOfContentFiles(
+        /// <remarks>This metohd requires that there are no two content files with the same paths.</remarks>
+        protected virtual EdataDictionaryRootEntry CreateDictionaryEntries(
             IEnumerable<EdataContentFile> contentFiles)
         {
-            //This alghoritm assumes that there are no two content files with the same paths.
-
-            ///Uses an ordinal comparison for correct ordering of names with hyphens
-            var pathsToSplit = contentFiles
+            List<ContentPathSplitInfo> pathsToSplit = contentFiles
                 .OrderBy(file => file.Path, new EdataDictStringComparer())
                 .Select(file => new ContentPathSplitInfo() { Path = file.Path })
                 .ToList();
 
-            var dictionaryEntries = new List<EdataSubPath>();
+            var dictionaryRoot = new EdataDictionaryRootEntry();
 
             //Wide match can't be picked over a long match.
             while (pathsToSplit.Count > 0)
             {
-                var pathsToCompare = GetPathsToCompare(pathsToSplit);
+                List<ContentPathSplitInfo> pathsToCompare = TakePathsToCompare(pathsToSplit);
                 if (pathsToCompare.Count == 1)
                 {
-                    var newEntry = new EdataFileSubPath(pathsToCompare[0].GetPathFromSplitIndex());
-                    AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryEntries);
+                    var newEntry = new EdataDictionaryFileEntry(pathsToCompare[0].GetPathFromSplitIndex());
+                    AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryRoot);
 
                     pathsToSplit.Remove(pathsToCompare[0]);
                 }
@@ -256,16 +293,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                         }
                         else
                         {
-                            EdataDirSubPath newEntry = null;
-                            if (String.IsNullOrEmpty(pathsToCompare[0].GetPathToSplitIndex()))
-                            {
-                                newEntry = new EdataRootDirSubPath(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
-                            }
-                            else
-                            {
-                                newEntry = new EdataDirSubPath(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
-                            }
-                            AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryEntries);
+                            var newEntry = new EdataDictionaryDirEntry(pathsToCompare[0].GetPathFromSplitIndex(length: matchIndex));
+                            AddEntryToDictionary(newEntry, pathsToCompare[0], dictionaryRoot);
 
                             //czy tu powinno być += czy tylko przypisanie?
                             pathsToCompare.ForEach(x => x.SplitIndex += matchIndex);
@@ -276,32 +305,32 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 }
             }
 
-            return dictionaryEntries;
+            return dictionaryRoot;
         }
 
         /// <summary>
-        /// Selects a list of paths to comparison from an another list of paths. 
+        /// Selects a list of paths for comparison from an another list of paths. 
         /// Paths which can be compared have an equal SplitIndex value, and start with the same first character.
         /// </summary>
-        /// <param name="remainingSplitPaths"></param>
+        /// <param name="pathsToSplit"></param>
         /// <returns></returns>
-        private List<ContentPathSplitInfo> GetPathsToCompare(IList<ContentPathSplitInfo> remainingSplitPaths)
+        private List<ContentPathSplitInfo> TakePathsToCompare(IList<ContentPathSplitInfo> pathsToSplit)
         {
             var pathsToCompare = new List<ContentPathSplitInfo>();
 
-            var orgItem = remainingSplitPaths[0];
+            var orgItem = pathsToSplit[0];
             pathsToCompare.Add(orgItem);
 
-            //Zastąpić algorytmem porównującym z dzielenie obszaru porównywania. Czyli pierwsze porówniaie indeks 0 i ostatni.
-            //jesli nie pasują to zero i pół itd, az do znalezienie dopasowania.
-            for (int i = 1; i < remainingSplitPaths.Count; ++i)
+            //Zastąpić algorytmem porównującym z dzielenie obszaru porównywania. 
+            //Czyli pierwsze porówniaie indeks 0 i ostatni jesli nie pasują to zero i pół itd, az do znalezienie dopasowania.
+            for (int i = 1; i < pathsToSplit.Count; ++i)
             {
-                var currentItem = remainingSplitPaths[i];
+                var currentItem = pathsToSplit[i];
 
                 if (currentItem.SplitIndex == orgItem.SplitIndex &&
                     currentItem.GetCharAtSplitIndex() == orgItem.GetCharAtSplitIndex())
                 {
-                    pathsToCompare.Add(remainingSplitPaths[i]);
+                    pathsToCompare.Add(pathsToSplit[i]);
                 }
                 else
                 {
@@ -341,40 +370,33 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         }
 
         private void AddEntryToDictionary(
-            EdataSubPath entry,
+            EdataDictionaryPathEntry entry,
             ContentPathSplitInfo entryPathSplitInfo,
-            List<EdataSubPath> dictionaryEntries)
+            EdataDictionaryRootEntry dictionaryRoot)
         {
-            //It's a first one so no need to search for a predecessor.
-            if (dictionaryEntries.Count == 0)
+            if (entryPathSplitInfo.SplitIndex == 0)
             {
-                dictionaryEntries.Add(entry);
-                return;
-            }
-
-            var precedingPath = entryPathSplitInfo.GetPathToSplitIndex();
-            EdataSubPath precedingPathEntry = null;
-            foreach (var e in dictionaryEntries)
-            {
-                var matchingEntry = e.SelectEntryByPath(precedingPath);
-                if (matchingEntry != null)
-                {
-                    precedingPathEntry = matchingEntry;
-                    break;
-                }
-            }
-
-            var pp = precedingPathEntry as EdataDirSubPath;
-            if (precedingPathEntry != null)
-            {
-                pp.AddFollowingSubPath(entry);
-                entry.PrecedingSubPath = pp;
+                dictionaryRoot.AddFollowingEntry(entry);
+                entry.PrecedingEntries = dictionaryRoot;
             }
             else
             {
-                throw new Exception(String.Format(
-                    "Cannot find a following precedding entry: {0}", 
-                    precedingPath));
+                var precedingPath = entryPathSplitInfo.GetPathToSplitIndex();
+                EdataDictionaryPathEntry precedingPathEntry = 
+                    dictionaryRoot.SelectEntryByPath(precedingPath);
+
+                var pp = precedingPathEntry as EdataDictionaryDirEntry;
+                if (precedingPathEntry != null)
+                {
+                    pp.AddFollowingEntry(entry);
+                    entry.PrecedingEntries = pp;
+                }
+                else
+                {
+                    throw new Exception(String.Format(
+                        "Cannot find a following precedding entry: {0}",
+                        precedingPath));
+                }
             }
         }
 
@@ -383,35 +405,46 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             return 0;
         }
 
-        protected virtual uint GetDictionaryLength(IEnumerable<EdataSubPath> entries)
+        protected virtual uint GetDictionaryOffset()
+        {
+            return 1037;
+        }
+
+        protected virtual uint ComputeDictionaryLength(EdataDictionaryRootEntry dictionaryRoot)
         {
             uint dictHeaderSize = 10;
             uint totalSize = dictHeaderSize;
 
-            foreach (var rootEntry in entries)
+            var entriesQueue = new Queue<EdataDictionaryPathEntry>();
+            entriesQueue.Enqueue(dictionaryRoot);
+
+            while (entriesQueue.Count > 0)
             {
-                var entriesQueue = new Queue<EdataSubPath>();
-                entriesQueue.Enqueue(rootEntry);
+                var entry = entriesQueue.Dequeue();
 
-                while (entriesQueue.Count > 0)
+                totalSize += entry.Length;
+
+                foreach (var subEntry in entry.FollowingEntries)
                 {
-                    var entry = entriesQueue.Dequeue();
-
-                    totalSize += entry.Length;
-
-                    foreach (var subEntry in entry.FollowingSubPaths)
-                    {
-                        entriesQueue.Enqueue(subEntry);
-                    }
+                    entriesQueue.Enqueue(subEntry);
                 }
             }
 
             return totalSize;
         }
 
-        protected virtual uint GetDictionaryOffset()
+        protected virtual uint GetFileOffset(uint dictionaryEnd)
         {
-            return 1037;
+            //Zdaje się że ta wrtość jest zapisana w nagłówku, obecnie pod nazwą Padding.
+            uint offsetStep = 8192;
+            uint fileOffset = 0;
+
+            while (fileOffset <= dictionaryEnd)
+            {
+                fileOffset += offsetStep;
+            }
+
+            return fileOffset;
         }
 
         protected bool AnyContentFileExceedsAvailableSpace(EdataFile file)
@@ -447,20 +480,6 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             }
 
             return false;
-        }
-
-        protected virtual uint GetFileOffset(uint dictionaryEnd)
-        {
-            //Zdaje się że ta wrtość jest zapisana w nagłówku, obecnie pod nazwą Padding.
-            uint offsetStep = 8192;
-            uint fileOffset = 0;
-
-            while (fileOffset <= dictionaryEnd)
-            {
-                fileOffset += offsetStep;
-            }
-
-            return fileOffset;
         }
 
         protected long GetSpaceSizeForFile(EdataContentFile file)

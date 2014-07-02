@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
-using WargameModInstaller.Common.Extensions;
 using WargameModInstaller.Model.Containers.Edata;
 
 namespace WargameModInstaller.Infrastructure.Containers.Edata
@@ -17,9 +16,9 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// 
         /// </summary>
         /// <param name="fileToWrite"></param>
-        public void Write(EdataFile fileToWrite)
+        public void Write(EdataFile edataFile)
         {
-            WriteContentInternal(fileToWrite);
+            Write(edataFile, CancellationToken.None);
         }
 
         /// <summary>
@@ -27,12 +26,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// </summary>
         /// <param name="fileToWrite"></param>
         /// <param name="token"></param>
-        public void Write(EdataFile fileToWrite, CancellationToken token)
-        {
-            WriteContentInternal(fileToWrite, token);
-        }
-
-        protected void WriteContentInternal(EdataFile edataFile, CancellationToken? token = null)
+        public void Write(EdataFile edataFile, CancellationToken token)
         {
             //Uważać tu na ścieżke jaka ma edata pełną czy relatywną..
             //No i dodatkowo od tego momentu może być pusta. A z racji tego że tylko możemy podmieniać edata nie pasuje
@@ -46,7 +40,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             }
 
             //Cancel if requested;
-            token.ThrowIfCanceledAndNotNull();
+            token.ThrowIfCancellationRequested();
 
             var edataContentFiles = edataFile.ContentFiles.OfType<EdataContentFile>();
 
@@ -69,19 +63,19 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                     //W tym przypadku używamy starego rozmieszczenia danych żeby nie odbudowywac pliku od nowa.
                     var header = edataFile.Header;
 
-                    var dictEntries = CreateDictionaryEntriesOfContentFiles(edataContentFiles);
+                    var dictRoot = CreateDictionaryEntries(edataContentFiles);
                     uint dictOffset = header.DictOffset;
-                    uint dictLength = GetDictionaryLength(dictEntries);
+                    uint dictLength = ComputeDictionaryLength(dictRoot);
                     uint dictEnd = dictOffset + dictLength;
 
-                    WriteLoadedContentByReplace(sourceEdata, edataContentFiles);
+                    WriteLoadedContentByReplace(sourceEdata, edataContentFiles, token);
 
-                    AssignContentFilesInfoToDictEntries(edataContentFiles, dictEntries);
+                    AssignContentFilesInfoToDictEntries(edataContentFiles, dictRoot);
 
                     //Clear the old part of file up to content.
                     WritePadding(sourceEdata, 0, header.FileOffset);
 
-                    var dictWriteInfo = WriteDictionary(sourceEdata, dictEntries, dictOffset);
+                    var dictWriteInfo = WriteDictionary(sourceEdata, dictRoot, dictOffset);
 
                     header.Checksum_V2 = Md5Hash.GetHash(dictWriteInfo.Checksum);
                     header.DictLength = dictWriteInfo.Length;
@@ -113,20 +107,20 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                     newEdata = new FileStream(temporaryEdataPath, FileMode.Create);
 
                     //W tym przypadku rozmieszczamy wszystko od zera wg wartości obliczonych.
-                    var dictEntries = CreateDictionaryEntriesOfContentFiles(edataContentFiles);
+                    var dictRoot = CreateDictionaryEntries(edataContentFiles);
                     uint dictOffset = GetDictionaryOffset();
-                    uint dictLength = GetDictionaryLength(dictEntries);
+                    uint dictLength = ComputeDictionaryLength(dictRoot);
                     uint dictEnd = dictOffset + dictLength;
 
                     uint fileOffset = GetFileOffset(dictEnd);
 
-                    var contentWriteInfo = WriteNotLoadedContent(sourceEdata, newEdata, edataContentFiles, fileOffset);
+                    var contentWriteInfo = WriteNotLoadedContent(sourceEdata, newEdata, edataContentFiles, fileOffset, token);
 
-                    AssignContentFilesInfoToDictEntries(edataContentFiles, dictEntries);
+                    AssignContentFilesInfoToDictEntries(edataContentFiles, dictRoot);
 
                     WritePadding(newEdata, 0, fileOffset);
 
-                    var dictWriteInfo = WriteDictionary(newEdata, dictEntries, dictOffset);
+                    var dictWriteInfo = WriteDictionary(newEdata, dictRoot, dictOffset);
 
                     var header = edataFile.Header;
                     header.Checksum_V2 = Md5Hash.GetHash(dictWriteInfo.Checksum);
