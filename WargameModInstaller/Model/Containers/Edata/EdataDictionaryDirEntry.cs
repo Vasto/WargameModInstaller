@@ -7,25 +7,39 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Model.Containers.Edata
 {
-    //To do: pomyśleć nad nazwą tej klasy
-
     /// <summary>
     /// Represents the Edata file's dictionary entry.
     /// </summary>
     public class EdataDictionaryDirEntry : EdataDictionaryPathEntry
     {
+        private int customLength;
+        private int customRelevance;
+        private bool useAutocalculatedValues;
+
         public EdataDictionaryDirEntry(String pathPart)
             : base(pathPart)
         {
-           
+            this.useAutocalculatedValues = true;
+        }
+
+        /// <summary>
+        /// Creates a new EdataDictionaryFileEntry, with custom relevance and entryLength values.
+        /// </summary>
+        /// <param name="pathPart"></param>
+        /// <param name="relevance"></param>
+        public EdataDictionaryDirEntry(String pathPart, int entryLength, int relevance)
+            : base(pathPart)
+        {
+            this.customRelevance = relevance;
+            this.useAutocalculatedValues = false;
+            this.customLength = entryLength;
         }
 
         /// <summary>
         /// Gets or sets the length in bytes of the dictionary area 
         /// where the current entry is relevant for other entries.
-        /// //To też liczyć z potomków.
         /// </summary>
-        public uint RelevanceLength
+        public int RelevanceLength
         {
             get
             {
@@ -38,6 +52,8 @@ namespace WargameModInstaller.Model.Containers.Edata
             if (!followingEntries.Contains(entry))
             {
                 followingEntries.Add(entry);
+
+                entry.PrecedingEntry = this;
             }
         }
 
@@ -46,6 +62,20 @@ namespace WargameModInstaller.Model.Containers.Edata
             if (followingEntries.Contains(entry))
             {
                 followingEntries.Remove(entry);
+
+                entry.PrecedingEntry = null;
+            }
+        }
+
+        public override bool IsEndingEntry()
+        {
+            if (useAutocalculatedValues)
+            {
+                return base.IsEndingEntry();
+            }
+            else
+            {
+                return (customRelevance == 0);
             }
         }
 
@@ -57,7 +87,7 @@ namespace WargameModInstaller.Model.Containers.Edata
                 buffer = BitConverter.GetBytes(Length);
                 ms.Write(buffer, 0, buffer.Length);
 
-                uint relevancelength = IsPathEndingEntry() ? 0 : RelevanceLength;
+                int relevancelength = IsEndingEntry() ? 0 : RelevanceLength;
                 buffer = BitConverter.GetBytes(relevancelength);
                 ms.Write(buffer, 0, buffer.Length);
 
@@ -78,44 +108,58 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
-        protected virtual uint GetRelevanceLength()
+        protected virtual int GetRelevanceLength()
         {
-            uint relevance = Length;
-            foreach (var entry in FollowingEntries)
+            if (useAutocalculatedValues)
             {
-                if (entry is EdataDictionaryDirEntry)
+                int relevance = Length;
+                foreach (var entry in FollowingEntries)
                 {
-                    relevance += ((EdataDictionaryDirEntry)entry).RelevanceLength;
+                    if (entry is EdataDictionaryDirEntry)
+                    {
+                        relevance += ((EdataDictionaryDirEntry)entry).RelevanceLength;
+                    }
+                    else
+                    {
+                        relevance += entry.Length;
+                    }
                 }
-                else
-                {
-                    relevance += entry.Length;
-                }
-            }
 
-            return relevance;
+                return relevance;
+            }
+            else
+            {
+                return customRelevance;
+            }
         }
 
-        protected override uint GetLengthInBytes()
+        protected override int GetLengthInBytes()
         {
-            uint totalLength = 0;
+            if (useAutocalculatedValues)
+            {
+                int totalLength = 0;
 
-            //Length
-            totalLength += sizeof(uint);
+                //Length
+                totalLength += sizeof(uint);
 
-            //RelevanceLength
-            totalLength += sizeof(uint);
+                //RelevanceLength
+                totalLength += sizeof(uint);
 
-            //SubPath
-            totalLength += (uint)PathPart.Length;
+                //SubPath
+                totalLength += PathPart.Length;
 
-            //zero ended string
-            totalLength += 1;
+                //zero ended string
+                totalLength += 1;
 
-            //supplement to even length.
-            totalLength += (uint)(totalLength % 2 == 0 ? 0 : 1);
+                //supplement to even length.
+                totalLength += (totalLength % 2 == 0 ? 0 : 1);
 
-            return totalLength;
+                return totalLength;
+            }
+            else
+            {
+                return customLength;
+            }
         }
 
     }

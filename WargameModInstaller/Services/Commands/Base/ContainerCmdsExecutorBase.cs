@@ -91,13 +91,16 @@ namespace WargameModInstaller.Services.Commands.Base
 
         protected void LoadContentFiles(IEnumerable<IContentFile> files)
         {
-            foreach (var file in files)
-            {
-                if (!file.IsContentLoaded)
-                {
-                    ContainerReaderService.LoadContent(file);
-                }
-            }
+            var notLoadedFiles = files.Where(x => !x.IsContentLoaded);
+            ContainerReaderService.LoadContent(notLoadedFiles);
+
+            //foreach (var file in files)
+            //{
+            //    if (!file.IsContentLoaded)
+            //    {
+            //        ContainerReaderService.LoadContent(file);
+            //    }
+            //}
         }
 
     }

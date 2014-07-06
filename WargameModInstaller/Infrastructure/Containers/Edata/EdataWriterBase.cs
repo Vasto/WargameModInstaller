@@ -105,7 +105,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             {
                 byte[] fileBuffer = file.Content;
                 file.Checksum = MD5.Create().ComputeHash(fileBuffer);
-                file.Size = file.Content.Length;
+                file.Length = file.Content.Length;
                 file.Offset = target.Position - contentOffset;
 
                 long spaceSize = GetSpaceSizeForFile(file);
@@ -154,12 +154,12 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 if (file.IsContentLoaded)
                 {
                     fileBuffer = file.Content;
-                    file.Size = file.Content.Length;
+                    file.Length = file.Content.Length;
                     file.Checksum = MD5.Create().ComputeHash(fileBuffer);
                 }
                 else
                 {
-                    fileBuffer = new byte[file.Size];
+                    fileBuffer = new byte[file.Length];
                     source.Seek(oldOffset + contentOffset, SeekOrigin.Begin);
                     source.Read(fileBuffer, 0, fileBuffer.Length);
                 }
@@ -196,10 +196,10 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             {
                 if (contentFile.IsContentLoaded)
                 {
-                    long orginalContentSize = contentFile.Size;
+                    long orginalContentSize = contentFile.Length;
 
                     byte[] fileBuffer = contentFile.Content;
-                    contentFile.Size = fileBuffer.Length;
+                    contentFile.Length = fileBuffer.Length;
                     contentFile.Checksum = MD5.Create().ComputeHash(fileBuffer);
 
                     source.Seek(contentFile.TotalOffset, SeekOrigin.Begin);
@@ -247,7 +247,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 if (fileEntry != null)
                 {
                     fileEntry.FileOffset = file.Offset;
-                    fileEntry.FileLength = file.Size;
+                    fileEntry.FileLength = file.Length;
                     fileEntry.FileChecksum = file.Checksum;
                 }
             }
@@ -377,7 +377,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             if (entryPathSplitInfo.SplitIndex == 0)
             {
                 dictionaryRoot.AddFollowingEntry(entry);
-                entry.PrecedingEntries = dictionaryRoot;
+                //entry.PrecedingEntry = dictionaryRoot;
             }
             else
             {
@@ -389,7 +389,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 if (precedingPathEntry != null)
                 {
                     pp.AddFollowingEntry(entry);
-                    entry.PrecedingEntries = pp;
+                    //entry.PrecedingEntry = pp;
                 }
                 else
                 {
@@ -422,7 +422,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             {
                 var entry = entriesQueue.Dequeue();
 
-                totalSize += entry.Length;
+                totalSize += (uint)entry.Length;
 
                 foreach (var subEntry in entry.FollowingEntries)
                 {
@@ -484,7 +484,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
         protected long GetSpaceSizeForFile(EdataContentFile file)
         {
-            long contentSize = file.IsContentLoaded ? file.ContentSize : file.Size;
+            long contentSize = file.IsContentLoaded ? file.ContentSize : file.Length;
 
             long contentSizeSupplTo16 = MathUtilities.SupplementTo(contentSize, 16);
 

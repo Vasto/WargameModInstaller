@@ -14,6 +14,60 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 {
     public abstract class EdataReaderBase
     {
+        public EdataReaderBase()
+        {
+            this.KnownContentFileTypes = CreateKnownContentFileTypes();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected Dictionary<ContentFileType, byte[]> KnownContentFileTypes
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Dictionary<ContentFileType, byte[]> CreateKnownContentFileTypes()
+        {
+            var knownTypes = new Dictionary<ContentFileType, byte[]>();
+            knownTypes.Add(ContentFileType.Ndfbin, ContentFileType.Ndfbin.MagicBytes);
+            knownTypes.Add(ContentFileType.Edata, ContentFileType.Edata.MagicBytes);
+            knownTypes.Add(ContentFileType.Trad, ContentFileType.Trad.MagicBytes);
+            knownTypes.Add(ContentFileType.Save, ContentFileType.Save.MagicBytes);
+            knownTypes.Add(ContentFileType.Prxypcpc, ContentFileType.Prxypcpc.MagicBytes);
+            knownTypes.Add(ContentFileType.Image, ContentFileType.Image.MagicBytes);
+
+            return knownTypes;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="headerData"></param>
+        /// <returns></returns>
+        protected ContentFileType GetFileTypeFromHeaderData(byte[] headerData)
+        {
+            foreach (var knownType in KnownContentFileTypes)
+            {
+                if (knownType.Value.Length < headerData.Length)
+                {
+                    headerData = headerData.Take(knownType.Value.Length).ToArray();
+                }
+
+                if (MiscUtilities.ComparerByteArrays(headerData, knownType.Value))
+                {
+                    return knownType.Key;
+                }
+            }
+
+            return ContentFileType.Unknown;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -23,11 +77,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// Credits to enohka for this method.
         /// See more at: http://github.com/enohka/moddingSuite
         /// </remarks>
-        protected virtual EdataHeader ReadHeader(Stream stream, CancellationToken token)
+        protected virtual EdataHeader ReadHeader(Stream stream)
         {
-            //Cancel if requested;
-            token.ThrowIfCancellationRequested();
-
             EdataHeader header;
 
             var buffer = new byte[Marshal.SizeOf(typeof(EdataHeader))];
@@ -36,243 +87,156 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
             header = MiscUtilities.ByteArrayToStructure<EdataHeader>(buffer);
 
-            if (header.Version > 2)
-            {
-                throw new NotSupportedException(string.Format("Edata version {0} not supported", header.Version));
-            }
-
             return header;
         }
 
         /// <summary>
-        /// 
+        /// Reads Edata version 2 dictionary entries
         /// </summary>
-        /// <param name="stream"></param>
+        /// <param name="source"></param>
         /// <param name="header"></param>
-        /// <param name="loadContent"></param>
-        /// <returns>A Collection of the Files found in the Dictionary.</returns>
-        /// <remarks>
-        /// Credits to enohka for this method.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// "The only tricky part about that algorythm is that you have to skip one byte if the length of the File/Dir name PLUS nullbyte is an odd number."
-        /// </remarks>
-        protected virtual IEnumerable<EdataContentFile> ReadEdatV2Dictionary(
-            Stream stream,
-            EdataHeader header,
-            bool loadContent,
-            CancellationToken token)
+        /// <param name="token"></param>
+        /// <returns></returns>
+        protected virtual EdataDictionaryRootEntry ReadDcitionaryEntries(
+            Stream source,
+            uint dictOffset,
+            uint dictLength)
         {
-            var files = new List<EdataContentFile>();
-            var dirs = new List<EdataContentDirectory>();
-            var endings = new List<long>();
+            EdataDictionaryRootEntry dictRoot = new EdataDictionaryRootEntry();
+            EdataDictionaryDirEntry workingDir = null;
 
-            stream.Seek(header.DictOffset, SeekOrigin.Begin);
+            source.Seek(dictOffset + dictRoot.Length, SeekOrigin.Begin);
 
-            long dirEnd = header.DictOffset + header.DictLength;
-            uint id = 0;
-
-            while (stream.Position < dirEnd)
+            long dictEnd = dictOffset + dictLength;
+            while (source.Position < dictEnd)
             {
-                //Cancel if requested;
-                token.ThrowIfCancellationRequested();
-
-
                 var buffer = new byte[4];
-                stream.Read(buffer, 0, 4);
-                int fileGroupId = BitConverter.ToInt32(buffer, 0);
+                source.Read(buffer, 0, 4);
+                int entrysFirstFour = BitConverter.ToInt32(buffer, 0);
 
-                if (fileGroupId == 0)
+                source.Read(buffer, 0, 4);
+                int entrysSecondFour = BitConverter.ToInt32(buffer, 0);
+
+                bool isFileEntry = (entrysFirstFour == 0);
+                if (isFileEntry)
                 {
-                    var file = new EdataContentFile();
-                    stream.Read(buffer, 0, 4);
-                    file.FileEntrySize = BitConverter.ToInt32(buffer, 0);
+                    int entryLength = entrysSecondFour;
+
+                    //source.Read(buffer, 0, 4);
+                    //int relevanceLength = BitConverter.ToInt32(buffer, 0);
 
                     buffer = new byte[8];
-                    stream.Read(buffer, 0, buffer.Length);
-                    file.Offset = BitConverter.ToInt64(buffer, 0);
-                    file.TotalOffset = file.Offset + header.FileOffset;
+                    source.Read(buffer, 0, buffer.Length);
+                    long offset = BitConverter.ToInt64(buffer, 0);
 
-                    stream.Read(buffer, 0, buffer.Length);
-                    file.Size = BitConverter.ToInt64(buffer, 0);
+                    source.Read(buffer, 0, buffer.Length);
+                    long length = BitConverter.ToInt64(buffer, 0);
 
-                    var checkSum = new byte[16];
-                    stream.Read(checkSum, 0, checkSum.Length);
-                    file.Checksum = checkSum;
+                    var checksum = new byte[16];
+                    source.Read(checksum, 0, checksum.Length);
 
-                    file.Name = MiscUtilities.ReadString(stream);
-                    file.Path = MergePath(dirs, file.Name);
-
-                    if (file.Name.Length % 2 == 0)
+                    String pathPart = MiscUtilities.ReadString(source);
+                    if (pathPart.Length % 2 == 0)
                     {
-                        stream.Seek(1, SeekOrigin.Current);
+                        source.Seek(1, SeekOrigin.Current);
                     }
 
-                    //to Id służy do identyfikacji plików, oparte na kolejności odczytu, nie pochodzi z danych edata.
-                    file.Id = id;
-                    id++;
-
-                    ResolveFileType(stream, file, header);
-
-                    if (loadContent)
+                    var newFile = new EdataDictionaryFileEntry(pathPart, entryLength, offset, length, checksum);
+                    if (workingDir != null)
                     {
-                        long currentStreamPosition = stream.Position;
+                        workingDir.AddFollowingEntry(newFile);
 
-                        file.Content = ReadContent(stream, file.TotalOffset, file.Size);
-                        //file.Content = ReadContent(stream, header.FileOffset + file.Offset, file.Size);
-                        //file.Size = file.Content.Length;
-
-                        stream.Seek(currentStreamPosition, SeekOrigin.Begin);
+                        //Usuwamy tylko jeśli pojawia się wpis pliku oznaczony jako kończący ścieżkę.
+                        if (newFile.IsEndingEntry())
+                        {
+                            EdataDictionaryDirEntry previousEntry = null;
+                            do
+                            {
+                                previousEntry = workingDir;
+                                workingDir = (EdataDictionaryDirEntry)workingDir.PrecedingEntry;
+                            }
+                            while (workingDir != null && previousEntry.IsEndingEntry());
+                        }
                     }
-
-                    files.Add(file);
-
-                    while (endings.Count > 0 && stream.Position == endings.Last())
+                    else
                     {
-                        dirs.Remove(dirs.Last());
-                        endings.Remove(endings.Last());
+                        dictRoot.AddFollowingEntry(newFile);
                     }
                 }
-                else if (fileGroupId > 0)
+                else //isDirEntry
                 {
-                    var dir = new EdataContentDirectory();
+                    int entryLength = entrysFirstFour;
+                    int relevanceLength = entrysSecondFour;
 
-                    stream.Read(buffer, 0, 4);
-                    dir.FileEntrySize = BitConverter.ToInt32(buffer, 0);
+                    //source.Read(buffer, 0, 4);
+                    //int relevanceLength = BitConverter.ToInt32(buffer, 0);
 
-                    if (dir.FileEntrySize != 0)
+                    String pathPart = MiscUtilities.ReadString(source);
+                    if (pathPart.Length % 2 == 0)
                     {
-                        endings.Add(dir.FileEntrySize + stream.Position - 8);
-                    }
-                    else if (endings.Count > 0)
-                    {
-                        endings.Add(endings.Last());
+                        source.Seek(1, SeekOrigin.Current);
                     }
 
-                    dir.Name = MiscUtilities.ReadString(stream);
-                    if (dir.Name.Length % 2 == 0)
+                    var newDir = new EdataDictionaryDirEntry(pathPart, entryLength, relevanceLength);
+                    if (workingDir != null)
                     {
-                        stream.Seek(1, SeekOrigin.Current);
+                        workingDir.AddFollowingEntry(newDir);
                     }
-
-                    dirs.Add(dir);
+                    else
+                    {
+                        dictRoot.AddFollowingEntry(newDir);
+                    }
+                    workingDir = newDir;
                 }
             }
 
-            return files;
+            return dictRoot;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="header"></param>
-        /// <param name="loadContent"></param>
+        /// <param name="source"></param>
+        /// <param name="dictionaryRoot"></param>
+        /// <param name="contentFilesSectionOffset"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// Credits to enohka for this method.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        protected virtual IEnumerable<EdataContentFile> ReadEdatV1Dictionary(
-            Stream stream,
-            EdataHeader header,
-            bool loadContent,
-            CancellationToken token )
+        protected virtual IEnumerable<EdataContentFile> TranslateDictionaryEntriesToContentFiles(
+            Stream source,
+            uint contentFilesSectionOffset,
+            EdataDictionaryRootEntry dictionaryRoot)
         {
-            var files = new List<EdataContentFile>();
-            var dirs = new List<EdataContentDirectory>();
-            var endings = new List<long>();
+            var contentFiles = new List<EdataContentFile>();
 
-            stream.Seek(header.DictOffset, SeekOrigin.Begin);
-
-            long dirEnd = header.DictOffset + header.DictLength;
-            uint id = 0;
-
-            while (stream.Position < dirEnd)
+            var fileEntries = dictionaryRoot.SelectEntriesOfType<EdataDictionaryFileEntry>();
+            foreach (var entry in fileEntries)
             {
-                //Cancel if requested;
-                token.ThrowIfCancellationRequested();
+                var newCotnetFile = new EdataContentFile();
+                newCotnetFile.Offset = entry.FileOffset;
+                newCotnetFile.TotalOffset = entry.FileOffset + contentFilesSectionOffset;
+                newCotnetFile.Length = entry.FileLength;
+                newCotnetFile.Checksum = entry.FileChecksum;
+                newCotnetFile.Path = entry.FullPath;
 
+                //To można by stąd wydzielić
+                ResolveContentFileType(source, newCotnetFile, contentFilesSectionOffset);
 
-                var buffer = new byte[4];
-                stream.Read(buffer, 0, 4);
-                int fileGroupId = BitConverter.ToInt32(buffer, 0);
-
-                if (fileGroupId == 0)
-                {
-                    var file = new EdataContentFile();
-                    stream.Read(buffer, 0, 4);
-                    file.FileEntrySize = BitConverter.ToInt32(buffer, 0);
-
-                    //buffer = new byte[8];  - it's [4] now, so no need to change
-                    stream.Read(buffer, 0, 4);
-                    file.Offset = BitConverter.ToInt32(buffer, 0);
-                    file.TotalOffset = file.Offset + header.FileOffset;
-
-                    stream.Read(buffer, 0, 4);
-                    file.Size = BitConverter.ToInt32(buffer, 0);
-
-                    //var checkSum = new byte[16];
-                    //fileStream.Read(checkSum, 0, checkSum.Length);
-                    //file.Checksum = checkSum;
-                    stream.Seek(1, SeekOrigin.Current);  //instead, skip 1 byte - as in WEE DAT unpacker
-
-                    file.Name = MiscUtilities.ReadString(stream);
-                    file.Path = MergePath(dirs, file.Name);
-
-                    if ((file.Name.Length + 1) % 2 == 0)
-                    {
-                        stream.Seek(1, SeekOrigin.Current);
-                    }
-
-                    file.Id = id;
-                    id++;
-
-                    ResolveFileType(stream, file, header);
-
-                    if (loadContent)
-                    {
-                        long currentStreamPosition = stream.Position;
-
-                        file.Content = ReadContent(stream, file.TotalOffset, file.Size);
-                        file.Size = file.Content.Length; ////dodane
-
-                        stream.Seek(currentStreamPosition, SeekOrigin.Begin);
-                    }
-
-                    files.Add(file);
-
-                    while (endings.Count > 0 && stream.Position == endings.Last())
-                    {
-                        dirs.Remove(dirs.Last());
-                        endings.Remove(endings.Last());
-                    }
-                }
-                else if (fileGroupId > 0)
-                {
-                    var dir = new EdataContentDirectory();
-
-                    stream.Read(buffer, 0, 4);
-                    dir.FileEntrySize = BitConverter.ToInt32(buffer, 0);
-
-                    if (dir.FileEntrySize != 0)
-                    {
-                        endings.Add(dir.FileEntrySize + stream.Position - 8);
-                    }
-                    else if (endings.Count > 0)
-                    {
-                        endings.Add(endings.Last());
-                    }
-
-                    dir.Name = MiscUtilities.ReadString(stream);
-                    if ((dir.Name.Length + 1) % 2 == 1)
-                    {
-                        stream.Seek(1, SeekOrigin.Current);
-                    }
-
-                    dirs.Add(dir);
-                }
+                contentFiles.Add(newCotnetFile);
             }
-            return files;
+
+            return contentFiles;
+        }
+
+        private void ResolveContentFileType(
+            Stream source,
+            EdataContentFile file,
+            uint contentFilesSectionOffset)
+        {
+            source.Seek(file.Offset + contentFilesSectionOffset, SeekOrigin.Begin);
+
+            var headerBuffer = new byte[12];
+            source.Read(headerBuffer, 0, headerBuffer.Length);
+
+            file.FileType = GetFileTypeFromHeaderData(headerBuffer);
         }
 
         /// <summary>
@@ -284,7 +248,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         {
             foreach (var file in contentFiles)
             {
-                file.Content = ReadContent(source, file.TotalOffset, file.Size);
+                file.Content = ReadContent(source, file.TotalOffset, file.Length);
             }
         }
 
@@ -303,88 +267,6 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             stream.Read(contentBuffer, 0, contentBuffer.Length);
 
             return contentBuffer;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <param name="file"></param>
-        /// <remarks>
-        /// Credits to enohka for this method.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        protected virtual void ResolveFileType(Stream stream, EdataContentFile file, EdataHeader header)
-        {
-            // save original offset
-            long origOffset = stream.Position;
-
-            stream.Seek(file.Offset + header.FileOffset, SeekOrigin.Begin);
-
-            var headerBuffer = new byte[12];
-            stream.Read(headerBuffer, 0, headerBuffer.Length);
-
-            file.FileType = GetFileTypeFromHeaderData(headerBuffer);
-
-            // set offset back to original
-            stream.Seek(origOffset, SeekOrigin.Begin);
-        }
-
-        /// <summary>
-        /// Merges a filename in its dictionary tree.
-        /// </summary>
-        /// <param name="dirs"></param>
-        /// <param name="fileName"></param>
-        /// <returns>The valid Path inside the package.</returns>
-        /// <remarks>
-        /// Credits to enohka for this method.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        protected virtual String MergePath(IEnumerable<EdataContentDirectory> dirs, String fileName)
-        {
-            var b = new StringBuilder();
-            foreach (EdataContentDirectory dir in dirs)
-            {
-                b.Append(dir.Name);
-            }
-            b.Append(fileName);
-
-            return b.ToString();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="headerData"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Credits to enohka for this method.
-        /// See more at: http://github.com/enohka/moddingSuite
-        /// </remarks>
-        public static ContentFileType GetFileTypeFromHeaderData(byte[] headerData)
-        {
-            var knownHeaders = new List<KeyValuePair<ContentFileType, byte[]>>();
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Ndfbin, ContentFileType.Ndfbin.MagicBytes));
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Edata, ContentFileType.Edata.MagicBytes));
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Trad, ContentFileType.Trad.MagicBytes));
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Save, ContentFileType.Save.MagicBytes));
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Prxypcpc, ContentFileType.Prxypcpc.MagicBytes));
-            knownHeaders.Add(new KeyValuePair<ContentFileType, byte[]>(ContentFileType.Image, ContentFileType.Image.MagicBytes));
-
-            foreach (var knownHeader in knownHeaders)
-            {
-                if (knownHeader.Value.Length < headerData.Length)
-                {
-                    headerData = headerData.Take(knownHeader.Value.Length).ToArray();
-                }
-
-                if (MiscUtilities.ComparerByteArrays(headerData, knownHeader.Value))
-                {
-                    return knownHeader.Key;
-                }
-            }
-
-            return ContentFileType.Unknown;
         }
 
         #region Helpers
@@ -458,6 +340,408 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         //            }
         //        }
         //    }
+        //} 
+        #endregion
+
+        #region Legacy
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="stream"></param>
+        ///// <param name="header"></param>
+        ///// <param name="loadContent"></param>
+        ///// <returns>A Collection of the Files found in the Dictionary.</returns>
+        ///// <remarks>
+        ///// Credits to enohka for this method.
+        ///// See more at: http://github.com/enohka/moddingSuite
+        ///// "The only tricky part about that algorythm is that you have to skip one byte if the length of the File/Dir name PLUS nullbyte is an odd number."
+        ///// </remarks>
+        //protected virtual IEnumerable<EdataContentFile> ReadEdatV2Dictionary(
+        //    Stream stream,
+        //    EdataHeader header,
+        //    bool loadContent,
+        //    CancellationToken token)
+        //{
+        //    var files = new List<EdataContentFile>();
+        //    var dirs = new List<EdataContentDirectory>();
+        //    var endings = new List<long>();
+
+        //    stream.Seek(header.DictOffset, SeekOrigin.Begin);
+
+        //    long dirEnd = header.DictOffset + header.DictLength;
+        //    uint id = 0;
+
+        //    while (stream.Position < dirEnd)
+        //    {
+        //        //Cancel if requested;
+        //        token.ThrowIfCancellationRequested();
+
+
+        //        var buffer = new byte[4];
+        //        stream.Read(buffer, 0, 4);
+        //        int fileGroupId = BitConverter.ToInt32(buffer, 0);
+
+        //        if (fileGroupId == 0)
+        //        {
+        //            var file = new EdataContentFile();
+        //            stream.Read(buffer, 0, 4);
+        //            file.FileEntrySize = BitConverter.ToInt32(buffer, 0);
+
+        //            buffer = new byte[8];
+        //            stream.Read(buffer, 0, buffer.Length);
+        //            file.Offset = BitConverter.ToInt64(buffer, 0);
+        //            file.TotalOffset = file.Offset + header.FileOffset;
+
+        //            stream.Read(buffer, 0, buffer.Length);
+        //            file.Size = BitConverter.ToInt64(buffer, 0);
+
+        //            var checkSum = new byte[16];
+        //            stream.Read(checkSum, 0, checkSum.Length);
+        //            file.Checksum = checkSum;
+
+        //            file.Name = MiscUtilities.ReadString(stream);
+        //            file.Path = MergePath(dirs, file.Name);
+
+        //            if (file.Name.Length % 2 == 0)
+        //            {
+        //                stream.Seek(1, SeekOrigin.Current);
+        //            }
+
+        //            //to Id służy do identyfikacji plików, oparte na kolejności odczytu, nie pochodzi z danych edata.
+        //            file.Id = id;
+        //            id++;
+
+        //            ResolveContentFileType(stream, file, header);
+
+        //            if (loadContent)
+        //            {
+        //                long currentStreamPosition = stream.Position;
+
+        //                file.Content = ReadContent(stream, file.TotalOffset, file.Size);
+        //                //file.Content = ReadContent(stream, header.FileOffset + file.Offset, file.Size);
+        //                //file.Size = file.Content.Length;
+
+        //                stream.Seek(currentStreamPosition, SeekOrigin.Begin);
+        //            }
+
+        //            files.Add(file);
+
+        //            while (endings.Count > 0 && stream.Position == endings.Last())
+        //            {
+        //                dirs.Remove(dirs.Last());
+        //                endings.Remove(endings.Last());
+        //            }
+        //        }
+        //        else if (fileGroupId > 0)
+        //        {
+        //            var dir = new EdataContentDirectory();
+
+        //            stream.Read(buffer, 0, 4);
+        //            dir.FileEntrySize = BitConverter.ToInt32(buffer, 0);
+
+        //            if (dir.FileEntrySize != 0)
+        //            {
+        //                endings.Add(dir.FileEntrySize + stream.Position - 8);
+        //            }
+        //            else if (endings.Count > 0)
+        //            {
+        //                endings.Add(endings.Last());
+        //            }
+
+        //            dir.Name = MiscUtilities.ReadString(stream);
+        //            if (dir.Name.Length % 2 == 0)
+        //            {
+        //                stream.Seek(1, SeekOrigin.Current);
+        //            }
+
+        //            dirs.Add(dir);
+        //        }
+        //    }
+
+        //    return files;
+        //}
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="stream"></param>
+        ///// <param name="header"></param>
+        ///// <param name="loadContent"></param>
+        ///// <returns></returns>
+        ///// <remarks>
+        ///// Credits to enohka for this method.
+        ///// See more at: http://github.com/enohka/moddingSuite
+        ///// </remarks>
+        //protected virtual IEnumerable<EdataContentFile> ReadEdatV1Dictionary(
+        //    Stream stream,
+        //    EdataHeader header,
+        //    bool loadContent,
+        //    CancellationToken token )
+        //{
+        //    var files = new List<EdataContentFile>();
+        //    var dirs = new List<EdataContentDirectory>();
+        //    var endings = new List<long>();
+
+        //    stream.Seek(header.DictOffset, SeekOrigin.Begin);
+
+        //    long dirEnd = header.DictOffset + header.DictLength;
+        //    uint id = 0;
+
+        //    while (stream.Position < dirEnd)
+        //    {
+        //        //Cancel if requested;
+        //        token.ThrowIfCancellationRequested();
+
+
+        //        var buffer = new byte[4];
+        //        stream.Read(buffer, 0, 4);
+        //        int fileGroupId = BitConverter.ToInt32(buffer, 0);
+
+        //        if (fileGroupId == 0)
+        //        {
+        //            var file = new EdataContentFile();
+        //            stream.Read(buffer, 0, 4);
+        //            file.FileEntrySize = BitConverter.ToInt32(buffer, 0);
+
+        //            //buffer = new byte[8];  - it's [4] now, so no need to change
+        //            stream.Read(buffer, 0, 4);
+        //            file.Offset = BitConverter.ToInt32(buffer, 0);
+        //            file.TotalOffset = file.Offset + header.FileOffset;
+
+        //            stream.Read(buffer, 0, 4);
+        //            file.Size = BitConverter.ToInt32(buffer, 0);
+
+        //            //var checkSum = new byte[16];
+        //            //fileStream.Read(checkSum, 0, checkSum.Length);
+        //            //file.Checksum = checkSum;
+        //            stream.Seek(1, SeekOrigin.Current);  //instead, skip 1 byte - as in WEE DAT unpacker
+
+        //            file.Name = MiscUtilities.ReadString(stream);
+        //            file.Path = MergePath(dirs, file.Name);
+
+        //            if ((file.Name.Length + 1) % 2 == 0)
+        //            {
+        //                stream.Seek(1, SeekOrigin.Current);
+        //            }
+
+        //            file.Id = id;
+        //            id++;
+
+        //            ResolveContentFileType(stream, file, header);
+
+        //            if (loadContent)
+        //            {
+        //                long currentStreamPosition = stream.Position;
+
+        //                file.Content = ReadContent(stream, file.TotalOffset, file.Size);
+        //                file.Size = file.Content.Length; ////dodane
+
+        //                stream.Seek(currentStreamPosition, SeekOrigin.Begin);
+        //            }
+
+        //            files.Add(file);
+
+        //            while (endings.Count > 0 && stream.Position == endings.Last())
+        //            {
+        //                dirs.Remove(dirs.Last());
+        //                endings.Remove(endings.Last());
+        //            }
+        //        }
+        //        else if (fileGroupId > 0)
+        //        {
+        //            var dir = new EdataContentDirectory();
+
+        //            stream.Read(buffer, 0, 4);
+        //            dir.FileEntrySize = BitConverter.ToInt32(buffer, 0);
+
+        //            if (dir.FileEntrySize != 0)
+        //            {
+        //                endings.Add(dir.FileEntrySize + stream.Position - 8);
+        //            }
+        //            else if (endings.Count > 0)
+        //            {
+        //                endings.Add(endings.Last());
+        //            }
+
+        //            dir.Name = MiscUtilities.ReadString(stream);
+        //            if ((dir.Name.Length + 1) % 2 == 1)
+        //            {
+        //                stream.Seek(1, SeekOrigin.Current);
+        //            }
+
+        //            dirs.Add(dir);
+        //        }
+        //    }
+        //    return files;
+        //}
+
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="stream"></param>
+        ///// <param name="file"></param>
+        ///// <remarks>
+        ///// Credits to enohka for this method.
+        ///// See more at: http://github.com/enohka/moddingSuite
+        ///// </remarks>
+        //protected virtual void ResolveContentFileType(Stream stream, EdataContentFile file, EdataHeader header)
+        //{
+        //    // save original offset
+        //    long origOffset = stream.Position;
+
+        //    stream.Seek(file.Offset + header.FileOffset, SeekOrigin.Begin);
+
+        //    var headerBuffer = new byte[12];
+        //    stream.Read(headerBuffer, 0, headerBuffer.Length);
+
+        //    file.FileType = GetFileTypeFromHeaderData(headerBuffer);
+
+        //    // set offset back to original
+        //    stream.Seek(origOffset, SeekOrigin.Begin);
+        //}
+
+        ///// <summary>
+        ///// Merges a filename in its dictionary tree.
+        ///// </summary>
+        ///// <param name="dirs"></param>
+        ///// <param name="fileName"></param>
+        ///// <returns>The valid Path inside the package.</returns>
+        ///// <remarks>
+        ///// Credits to enohka for this method.
+        ///// See more at: http://github.com/enohka/moddingSuite
+        ///// </remarks>
+        //protected virtual String MergePath(IEnumerable<EdataContentDirectory> dirs, String fileName)
+        //{
+        //    var b = new StringBuilder();
+        //    foreach (EdataContentDirectory dir in dirs)
+        //    {
+        //        b.Append(dir.Name);
+        //    }
+        //    b.Append(fileName);
+
+        //    return b.ToString();
+        //}
+
+        ///// <summary>
+        ///// Reads Edata version 2 dictionary into content files.
+        ///// </summary>
+        ///// <param name="source"></param>
+        ///// <param name="header"></param>
+        ///// <param name="token"></param>
+        ///// <returns></returns>
+        //protected virtual EdataDictionaryRootEntry ReadDcitionaryGood(
+        //    Stream source,
+        //    uint dictOffset,
+        //    uint dictLength)
+        //{
+        //    var root = new EdataDictionaryRootEntry();
+        //    var dirsStack = new Stack<EdataDictionaryDirEntry>();
+
+        //    source.Seek(dictOffset + root.Length, SeekOrigin.Begin);
+
+        //    long dictEnd = dictOffset + dictLength;
+        //    while (source.Position < dictEnd)
+        //    {
+        //        var buffer = new byte[4];
+        //        source.Read(buffer, 0, 4);
+        //        int entrysFirstFour = BitConverter.ToInt32(buffer, 0);
+
+        //        bool isFileEntry = (entrysFirstFour == 0);
+        //        if (isFileEntry)
+        //        {
+        //            source.Read(buffer, 0, 4);
+        //            int entryLenght = BitConverter.ToInt32(buffer, 0);
+
+        //            buffer = new byte[8];
+        //            source.Read(buffer, 0, buffer.Length);
+        //            long offset = BitConverter.ToInt64(buffer, 0);
+
+        //            source.Read(buffer, 0, buffer.Length);
+        //            long length = BitConverter.ToInt64(buffer, 0);
+
+        //            var checksum = new byte[16];
+        //            source.Read(checksum, 0, checksum.Length);
+
+        //            string pathPart = MiscUtilities.ReadString(source);
+        //            if (pathPart.Length % 2 == 0)
+        //            {
+        //                source.Seek(1, SeekOrigin.Current);
+        //            }
+
+        //            var newEntry = new EdataDictionaryFileEntry(pathPart, (uint)entryLenght, offset, length, checksum);
+
+        //            //WIP
+        //            //if (dirsStack.Count > 0)
+        //            //{
+        //            //    var parentEntry = newEntry.IsPathEndingEntry() ?
+        //            //        dirsStack.Pop() :
+        //            //        dirsStack.Peek();
+        //            //    parentEntry.AddFollowingEntry(newEntry);
+
+        //            //    while (dirsStack.Count > 0 &&
+        //            //        entryLenght == 0 &&
+        //            //        parentEntry.IsPathEndingEntry())
+        //            //    {
+        //            //        parentEntry = dirsStack.Pop();
+        //            //    }
+        //            //}
+        //            //else
+        //            //{
+        //            //    root.AddFollowingEntry(newEntry);
+        //            //}
+
+        //            //Verfied good,
+        //            if (dirsStack.Count > 0)
+        //            {
+        //                var parentEntry = entryLenght == 0 ?
+        //                    dirsStack.Pop() :
+        //                    dirsStack.Peek();
+        //                parentEntry.AddFollowingEntry(newEntry);
+
+        //                while (dirsStack.Count > 0 &&
+        //                    entryLenght == 0 &&
+        //                    parentEntry.RelevanceLength == 0)
+        //                {
+        //                    parentEntry = dirsStack.Pop();
+        //                }
+        //            }
+        //            else
+        //            {
+        //                root.AddFollowingEntry(newEntry);
+        //            }
+        //        }
+        //        else //isDirEntry
+        //        {
+        //            //int entrySize = entrysFirstFour;
+
+        //            source.Read(buffer, 0, 4);
+        //            int relevance = BitConverter.ToInt32(buffer, 0);
+
+        //            string pathPart = MiscUtilities.ReadString(source);
+        //            if (pathPart.Length % 2 == 0)
+        //            {
+        //                source.Seek(1, SeekOrigin.Current);
+        //            }
+
+        //            var newEntry = new EdataDictionaryDirEntry(pathPart, (uint)relevance);
+        //            if (dirsStack.Count > 0)
+        //            {
+        //                var parentEntry = dirsStack.Peek();
+        //                parentEntry.AddFollowingEntry(newEntry);
+        //            }
+        //            else
+        //            {
+        //                root.AddFollowingEntry(newEntry);
+        //            }
+        //            dirsStack.Push(newEntry);
+
+        //        }
+        //        //dir entry ends when the second 4 bytes (relevance) are zero
+        //        //file entry ends when the second 4 bytes (entrysize) are zero;
+        //    }
+
+        //    return root;
         //} 
         #endregion
 

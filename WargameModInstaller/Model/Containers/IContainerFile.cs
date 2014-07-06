@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Model.Containers
 {
+    //To do: zastanowić się czy to nie powinna zawierać także właściwości określającej typ pliku kontenera.
+
     public interface IContainerFile
     {
         /// <summary>

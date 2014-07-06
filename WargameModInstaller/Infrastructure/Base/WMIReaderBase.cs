@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using WargameModInstaller.Common.Entities;
-using WargameModInstaller.Infrastructure.Config;
 using WargameModInstaller.Model;
 
 namespace WargameModInstaller.Infrastructure

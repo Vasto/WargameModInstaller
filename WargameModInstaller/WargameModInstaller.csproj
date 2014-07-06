@@ -167,7 +167,7 @@
     <Compile Include="Infrastructure\Image\TgvBinNoMipMapsWriter.cs" />
     <Compile Include="Infrastructure\Image\TgvBinReader.cs" />
     <Compile Include="Infrastructure\Image\TgvBinWriter.cs" />
-    <Compile Include="Infrastructure\WMIReaderBase.cs" />
+    <Compile Include="Infrastructure\Base\WMIReaderBase.cs" />
     <Compile Include="Model\Commands\ICmdGroup.cs" />
     <Compile Include="Model\Commands\ReplaceImagePartCmd.cs" />
     <Compile Include="Model\Commands\SharedTargetCmdGroup.cs" />
@@ -176,8 +176,6 @@
     <Compile Include="Model\Config\ISettingsFactory.cs" />
     <Compile Include="Model\Config\ScreenSettings.cs" />
     <Compile Include="Model\Config\SettingsFactory.cs" />
-    <Compile Include="Model\Containers\Edata\EdataContentDirectory.cs" />
-    <Compile Include="Model\Containers\Edata\EdataContentEntity.cs" />
     <Compile Include="Model\Containers\Edata\EdataContentFile.cs" />
     <Compile Include="Model\Containers\Edata\EdataFile.cs" />
     <Compile Include="Model\Containers\Edata\EdataHeader.cs" />

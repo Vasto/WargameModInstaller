@@ -7,14 +7,66 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Model.Containers.Edata
 {
-    //To do: pomyśleć nad nazwą tej klasy
-
     public class EdataDictionaryFileEntry : EdataDictionaryPathEntry
     {
+        private int customLength;
+        private bool useAutocalculatedValues;
+
         public EdataDictionaryFileEntry(String pathPart)
             : base(pathPart)
         {
             this.FileChecksum = new byte[16];
+            this.useAutocalculatedValues = true;
+        }
+
+        public EdataDictionaryFileEntry(
+            String pathPart, 
+            long fileOffset, 
+            long fileLength,
+            byte[] fileChecksum)
+            : base(pathPart)
+        {
+            this.FileOffset = fileOffset;
+            this.FileLength = fileLength;
+            this.FileChecksum = fileChecksum;
+            this.useAutocalculatedValues = true;
+        }
+
+        /// <summary>
+        /// Creates a new EdataDictionaryFileEntry, with custom file netry length value.
+        /// </summary>
+        /// <param name="pathPart"></param>
+        /// <param name="length"></param>
+        public EdataDictionaryFileEntry(String pathPart, int entryLength)
+            : base(pathPart)
+        {
+            this.FileChecksum = new byte[16];
+            this.customLength = entryLength;
+            this.useAutocalculatedValues = false;
+        }
+
+        /// <summary>
+        /// Creates a new EdataDictionaryFileEntry, with custom file netry length value.
+        /// </summary>
+        /// <param name="pathPart"></param>
+        /// <param name="entryLength"></param>
+        /// <param name="fileOffset"></param>
+        /// <param name="fileLength"></param>
+        /// <param name="fileChecksum"></param>
+        public EdataDictionaryFileEntry(
+            String pathPart,
+            int entryLength,
+            long fileOffset,
+            long fileLength,
+            byte[] fileChecksum)
+            : base(pathPart)
+        {
+
+            this.FileOffset = fileOffset;
+            this.FileLength = fileLength;
+            this.FileChecksum = fileChecksum;
+            this.customLength = entryLength;
+            this.useAutocalculatedValues = false;
         }
 
         /// <summary>
@@ -44,6 +96,18 @@ namespace WargameModInstaller.Model.Containers.Edata
             set;
         }
 
+        public override bool IsEndingEntry()
+        {
+            if (useAutocalculatedValues)
+            {
+                return base.IsEndingEntry();
+            }
+            else 
+            {
+                return (customLength == 0);
+            }
+        }
+
         public override byte[] ToBytes()
         {
             using (var ms = new MemoryStream())
@@ -51,7 +115,7 @@ namespace WargameModInstaller.Model.Containers.Edata
                 byte[] buffer = new byte[4];
                 ms.Write(buffer, 0, buffer.Length);
 
-                uint length = IsPathEndingEntry() ? 0 : Length;
+                int length = IsEndingEntry() ? 0 : Length;
                 buffer = BitConverter.GetBytes(length);
                 ms.Write(buffer, 0, buffer.Length);
 
@@ -81,35 +145,42 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
-        protected override uint GetLengthInBytes()
+        protected override int GetLengthInBytes()
         {
-            uint totalLength = 0;
+            if (useAutocalculatedValues)
+            {
+                int totalLength = 0;
 
-            //FileHeader
-            totalLength += 4;
+                //FileHeader
+                totalLength += 4;
 
-            //Length
-            totalLength += sizeof(uint);
+                //Length
+                totalLength += sizeof(uint);
 
-            //FileOffset
-            totalLength += sizeof(long);
+                //FileOffset
+                totalLength += sizeof(long);
 
-            //FileLength
-            totalLength += sizeof(long);
+                //FileLength
+                totalLength += sizeof(long);
 
-            //FileChecksum
-            totalLength += (uint)FileChecksum.Length;
+                //FileChecksum
+                totalLength += FileChecksum.Length;
 
-            //SubPath
-            totalLength += (uint)PathPart.Length;
+                //SubPath
+                totalLength += PathPart.Length;
 
-            //zero ended string
-            totalLength += 1;
+                //zero ended string
+                totalLength += 1;
 
-            //supplement to even length.
-            totalLength += (uint)(totalLength % 2 == 0 ? 0 : 1);
+                //supplement to even length.
+                totalLength += totalLength % 2 == 0 ? 0 : 1;
 
-            return totalLength;
+                return totalLength;
+            }
+            else
+            {
+                return customLength;
+            }
         }
 
     }

@@ -27,7 +27,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         /// <summary>
         /// Gets or sets the parent entry in the hierarchy.
         /// </summary>
-        public EdataDictionaryPathEntry PrecedingEntries
+        public EdataDictionaryPathEntry PrecedingEntry
         {
             get;
             set;
@@ -45,7 +45,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// Gets or sets the path fragment hold by the current entry.
+        /// Gets the path fragment hold by the current entry.
         /// </summary>
         public String PathPart
         {
@@ -54,9 +54,21 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
+        /// Gets the full path of the entry, 
+        /// which is combined path of current entry and all preceeding entries.
+        /// </summary>
+        public String FullPath
+        {
+            get
+            {
+                return GetFullPath();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the length of entry in bytes.
         /// </summary>
-        public uint Length
+        public int Length
         {
             get
             {
@@ -64,13 +76,12 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
-        //wyniesc to z tad bo to no chyba ze pominiemy koniecznosc odnoszenia sie do pliku czyli podklasy bo to jest zło
-        //Wywalić to pozniej fo extension method, wtedy sobie moze operowac pojeciem pliku
         public virtual EdataDictionaryPathEntry SelectEntryByPath(String path)
         {
             EdataDictionaryPathEntry result = null;
 
             //This alghoritm assumes that there are no two child entries with the same sub paths.
+
             if (path == PathPart)
             {
                 result = this;
@@ -78,15 +89,15 @@ namespace WargameModInstaller.Model.Containers.Edata
             else if (path.StartsWith(PathPart))
             {
                 int startIndex = PathPart.Length;
-                var currentMatch = this;
+                EdataDictionaryPathEntry currentMatch = this;
                 bool matchFound = true;
                 while (matchFound)
                 {
                     matchFound = false;
 
-                    for (int i = 0; i < currentMatch.followingEntries.Count; ++i)
+                    for (int i = 0; i < currentMatch.FollowingEntries.Count; ++i)
                     {
-                        var potentialMatch = currentMatch.followingEntries[i];
+                        var potentialMatch = currentMatch.FollowingEntries[i];
                         var subPath = potentialMatch.PathPart;
 
                         if ((startIndex < path.Length) &&
@@ -111,20 +122,28 @@ namespace WargameModInstaller.Model.Containers.Edata
             return result;
         }
 
-        public override String ToString()
+        public virtual IEnumerable<T> SelectEntriesOfType<T>() where T : EdataDictionaryPathEntry
         {
-            return PathPart.ToString(System.Globalization.CultureInfo.CurrentCulture);
+            var entries = new List<T>();
+
+            foreach (var entry in FollowingEntries)
+            {
+                if (entry is T)
+                {
+                    entries.Add((T)entry);
+                }
+
+                entries.AddRange(entry.SelectEntriesOfType<T>());
+            }
+
+            return entries;
         }
 
-        public abstract byte[] ToBytes();
-
-        protected abstract uint GetLengthInBytes();
-
-        protected virtual bool IsPathEndingEntry()
+        public virtual bool IsEndingEntry()
         {
-            if (PrecedingEntries != null)
+            if (PrecedingEntry != null)
             {
-                var lastSubPath = PrecedingEntries.FollowingEntries.LastOrDefault();
+                var lastSubPath = PrecedingEntry.FollowingEntries.LastOrDefault();
                 if (lastSubPath != null && lastSubPath == this)
                 {
                     return true;
@@ -133,6 +152,30 @@ namespace WargameModInstaller.Model.Containers.Edata
 
             return false;
         }
+
+        public override String ToString()
+        {
+            return PathPart.ToString(System.Globalization.CultureInfo.CurrentCulture);
+        }
+
+        public abstract byte[] ToBytes();
+
+        protected String GetFullPath()
+        {
+            StringBuilder path = new StringBuilder();
+
+            var currentEntry = this;
+            while (currentEntry != null)
+            {
+                path.Insert(0, currentEntry.PathPart);
+
+                currentEntry = currentEntry.PrecedingEntry;
+            }
+
+            return path.ToString();
+        }
+
+        protected abstract int GetLengthInBytes();
 
     }
 }

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Containers.Edata;
 
 namespace WargameModInstaller.Infrastructure.Containers.Edata
@@ -23,42 +23,53 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             token.ThrowIfCancellationRequested();
 
             EdataHeader header;
-            //byte[] postHeaderData;
             IEnumerable<EdataContentFile> contentFiles;
 
             using (MemoryStream stream = new MemoryStream(rawEdata))
             {
-                header = ReadHeader(stream, token);
-
-                //postHeaderData = ReadPostHeaderData(stream, header);
-
-                if (header.Version == 1)
+                if (!CanReadHeaderFromBuffer(rawEdata))
                 {
-                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
-                    contentFiles = ReadEdatV1Dictionary(stream, header, loadContent, token);
-                }
-                else if (header.Version == 2)
-                {
-                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
-                    contentFiles = ReadEdatV2Dictionary(stream, header, loadContent, token);
-                }
-                else
-                {
-                    throw new NotSupportedException(string.Format("Edata Version {0} is currently not supported", header.Version));
+                    throw new ArgumentException("Cannot read header from the buffer," + 
+                        "because header size exceeds size of the buffer", "rawEdata");
                 }
 
-                //LoadContentFiles(stream, contentFiles);
+                header = ReadHeader(stream);
+
+                if(!CanReadDictionaryFromBuffer(rawEdata, header.DictOffset, header.DictLength))
+                {
+                    throw new ArgumentException("Cannot read dictionary from the buffer," +
+                        "because dictionary size exceeds size of the buffer", "rawEdata");
+                }
+
+                if (header.Version != 2)
+                {
+                    throw new NotSupportedException(String.Format("Edata Version {0} is currently not supported", header.Version));
+                }
+
+                var dictRoot = ReadDcitionaryEntries(stream, header.DictOffset, header.DictLength);
+                contentFiles = TranslateDictionaryEntriesToContentFiles(stream, header.FileOffset,  dictRoot);
+
+                if (loadContent)
+                {
+                    LoadContentFiles(stream, contentFiles);
+                }
             }
 
-            //EdataFile edataFile = new EdataFile(header, postHeaderData, contentFiles);
             EdataFile edataFile = new EdataFile(header, contentFiles);
-            //Może to powinien przypiswyać plik edata...?
-            //foreach (var contentFile in edataFile.ContentFiles)
-            //{
-            //    contentFile.Owner = edataFile;
-            //}
 
             return edataFile;
+        }
+
+        private bool CanReadHeaderFromBuffer(byte[] dataBuffer)
+        {
+            return Marshal.SizeOf(typeof(EdataHeader)) < dataBuffer.Length;
+        }
+
+        private bool CanReadDictionaryFromBuffer(byte[] dataBuffer, uint dictOffset, uint dictLength)
+        {
+            uint dictEnd = dictOffset + dictLength;
+
+            return dictEnd < dataBuffer.Length;
         }
 
     }

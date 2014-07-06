@@ -12,6 +12,11 @@ namespace WargameModInstaller.Model.Containers
     //To umożliwiło by ujednoslicenie metod zbiorczych silnie typowanych typu GetAll, bo obecne meotdy klasy bazowej Enum maja maknakemnty:
     //wymaganie publicnzego kontrukotr, nie uwzgledinianie typów pochodnych itd.
 
+    //To do2: Pomyśleć nad jakimś rozdzieleniem/utworzeniem typów plików kontentu i typów plików konetenerów, tak aby obiekty IcontainerFile
+    //        mogły też przechowywać informacje o swoim typie. Póki co użycie tego typu do obu przypadków moze być troche mylące.
+    //        Problem polega na tym że oba typy musiały by być ze sobą wymienne, jako że pliki konentu także mogą być plikami konetenerowymi,
+    //        natomiast pliki konterneowe nie mogą przyjować niektórych typów plików kontentu.
+
     public class ContentFileType : Enumeration
     {
         public static readonly ContentFileType Ndfbin = 

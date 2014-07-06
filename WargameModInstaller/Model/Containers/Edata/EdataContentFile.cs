@@ -20,7 +20,7 @@ namespace WargameModInstaller.Model.Containers.Edata
     ///     zstring name;
     /// };
     /// </remarks>
-    public class EdataContentFile : EdataContentEntity, IContentFile
+    public class EdataContentFile : /*EdataContentEntity,*/ IContentFile
     {
         private byte[] content;
 
@@ -102,17 +102,18 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
 
-        /// <summary>
-        /// Gets or set the order id in the dictionary.
-        /// </summary>
-        public uint Id
-        {
-            get;
-            set;
-        }
+        ///// <summary>
+        ///// Gets or set the order id in the dictionary.
+        ///// </summary>
+        //public uint Id
+        //{
+        //    get;
+        //    set;
+        //}
 
         /// <summary>
-        /// Offset względem początku częsci danych.
+        /// Gets or sets an offset of the content file 
+        /// from the begining of the content section of conatianer's file.
         /// </summary>
         public long Offset
         {
@@ -121,8 +122,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// Offset uwzględniający wartość ofsetu wskazywaną przez plik nagłówka.
-        /// Offset względem początku pliku.
+        /// Gets or sets an offset of the content file from the begining of the container file.
         /// </summary>
         public long TotalOffset
         {
@@ -131,16 +131,16 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// Rozmiar pierwotny, odczytany, modyfikowane kiedy nastepuje powrotny zapis.
+        /// Gets or sets a length of the content file read from container file.
         /// </summary>
-        public long Size
+        public long Length
         {
             get;
             set;
         }
 
         /// <summary>
-        /// Gets or sets the file checksum.
+        /// Gets or sets the content file checksum.
         /// </summary>
         public byte[] Checksum
         {

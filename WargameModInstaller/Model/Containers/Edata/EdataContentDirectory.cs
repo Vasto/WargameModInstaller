@@ -5,10 +5,10 @@ using System.Text;
 
 namespace WargameModInstaller.Model.Containers.Edata
 {
-    /// <summary>
-    /// zastapić to
-    /// </summary>
-    public class EdataContentDirectory : EdataContentEntity
-    {
-    }
+    ///// <summary>
+    ///// zastapić to
+    ///// </summary>
+    //public class EdataContentDirectory : EdataContentEntity
+    //{
+    //}
 }

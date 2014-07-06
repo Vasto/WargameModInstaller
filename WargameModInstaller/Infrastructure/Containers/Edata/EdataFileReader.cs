@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,12 +8,8 @@ using WargameModInstaller.Model.Containers.Edata;
 
 namespace WargameModInstaller.Infrastructure.Containers.Edata
 {
-    //To do: do przeróbki odczytywanie słownika tak aby wykorzystywało nowe elementy modelu.
-
     public class EdataFileReader : EdataReaderBase, IEdataFileReader
     {
-        //private String lastEdataFilePath;
-
         public EdataFile Read(String edataFilePath, bool loadContent = false)
         {
             return Read(edataFilePath, loadContent, CancellationToken.None);
@@ -36,31 +31,23 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
             using (FileStream stream = new FileStream(lastEdataFilePath, FileMode.Open))
             {
-                header = ReadHeader(stream, token);
-                if (header.Version == 1)
-                {
-                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
-                    contentFiles = ReadEdatV1Dictionary(stream, header, loadContent, token);
-                }
-                else if (header.Version == 2)
-                {
-                    //ReadAndWriteDictionaryStats(stream, header, "C:\\ZZ_3.dat.txt");
-                    contentFiles = ReadEdatV2Dictionary(stream, header, loadContent, token);
-                }
-                else
+                header = ReadHeader(stream);
+
+                if (header.Version != 2)
                 {
                     throw new NotSupportedException(String.Format("Edata Version {0} is currently not supported", header.Version));
+                }
+
+                var dictRoot = ReadDcitionaryEntries(stream, header.DictOffset, header.DictLength);
+                contentFiles = TranslateDictionaryEntriesToContentFiles(stream, header.FileOffset,  dictRoot);
+
+                if (loadContent)
+                {
+                    LoadContentFiles(stream, contentFiles);
                 }
             }
 
             EdataFile edataFile = new EdataFile(lastEdataFilePath, header, contentFiles);
-            //Może to powinien przypiswyać plik edata...?
-            foreach (var contentFile in edataFile.ContentFiles)
-            {
-                contentFile.Owner = edataFile;
-            }
-
-            //WriteContentFiles("C:\\cf_mod_sorted.txt", contentFiles);
 
             return edataFile;
         }
@@ -84,7 +71,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
             using (FileStream stream = File.OpenRead(contentOwenr.Path))
             {
-                return ReadContent(stream, file.TotalOffset, file.Size);   
+                return ReadContent(stream, file.TotalOffset, file.Length);   
             }
         }
 
@@ -95,7 +82,6 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         public void LoadContent(EdataContentFile file)
         {
             file.Content = ReadContent(file);
-            //file.Size = file.Content.Length;
         }
 
         /// <summary>
@@ -104,9 +90,23 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// <param name="file"></param>
         public void LoadContent(IEnumerable<EdataContentFile> files)
         {
-            foreach (var file in files)
+            var filesGroupedByOwner = files.GroupBy(x => x.Owner);
+
+            foreach (var fileGroup in filesGroupedByOwner)
             {
-                LoadContent(file);
+                var owner = fileGroup.Key;
+                if (owner == null)
+                {
+                    throw new ArgumentException("One of Edata content files is not assigned to any Edata container file.");
+                }
+
+                using (FileStream stream = File.OpenRead(owner.Path))
+                {
+                    foreach (var cf in fileGroup)
+                    {
+                        cf.Content = ReadContent(stream, cf.TotalOffset, cf.Length);
+                    }
+                }
             }
         }
 

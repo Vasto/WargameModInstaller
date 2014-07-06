@@ -6,28 +6,12 @@ using System.Threading.Tasks;
 
 namespace WargameModInstaller.Model.Containers.Edata
 {
-    public class EdataDictionaryRootEntry : EdataDictionaryPathEntry
+    public class EdataDictionaryRootEntry : EdataDictionaryDirEntry
     {
         public EdataDictionaryRootEntry()
             : base(String.Empty)
         {
 
-        }
-
-        public void AddFollowingEntry(EdataDictionaryPathEntry entry)
-        {
-            if (!followingEntries.Contains(entry))
-            {
-                followingEntries.Add(entry);
-            }
-        }
-
-        public void RemoveFollowingEntry(EdataDictionaryPathEntry entry)
-        {
-            if (followingEntries.Contains(entry))
-            {
-                followingEntries.Remove(entry);
-            }
         }
 
         public override EdataDictionaryPathEntry SelectEntryByPath(String path)
@@ -51,9 +35,14 @@ namespace WargameModInstaller.Model.Containers.Edata
             return content;
         }
 
-        protected override uint GetLengthInBytes()
+        protected override int GetLengthInBytes()
         {
             return 10;
+        }
+
+        protected override int GetRelevanceLength()
+        {
+            return 0;
         }
 
     }

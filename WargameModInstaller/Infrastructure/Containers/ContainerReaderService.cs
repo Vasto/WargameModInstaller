@@ -17,21 +17,48 @@ namespace WargameModInstaller.Infrastructure.Containers
     /// </summary>
     public class ContainerReaderService : IContainerReaderService
     {
-        protected readonly HashSet<ContentFileType> knownContainers;
-        protected readonly Dictionary<ContentFileType, ReadFileFunc> readFileFuncsMap;
-        protected readonly Dictionary<ContentFileType, ReadRawFunc> readRawFuncsMap;
-        protected readonly Dictionary<ContentFileType, LoadFunc> loadFuncsMap;
-
         protected delegate IContainerFile ReadFileFunc(String path, bool loadContent, CancellationToken token);
         protected delegate IContainerFile ReadRawFunc(byte[] raw, bool loadContent, CancellationToken token);
-        protected delegate void LoadFunc(IContentFile file, CancellationToken token);
+        //protected delegate void LoadFileFunc(IContentFile file, CancellationToken token);
+        protected delegate void LoadFilesFunc(IEnumerable<IContentFile> files, CancellationToken token);
 
         public ContainerReaderService()
         {
-            knownContainers = CreateKnownContainers();
-            readFileFuncsMap = CreateReadFileFuncsMap();
-            readRawFuncsMap = CreateReadRawFuncsMap();
-            loadFuncsMap = CreateLoadFuncsMap();
+            this.KnownContainerTypes = CreateKnownContainerTypes();
+            this.ContainerFileTypes = CreateContainerFileTypesMap();
+            this.ReadFileFuncs = CreateReadFileFuncsMap();
+            this.ReadRawFuncs = CreateReadRawFuncsMap();
+            this.LoadFilesFuncs = CreateLoadFuncsMap();
+        }
+
+        protected HashSet<ContentFileType> KnownContainerTypes
+        {
+            get;
+            private set;
+        }
+
+        protected Dictionary<Type, ContentFileType> ContainerFileTypes
+        {
+            get;
+            private set;
+        }
+
+        protected Dictionary<ContentFileType, ReadFileFunc> ReadFileFuncs
+        {
+            get;
+            private set;
+        }
+
+        protected Dictionary<ContentFileType, ReadRawFunc> ReadRawFuncs
+        {
+            get;
+            private set;
+        }
+
+        protected Dictionary<ContentFileType, LoadFilesFunc> LoadFilesFuncs
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -59,7 +86,7 @@ namespace WargameModInstaller.Infrastructure.Containers
                 throw new ArgumentException("A file with the specified path doesn't exist.", "containerFilePath");
             }
 
-            var longestMagic = knownContainers.Max(x => x.MagicBytes.Length);
+            var longestMagic = KnownContainerTypes.Max(x => x.MagicBytes.Length);
             byte[] magicBuffer = new byte[longestMagic];
 
             using (Stream source = File.OpenRead(containerFilePath))
@@ -69,7 +96,7 @@ namespace WargameModInstaller.Infrastructure.Containers
 
             var containerType = ResolveFileType(magicBuffer);
 
-            var readFunc = readFileFuncsMap[containerType];
+            var readFunc = ReadFileFuncs[containerType];
 
             var containerFile = readFunc(containerFilePath, loadContent, token);
 
@@ -101,7 +128,7 @@ namespace WargameModInstaller.Infrastructure.Containers
                 throw new ArgumentNullException("rawContainerFile");
             }
 
-            var longestMagic = knownContainers.Max(x => x.MagicBytes.Length);
+            var longestMagic = KnownContainerTypes.Max(x => x.MagicBytes.Length);
             byte[] magicBuffer = new byte[longestMagic];
 
             using (Stream source = new MemoryStream(rawContainerFile))
@@ -111,7 +138,7 @@ namespace WargameModInstaller.Infrastructure.Containers
 
             var containerType = ResolveFileType(magicBuffer); //Może zwrócić unknown, obsłużyć
 
-            var readFunc = readRawFuncsMap[containerType];
+            var readFunc = ReadRawFuncs[containerType];
 
             var containerFile = readFunc(rawContainerFile, loadContent, token);
 
@@ -133,23 +160,25 @@ namespace WargameModInstaller.Infrastructure.Containers
         /// <param name="files"></param>
         public void LoadContent(IEnumerable<IContentFile> files)
         {
-            foreach (var file in files)
+            var filesGroupedByOwner = files.GroupBy(x => x.Owner);
+
+            foreach (var fileGroup in filesGroupedByOwner)
             {
-                if (file.Owner == null)
+                var owner = fileGroup.Key;
+                if (owner == null)
                 {
-                    throw new ArgumentException(
-                        String.Format("'{0}' is not assigned to any Edata File Owner.", file), "file");
+                    throw new ArgumentException("One of content files is not assigned to any container file.");
                 }
 
-                var containerType = ResolveFileType(file); //Może zwrócić unknown, obsłużyć
+                var containerType = ResolveFileType(owner);
 
-                var loadFunc = loadFuncsMap[containerType];
+                var loadFunc = LoadFilesFuncs[containerType];
 
-                loadFunc(file, CancellationToken.None);
+                loadFunc(fileGroup, CancellationToken.None);
             }
         }
 
-        protected virtual HashSet<ContentFileType> CreateKnownContainers()
+        protected virtual HashSet<ContentFileType> CreateKnownContainerTypes()
         {
             var result = new HashSet<ContentFileType>();
             result.Add(ContentFileType.Edata);
@@ -157,6 +186,14 @@ namespace WargameModInstaller.Infrastructure.Containers
             //result.Add(ContentFileType2.Mesh);
 
             return result;
+        }
+
+        protected virtual Dictionary<Type, ContentFileType> CreateContainerFileTypesMap()
+        {
+            var map = new Dictionary<Type, ContentFileType>();
+            map.Add(typeof(EdataFile), ContentFileType.Edata);
+
+            return map;
         }
 
         protected virtual Dictionary<ContentFileType, ReadFileFunc> CreateReadFileFuncsMap()
@@ -181,21 +218,20 @@ namespace WargameModInstaller.Infrastructure.Containers
             return map;
         }
 
-        protected virtual Dictionary<ContentFileType, LoadFunc> CreateLoadFuncsMap()
+        protected virtual Dictionary<ContentFileType, LoadFilesFunc> CreateLoadFuncsMap()
         {
-            var map = new Dictionary<ContentFileType, LoadFunc>();
-            map.Add(ContentFileType.Edata, (contentFile, token) =>
+            var map = new Dictionary<ContentFileType, LoadFilesFunc>();
+            map.Add(ContentFileType.Edata, (contentFiles, token) =>
             {
-                (new EdataFileReader()).LoadContent((EdataContentFile)contentFile);
+                (new EdataFileReader()).LoadContent(contentFiles.OfType<EdataContentFile>());
             });
-
 
             return map;
         }
 
         protected ContentFileType ResolveFileType(byte[] binData)
         {
-            foreach (var containerType in knownContainers)
+            foreach (var containerType in KnownContainerTypes)
             {
                 if(MiscUtilities.ComparerByteArrays(
                     containerType.MagicBytes, 
@@ -208,12 +244,20 @@ namespace WargameModInstaller.Infrastructure.Containers
             return ContentFileType.Unknown;
         }
 
-        protected ContentFileType ResolveFileType(IContentFile file)
+        protected ContentFileType ResolveFileType(IContainerFile file)
         {
-            //return file.FileType;
-            //Until switched to ContentFileType2:
+            //To powinno wywnioskować na podstawie typu ownera, a nie samego pliku przekazanego
+            //poki co wspeiramy tylkoe data wiec ejst ok, ale ne dłuższ mete zle
 
-            return ContentFileType.Edata;
+            foreach (var typeFileTypePair in ContainerFileTypes)
+            {
+                if (typeFileTypePair.Key.IsInstanceOfType(file))
+                {
+                    return typeFileTypePair.Value;
+                }
+            }
+
+            return ContentFileType.Unknown;
         }
 
 
