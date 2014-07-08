@@ -52,30 +52,32 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
 
                 int x1 = x[index];
                 int y1 = y[index];
-
-                int xWeight;
-                int yWeight;
-
-                weights.TryGetValue(x1, out xWeight);
-                weights.TryGetValue(y1, out yWeight);
-
-                x1 += xWeight;
-                y1 += yWeight;
-
-                if (x1 < y1)
+                if (x1 != y1)
                 {
-                    return -1;
-                }
-                else if (x1 > y1)
-                {
-                    return 1;
+                    int xWeight;
+                    int yWeight;
+
+                    weights.TryGetValue(x1, out xWeight);
+                    weights.TryGetValue(y1, out yWeight);
+
+                    x1 += xWeight;
+                    y1 += yWeight;
+
+                    if (x1 < y1)
+                    {
+                        return -1;
+                    }
+                    else if (x1 > y1)
+                    {
+                        return 1;
+                    }
                 }
 
                 index++;
             }
 
             return x.Length < y.Length ? -1 : 1;
-
         }
+
     }
 }

@@ -65,7 +65,7 @@ namespace WargameModInstaller.Common.Entities
             private set;
         }
 
-        public bool Equals(PathBase other)
+        public virtual bool Equals(PathBase other)
         {
             PathBase otherPath = other as PathBase;
             if (otherPath != null)

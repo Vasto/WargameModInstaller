@@ -35,16 +35,16 @@ namespace WargameModInstaller.Services.Commands.Base
             private set;
         }
 
-        protected void SaveContainerChanges(IContainerFile container, CancellationToken token)
-        {
-            //Trzeba pomyśleć o innej ścieżce dla tego komunikatu, bo ta jest pełna i powoduje zbyt duże
-            //zmiany długosci wyswietlanych komunikatów w interfejsie, poza tym jest pełna, a wyswietlane sa relatywne.
-            CurrentMessage = String.Format(
-                Properties.Resources.RebuildingParametrizedMsg,
-                container.Path);
+        //protected void SaveContainerChanges(IContainerFile container, CancellationToken token)
+        //{
+        //    //Trzeba pomyśleć o innej ścieżce dla tego komunikatu, bo ta jest pełna i powoduje zbyt duże
+        //    //zmiany długosci wyswietlanych komunikatów w interfejsie, poza tym jest pełna, a wyswietlane sa relatywne.
+        //    CurrentMessage = String.Format(
+        //        Properties.Resources.RebuildingParametrizedMsg,
+        //        container.Path);
 
-            ContainerWriterService.WriteFile(container, token);
-        }
+        //    ContainerWriterService.WriteFile(container, token);
+        //}
 
         protected IEnumerable<String> GetPathsOfContentFiles(IInstallCmd cmd)
         {
@@ -93,14 +93,6 @@ namespace WargameModInstaller.Services.Commands.Base
         {
             var notLoadedFiles = files.Where(x => !x.IsContentLoaded);
             ContainerReaderService.LoadContent(notLoadedFiles);
-
-            //foreach (var file in files)
-            //{
-            //    if (!file.IsContentLoaded)
-            //    {
-            //        ContainerReaderService.LoadContent(file);
-            //    }
-            //}
         }
 
     }

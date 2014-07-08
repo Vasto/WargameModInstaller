@@ -74,6 +74,12 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
+        public String Checksum
+        {
+            get;
+            set;
+        }
+
         protected override String GetCommandsName()
         {
             return "AddImageCommand";

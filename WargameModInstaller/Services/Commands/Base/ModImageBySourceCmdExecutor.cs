@@ -28,10 +28,10 @@ namespace WargameModInstaller.Services.Commands.Base
             return newtgv;
         }
 
-        protected TgvImage BytesToTgv(byte[] rawTgv)
+        protected TgvImage BytesToTgv(byte[] rawTgv, bool readMipMaps = true)
         {
             ITgvBinReader rawReader = new TgvBinReader();
-            TgvImage oldTgv = rawReader.Read(rawTgv);
+            TgvImage oldTgv = rawReader.Read(rawTgv, readMipMaps);
 
             return oldTgv;
         }

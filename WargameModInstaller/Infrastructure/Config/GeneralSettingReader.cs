@@ -55,6 +55,9 @@ namespace WargameModInstaller.Infrastructure.Config
             result.Add(GeneralSettingEntryType.WargameVersion, (source) => 
                 ReadSetting(source, GeneralSettingEntryType.WargameVersion, "Version"));
 
+            result.Add(GeneralSettingEntryType.AutoInstall, (source) =>
+                ReadSetting(source, GeneralSettingEntryType.AutoInstall, "Value"));
+
             return result;
         }
 

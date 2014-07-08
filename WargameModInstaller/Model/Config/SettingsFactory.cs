@@ -70,6 +70,9 @@ namespace WargameModInstaller.Model.Config
             funcs.Add(GeneralSettingEntryType.WargameVersion, () =>
                 CreateGeneralSetting(GeneralSettingEntryType.WargameVersion, WargameVersionType.GetDefault().Name));
 
+            funcs.Add(GeneralSettingEntryType.AutoInstall, () =>
+                 CreateGeneralSetting(GeneralSettingEntryType.AutoInstall, Boolean.FalseString));
+
             funcs.Add(ScreenSettingsEntryType.WelcomeScreen, () =>
                 CreateScreenSettings(
                     ScreenSettingsEntryType.WelcomeScreen,

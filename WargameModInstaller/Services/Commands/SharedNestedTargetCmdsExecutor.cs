@@ -15,9 +15,6 @@ using WargameModInstaller.Services.Containers;
 
 namespace WargameModInstaller.Services.Commands
 {
-    //Pomyśleć o upakowaniu w tych klasach całego odniesenie do kontenerów i ładowania potrzebnej zawartości plików do operacji
-    //tak aby exekutory pojedyńczych kommend nie musiały ładować kontentu, ani wogole przejmować się obszarem plików kontenerowych.
-
     public class SharedNestedTargetCmdsExecutor : ContainerCmdsExecutorBase<SharedNestedTargetCmdGroup>
     {
         public SharedNestedTargetCmdsExecutor(
@@ -70,7 +67,9 @@ namespace WargameModInstaller.Services.Commands
                 ContainerFileLoadManager loadManager = new ContainerFileLoadManager();
                 loadManager.MaxLoadReached += (sender, args) =>
                 {
-                    SaveContainerChanges(lastContainerFile, token);
+                    CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.TargetPath);
+
+                    ContainerWriterService.WriteFile(lastContainerFile, token);
                     loadManager.FreeManagedFilesLoad();
                 };
 
@@ -93,9 +92,7 @@ namespace WargameModInstaller.Services.Commands
                 }
 
                 CurrentStep++;
-                CurrentMessage = String.Format(
-                    Properties.Resources.RebuildingParametrizedMsg, 
-                    CommandGroup.TargetPath);
+                CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.TargetPath);
 
                 RollContainers(containersHierarchy, token);
             }

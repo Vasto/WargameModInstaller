@@ -82,18 +82,6 @@ namespace WargameModInstaller.Model.Commands
             set;
         }
 
-        //Dla tej komendy informacjê o kompresji lepiej pobraæ z oryginalego contentu
-        //jako, ¿e ona modyfikuje tylko jego czêœæ, wiêc powinien on narzuciæ to info.
-        ///// <summary>
-        ///// Gets or sets an information wheather the content 
-        ///// of the image has to be compressed during the replacement procces..
-        ///// </summary>
-        //public bool UseCompression
-        //{
-        //    get;
-        //    set;
-        //}
-
         protected override String GetCommandsName()
         {
             return "ReplaceImageTileCommand";

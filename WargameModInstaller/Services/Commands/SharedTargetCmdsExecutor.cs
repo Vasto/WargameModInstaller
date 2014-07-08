@@ -52,7 +52,9 @@ namespace WargameModInstaller.Services.Commands
             ContainerFileLoadManager loadManager = new ContainerFileLoadManager();
             loadManager.MaxLoadReached += (sender, args) =>
             {
-                SaveContainerChanges(containerFile, token);
+                CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.TargetPath);
+
+                ContainerWriterService.WriteFile(containerFile, token);
                 loadManager.FreeManagedFilesLoad();
             };
 
@@ -74,7 +76,9 @@ namespace WargameModInstaller.Services.Commands
                 executor.Execute(newExecutionContext, token);
             }
 
-            SaveContainerChanges(containerFile, token);
+            CurrentMessage = String.Format(Properties.Resources.RebuildingParametrizedMsg, CommandGroup.TargetPath);
+
+            ContainerWriterService.WriteFile(containerFile, token);
 
             //Set max, completed
             CurrentStep = TotalSteps;

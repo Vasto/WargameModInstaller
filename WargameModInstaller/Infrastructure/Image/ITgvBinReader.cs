@@ -12,6 +12,6 @@ namespace WargameModInstaller.Infrastructure.Image
     /// </summary>
     public interface ITgvBinReader
     {
-        TgvImage Read(byte[] rawTgvData);
+        TgvImage Read(byte[] rawTgvData, bool loadMipMaps = true);
     }
 }

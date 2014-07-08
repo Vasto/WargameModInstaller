@@ -51,5 +51,27 @@ namespace WargameModInstaller.Common.Entities
             return PathUtilities.IsValidRelativePath(path);
         }
 
+        public override bool Equals(PathBase other)
+        {
+            PathBase otherPath = other as PathBase;
+            if (otherPath != null)
+            {
+                //Installtion paths have to be case insensitive, since windows local paths are case insensitive
+                return (StringComparer.CurrentCultureIgnoreCase.Compare(otherPath.Value, this.Value)) == 0 &&
+                    (otherPath.PathType == this.PathType);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            //Installtion paths have to be case insensitive, since windows local paths are case insensitive
+            return StringComparer.CurrentCultureIgnoreCase.GetHashCode(Value) +
+                PathType.GetHashCode();
+        }
+
     }
 }

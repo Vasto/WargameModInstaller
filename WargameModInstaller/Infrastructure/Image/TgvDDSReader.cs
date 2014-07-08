@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Common.Utilities.Image.DDS;
+using WargameModInstaller.Common.Utilities.Image.TGV;
 using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Infrastructure.Image
@@ -94,6 +95,7 @@ namespace WargameModInstaller.Infrastructure.Image
 
                 DDSHelper.ConversionFlags conversionFlags;
                 file.Format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags);
+                file.PixelFormatString = TgvUtilities.GetTgvFromPixelFormat(file.Format);
             }
 
             return file;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Model.Containers;
 using WargameModInstaller.Model.Containers.Edata;
@@ -27,7 +28,9 @@ namespace WargameModInstaller.Services.Commands
             {
                 TgvImage image = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
                 //Trzeba mieć na to oko, czy nie powoduje problemów, bo przy replace była używana checksuma starego obrazka.
-                image.SourceChecksum = image.ComputeContentChecksum();
+                image.SourceChecksum = !String.IsNullOrEmpty(Command.Checksum) 
+                    ? MiscUtilities.HexByteStringToByteArray(Command.Checksum)
+                    : image.ComputeContentChecksum();
                 image.IsCompressed = Command.UseCompression;
 
                 var newContentFile = new EdataContentFile()
@@ -56,11 +59,13 @@ namespace WargameModInstaller.Services.Commands
                 //i trudno to rozwiązać przy założeniu ze dane są ładowane na zewnątrz.
 
                 //TgvImage oldTgv = BytesToTgv(contentFile.Content);
-                TgvImage newtgv = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
-                newtgv.SourceChecksum = newtgv.ComputeContentChecksum();
-                newtgv.IsCompressed = Command.UseCompression;
+                TgvImage image = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
+                image.SourceChecksum = !String.IsNullOrEmpty(Command.Checksum)
+                    ? MiscUtilities.HexByteStringToByteArray(Command.Checksum)
+                    : image.ComputeContentChecksum();
+                image.IsCompressed = Command.UseCompression;
 
-                contentFile.Content = TgvToBytes(newtgv, !Command.UseMipMaps);
+                contentFile.Content = TgvToBytes(image, !Command.UseMipMaps);
             }
         }
 

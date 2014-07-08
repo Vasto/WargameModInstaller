@@ -10,7 +10,7 @@ using WargameModInstaller.Services.Commands.Base;
 namespace WargameModInstaller.Services.Commands
 {
     /// <summary>
-    /// Pmyśleć nad możliwościa wywalenia tego i utworzenia jako podstawoego executora shared target executora
+    /// Póki co robi za obiekt grupujący komendy niezależne od zawartości plików kontentu.
     /// </summary>
     public class BasicCmdsExecutor : CmdGroupExecutorBase<BasicCmdGroup>
     {

@@ -153,7 +153,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                             do
                             {
                                 previousEntry = workingDir;
-                                workingDir = (EdataDictionaryDirEntry)workingDir.PrecedingEntry;
+                                workingDir = workingDir.PrecedingEntry as EdataDictionaryDirEntry;
                             }
                             while (workingDir != null && previousEntry.IsEndingEntry());
                         }

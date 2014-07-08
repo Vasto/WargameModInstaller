@@ -6,7 +6,8 @@ using WargameModInstaller.Model.Image;
 
 namespace WargameModInstaller.Services.Image
 {
-    //To do: Add support for the MipMaps parts replacing
+    //To do: Add support for the MipMaps parts replacing (?)
+    //Note: Wydaję się że to bedzie tylko poprawne dla formatów używającyhc kompresji o rozmiarze bloku 4:1 (DXT5, DXT3)
 
     public class ImageComposerService : IImageComposerService
     {
@@ -84,13 +85,15 @@ namespace WargameModInstaller.Services.Image
             var targetRectangleContent = ConvertContentToRectangleArray(target.Content, target.MipWidth, target.MipHeight);
             var sourceRectangleContent = ConvertContentToRectangleArray(source.Content, source.MipWidth, source.MipHeight);
 
-            for (int x = 0; x < source.MipWidth; ++x)
+            for (uint x = 0; x < source.MipWidth; ++x)
             {
-                for (int y = 0; y < source.MipHeight; ++y)
+                uint xMod = xPos + x;
+                for (uint y = 0; y < source.MipHeight; ++y)
                 {
-                    if (xPos + x < target.MipWidth && yPos + y < target.MipHeight)
+                    uint yMod = yPos + y;
+                    if (xMod < target.MipWidth && yMod < target.MipHeight)
                     {
-                        targetRectangleContent[xPos + x, yPos + y] = sourceRectangleContent[x, y];
+                        targetRectangleContent[xMod, yMod] = sourceRectangleContent[x, y];
                     }
                 }
             }
@@ -123,7 +126,8 @@ namespace WargameModInstaller.Services.Image
                 uint currentBlockStride = stride;
                 if (currentBlock == BlockCount)
                 {
-                    currentBlockStride = height % stride == 0 ? stride :  height % stride;
+                    uint tmp = height % stride;
+                    currentBlockStride = tmp == 0 ? stride : tmp;
                 }
 
                 uint passedBlockStrideMultiplied = passedBlocks * stride;
@@ -159,11 +163,12 @@ namespace WargameModInstaller.Services.Image
                 {
                     for (uint y = 0; y < stride; ++y)
                     {
+                        uint yMod = y + blockStrideMultiplied;
                         //Sprawdzenie czy indeks y nie wykroczył poza granice, w przypadku obrazów o romiarze nie będącym wielokrotnością liczby stride (4).
                         //uint passedBlocks = (((long)currentBlock - 1) < 0 ? 0 : currentBlock - 1);
-                        if ((y + (blockStrideMultiplied)) < height)
+                        if (yMod < height)
                         {
-                            result[resultIndexer++] = content[x, y + blockStrideMultiplied];
+                            result[resultIndexer++] = content[x, yMod];
                         }
                     }
                 }

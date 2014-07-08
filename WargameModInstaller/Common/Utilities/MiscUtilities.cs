@@ -107,7 +107,6 @@ namespace WargameModInstaller.Common.Utilities
             return obj != null && obj.GetType().IsValueType;
         }
 
-
         public static byte[] HexByteStringToByteArray(String hex)
         {
             int numberChars = hex.Length / 2;

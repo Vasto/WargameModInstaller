@@ -1,9 +1,13 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WargameModInstaller", "WargameModInstaller\WargameModInstaller.csproj", "{3E1FD406-627F-4924-BBCC-932D41AAA395}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WargameModInstallerTest", "WargameModInstallerTest\WargameModInstallerTest.csproj", "{A365808D-21FE-4F27-A2CD-64BD5E1BFC97}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3E1FD406-627F-4924-BBCC-932D41AAA395} = {3E1FD406-627F-4924-BBCC-932D41AAA395}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WargameFileCrawler", "WargameFileCrawler\WargameFileCrawler.csproj", "{B0553B56-0532-41DF-8561-9961A52B9EE2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3E1FD406-627F-4924-BBCC-932D41AAA395} = {3E1FD406-627F-4924-BBCC-932D41AAA395}
 	EndProjectSection
@@ -22,6 +26,10 @@ Global
 		{A365808D-21FE-4F27-A2CD-64BD5E1BFC97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A365808D-21FE-4F27-A2CD-64BD5E1BFC97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A365808D-21FE-4F27-A2CD-64BD5E1BFC97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0553B56-0532-41DF-8561-9961A52B9EE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0553B56-0532-41DF-8561-9961A52B9EE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0553B56-0532-41DF-8561-9961A52B9EE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0553B56-0532-41DF-8561-9961A52B9EE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

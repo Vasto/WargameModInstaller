@@ -6,9 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using WargameModInstaller.Common.Utilities;
+using WargameModInstaller.Model.Config;
 using WargameModInstaller.Services.Config;
 using WargameModInstaller.Services.Utilities;
 using WargameModInstaller.ViewModels.Messages;
+using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.ViewModels
 {
@@ -212,14 +214,17 @@ namespace WargameModInstaller.ViewModels
             CanNext = NextScreen != null;
         }
 
+        protected override void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
 
-
-        ///// <summary>
-        ///// Called when the setup is canceling.
-        ///// </summary>
-        //protected virtual void OnCanceling()
-        //{
-        //}
+            if (SettingsProvider.GetGeneralSettings(GeneralSettingEntryType.AutoInstall)
+                .Value
+                .ToOrDefault<bool>())
+            {
+                Next();
+            }
+        }
 
     }
 

@@ -9,6 +9,7 @@ using WargameModInstaller.Model.Config;
 using WargameModInstaller.Services.Config;
 using WargameModInstaller.Services.Utilities;
 using WargameModInstaller.ViewModels.Messages;
+using WargameModInstaller.Common.Extensions;
 
 namespace WargameModInstaller.ViewModels
 {
@@ -55,6 +56,14 @@ namespace WargameModInstaller.ViewModels
             EventAggregator.Publish(new InstallClosedMessage(this));
         }
 
+        public override void Next()
+        {
+            if (NextScreen == null)
+            {
+                Finish();
+            }
+        }
+
         protected override void OnActivate()
         {
             base.OnActivate();
@@ -63,7 +72,6 @@ namespace WargameModInstaller.ViewModels
             CanBack = false;
             CanNext = false;
         }
-
 
     }
 }

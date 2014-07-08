@@ -241,8 +241,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             return rules;
         }
 
-        private IEnumerable<ICmdGroup> BasicCmdGroupProductionRule(
-            IEnumerable<IInstallCmd> cmds)
+        private IEnumerable<ICmdGroup> BasicCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
         {
             var validCmds = cmds.Where(cmd =>
                 cmd is CopyGameFileCmd ||
@@ -261,8 +260,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             return resultGroups;
         }
 
-        private IEnumerable<ICmdGroup> SharedTargetCmdGroupProductionRule(
-            IEnumerable<IInstallCmd> cmds)
+        private IEnumerable<ICmdGroup> SharedTargetCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
         {
             var validCmds = cmds.Where(cmd =>
                 cmd is ReplaceImageCmd ||
@@ -276,7 +274,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             var groups = from cmd in validCmds
                          group cmd by new {
                              ((IHasTarget)cmd).TargetPath,
-                              cmd.Priority
+                             cmd.Priority
                          };
 
             var resultGroups = new List<SharedTargetCmdGroup>();
@@ -292,8 +290,7 @@ namespace WargameModInstaller.Infrastructure.Commands
             return resultGroups;
         }
 
-        private IEnumerable<ICmdGroup> SharedNestedTargetCmdGroupProductionRule(
-            IEnumerable<IInstallCmd> cmds)
+        private IEnumerable<ICmdGroup> SharedNestedTargetCmdGroupProductionRule(IEnumerable<IInstallCmd> cmds)
         {
             var multipleNestedCmds = cmds
                 .Where(cmd => cmd is IHasNestedTarget && 
@@ -416,7 +413,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
                 var contentPath = cmdElement.Attribute("targetContentPath").ValueNullSafe();
                 var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(useMipMapsDefault);
-                var compress = cmdElement.Attribute("useCompression").ValueOr<bool>(compressDefault);
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(criticalCmdsDefault);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
@@ -425,7 +421,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
                 newCmd.NestedTargetPath = new ContentPath(contentPath);
                 newCmd.UseMipMaps = useMipMaps;
-                newCmd.UseCompression = compress;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -449,7 +444,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var row = cmdElement.Attribute("row").ValueOrDefault<int?>();
                 var tileSize = cmdElement.Attribute("tileSize").ValueOr<int>(256);
                 var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(useMipMapsDefault);
-                //var compress = cmdElement.Attribute("useCompression").ValueOr<bool>(compressDefault);
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(criticalCmdsDefault);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
@@ -461,7 +455,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.Row = row;
                 newCmd.TileSize = tileSize;
                 newCmd.UseMipMaps = useMipMaps;
-                //newCmd.UseCompression = compress;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -484,7 +477,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var xPos = cmdElement.Attribute("xPos").ValueOr<int>(0);
                 var yPos = cmdElement.Attribute("yPos").ValueOr<int>(0);
                 var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(useMipMapsDefault);
-                //var compress = cmdElement.Attribute("useCompression").ValueOr<bool>(compressDefault);
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(criticalCmdsDefault);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
@@ -495,7 +487,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.XPosition = xPos;
                 newCmd.YPosition = yPos;
                 newCmd.UseMipMaps = useMipMaps;
-                //newCmd.UseCompression = compress;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -622,6 +613,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var overwrite = cmdElement.Attribute("overwriteIfExist").ValueOr<bool>(overwriteIfExistDefault);
                 var useMipMaps = cmdElement.Attribute("useMipMaps").ValueOr<bool>(useMipMapsDefault);
                 var compress = cmdElement.Attribute("useCompression").ValueOr<bool>(compressDefault);
+                var checksum = cmdElement.Attribute("checksum").ValueNullSafe();
                 var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(criticalCmdsDefault);
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(3);
 
@@ -632,6 +624,7 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.OverwriteIfExist = overwrite;
                 newCmd.UseMipMaps = useMipMaps;
                 newCmd.UseCompression = compress;
+                newCmd.Checksum = checksum;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

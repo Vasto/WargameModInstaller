@@ -37,7 +37,8 @@ namespace WargameModInstaller.Services.Commands
             }
 
             //Ładowanie starego obrazka nie będzie potrzebne jeśli bedzie pewnośc ze recznie wygenerowana checkusma jest ok.
-            TgvImage oldTgv = BytesToTgv(contentFile.Content);
+            //Ale co z info o kompresji? Trudno żeby użytkownik je znał poprawnie...
+            TgvImage oldTgv = BytesToTgv(contentFile.Content, false);
             TgvImage newtgv = DDSFileToTgv(data.ModificationSourcePath, !Command.UseMipMaps);
             //newtgv.SourceChecksum = newtgv.ComputeContentChecksum();
             //newtgv.IsCompressed = Command.UseCompression;

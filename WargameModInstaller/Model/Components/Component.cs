@@ -132,9 +132,10 @@ namespace WargameModInstaller.Model.Components
                 childrenComponents.Add(child);
                 child.parentComponent = this;
 
-                if (child.IsOtherSiblingExclusiveMarkedForInstall())
+                if (!isMarkedForInstall ||
+                    child.IsOtherSiblingExclusiveMarkedForInstall())
                 {
-                    child.IsMarkedForInstall = false;
+                    child.isMarkedForInstall = false;
                 }
             }
         }
@@ -157,7 +158,6 @@ namespace WargameModInstaller.Model.Components
                 child.parentComponent = null;
             }
         }
-
 
         private void NotifyIsMarkedForInstallChanged(bool newValue)
         {
