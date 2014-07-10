@@ -24,12 +24,11 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             {
                 throw new ArgumentException(String.Format("File '{0}' doesn't exist.", edataFilePath), "edataFilePath");
             }
-            var lastEdataFilePath = edataFilePath;
 
             EdataHeader header;
             IEnumerable<EdataContentFile> contentFiles;
 
-            using (FileStream stream = new FileStream(lastEdataFilePath, FileMode.Open))
+            using (FileStream stream = new FileStream(edataFilePath, FileMode.Open))
             {
                 header = ReadHeader(stream);
 
@@ -47,7 +46,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 }
             }
 
-            EdataFile edataFile = new EdataFile(lastEdataFilePath, header, contentFiles);
+            EdataFile edataFile = new EdataFile(edataFilePath, header, contentFiles);
 
             return edataFile;
         }

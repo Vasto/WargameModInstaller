@@ -34,7 +34,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         {
             target.Seek(offset, SeekOrigin.Begin);
 
-            byte[] rawHeader = WargameModInstaller.Common.Utilities.MiscUtilities.StructToBytes(header);
+            byte[] rawHeader = MiscUtilities.StructToBytes(header);
             target.Write(rawHeader, 0, rawHeader.Length);
         }
 

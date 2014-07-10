@@ -32,7 +32,6 @@ namespace WargameModInstaller.Model.Containers.Edata
         /// <param name="contentFiles"></param>
         public EdataFile(
             EdataHeader header,
-            /*byte[] postHeaderData,*/
             IEnumerable<IContentFile> contentFiles)
         {
             this.Header = header;
@@ -52,12 +51,10 @@ namespace WargameModInstaller.Model.Containers.Edata
         public EdataFile(
             String path, 
             EdataHeader header,
-            /*byte[] postHeaderData,*/
             IEnumerable<IContentFile> contentFiles)
         {
             this.Path = path;
             this.Header = header;
-            //this.PostHeaderData = postHeaderData;
             this.contentFilesDictionary = contentFiles.ToDictionary(x => x.Path);
             //this.IsVirtual = false;
 
@@ -65,7 +62,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the path of the container file.
         /// </summary>
         /// <remarks>
         /// From now it might not have a path.
@@ -84,19 +81,6 @@ namespace WargameModInstaller.Model.Containers.Edata
             get;
             set;
         }
-
-        /// <summary>
-        /// Ca³oœæ danych pomiedzy ostatnim bajtem nag³ówka, a pierwszym bajtem contentu plików.
-        /// W sumie to s¹ g³ównie zera, s³ownik, zera... (po co to tak naprawde by³a?, wiem ze niedzialo bez tego...)
-        /// 
-        /// Update: Wraz z implementacj¹ budowy s³ownika edata od zera, te dane nie bêd¹ potrzebne. Póki
-        /// Póki co dla kompatybilnowsci z poprzednimi klasami, nie korzystajcymi z budowy s³ownika, musi zostaæ.
-        /// </summary>
-        //public byte[] PostHeaderData
-        //{
-        //    get;
-        //    private set;
-        //}
 
         ///// <summary>
         ///// 
@@ -117,7 +101,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// 
+        /// Gets the collection of content files belonging to the container file.
         /// </summary>
         public IReadOnlyCollection<IContentFile> ContentFiles
         {
@@ -128,7 +112,7 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// 
+        /// Gets a content file with the specified content path.
         /// </summary>
         /// <param name="contentPath"></param>
         /// <returns></returns>
@@ -146,6 +130,11 @@ namespace WargameModInstaller.Model.Containers.Edata
             }
         }
 
+        /// <summary>
+        /// Checks whether a content file with a specified content files belongs to the conatiner file.
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
         public bool ContainsContentFileWithPath(String path)
         {
             if (String.IsNullOrEmpty(path))
@@ -158,6 +147,10 @@ namespace WargameModInstaller.Model.Containers.Edata
             return contentFilesDictionary.ContainsKey(path);
         }
 
+        /// <summary>
+        /// Adds a given content file to the container file.
+        /// </summary>
+        /// <param name="file"></param>
         public void AddContentFile(IContentFile contentFile)
         {
             if(String.IsNullOrEmpty(contentFile.Path))
@@ -182,6 +175,10 @@ namespace WargameModInstaller.Model.Containers.Edata
             HasContentFilesCollectionChanged = true;
         }
 
+        /// <summary>
+        /// Removes a specified content file from the container file.
+        /// </summary>
+        /// <param name="file"></param>
         public void RemoveContentFile(IContentFile contentFile)
         {
             if (!contentFilesDictionary.ContainsKey(contentFile.Path))

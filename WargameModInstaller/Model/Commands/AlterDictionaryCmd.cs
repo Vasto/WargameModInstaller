@@ -17,13 +17,33 @@ namespace WargameModInstaller.Model.Commands
         /// </summary>
         public AlterDictionaryCmd()
         {
-            this.AlteredEntries = new List<KeyValuePair<String, String>>();
+            this.AddedEntries = new List<KeyValuePair<String, String>>();
+            this.RemovedEntries = new List<String>();
+            this.RenamedEntries = new List<KeyValuePair<String, String>>();
         }
 
         /// <summary>
-        /// Gets or sets a dictionary containing hash values of entries as keys and content to alter.
+        /// Gets or sets a set of hash value pairs of entries which ahve to be added.
         /// </summary>
-        public IEnumerable<KeyValuePair<String, String>>  AlteredEntries
+        public IEnumerable<KeyValuePair<String, String>> AddedEntries
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a set of hashes of entries which have to be removed.
+        /// </summary>
+        public IEnumerable<String> RemovedEntries
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets a set containing a pairs of entries hashes and their new names.
+        /// </summary>
+        public IEnumerable<KeyValuePair<String, String>> RenamedEntries
         {
             get;
             set;

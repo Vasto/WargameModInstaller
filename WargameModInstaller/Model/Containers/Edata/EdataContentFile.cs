@@ -20,7 +20,7 @@ namespace WargameModInstaller.Model.Containers.Edata
     ///     zstring name;
     /// };
     /// </remarks>
-    public class EdataContentFile : /*EdataContentEntity,*/ IContentFile
+    public class EdataContentFile : IContentFile
     {
         private byte[] content;
 
@@ -100,16 +100,6 @@ namespace WargameModInstaller.Model.Containers.Edata
             get;
             private set;
         }
-
-
-        ///// <summary>
-        ///// Gets or set the order id in the dictionary.
-        ///// </summary>
-        //public uint Id
-        //{
-        //    get;
-        //    set;
-        //}
 
         /// <summary>
         /// Gets or sets an offset of the content file 

@@ -535,34 +535,27 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var priority = cmdElement.Attribute("priority").ValueOr<int>(2);
 
                 //Read Entries
-                var entries = new List<KeyValuePair<String, String>>();
-                var entriesElements = cmdElement.Elements("Entry");
-                foreach (var entryElement in entriesElements)
-                {
-                    //First try to read the attribute, because an empty tag element value returns an empty string not null.
-                    var value = entryElement.Attribute("value").ValueNullSafe() ??
-                        entryElement.ValueNullSafe();
+                var addEntryElements = cmdElement.Elements("AddEntry");
+                var addEntries = ReadEntriesFromElements(addEntryElements);
 
-                    var hash = entryElement.Attribute("hash").ValueNullSafe();
-                    if (hash != null)
-                    {
-                        var newEntry = new KeyValuePair<String, String>(hash, value);
-                        entries.Add(newEntry);
-                    }
-                    else
-                    {
-                        var line = (entryElement as IXmlLineInfo).LineNumber;
-                        var warning = String.Format(
-                            "Entry at line: \"{0}\" was ignored. It doesn't contain a specified hash attribute.",
-                            line);
-                        Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
-                    }
-                }
+                var delEntryElements = cmdElement.Elements("RemoveEntry");
+                var delEntries = ReadEntriesFromElements(delEntryElements).Select(x => x.Key).ToList();
+
+                var renameEntryElements = cmdElement.Elements("RenameEntry");
+                var renameEntries = ReadEntriesFromElements(renameEntryElements);
+
+                //For backward compatibility, reading of an old rename entries
+                var legacyEntriesElements = cmdElement.Elements("Entry");
+                var legacyEntries = ReadEntriesFromElements(legacyEntriesElements);
+
+                renameEntries = renameEntries.Concat(legacyEntries).ToList();
 
                 var newCmd = new AlterDictionaryCmd();
                 newCmd.TargetPath = new InstallEntityPath(targetPath);
                 newCmd.NestedTargetPath = new ContentPath(contentPath);
-                newCmd.AlteredEntries = entries;
+                newCmd.AddedEntries = addEntries;
+                newCmd.RemovedEntries = delEntries;
+                newCmd.RenamedEntries = renameEntries;
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 
@@ -570,6 +563,37 @@ namespace WargameModInstaller.Infrastructure.Commands
             }
 
             return result;
+        }
+
+        private IEnumerable<KeyValuePair<String, String>> ReadEntriesFromElements(IEnumerable<XElement> elements)
+        {
+            var entries = new List<KeyValuePair<String, String>>();
+            foreach (var entryElement in elements)
+            {
+                //First try to read the attribute, because an empty tag element value returns an empty string not null.
+                var value = entryElement.Attribute("value").ValueNullSafe() ??
+                    entryElement.ValueNullSafe();
+
+                var hash = entryElement.Attribute("hash").ValueNullSafe();
+                var newEntry = new KeyValuePair<String, String>(hash, value);
+                entries.Add(newEntry);
+
+                //if (hash != null)
+                //{
+                    //var newEntry = new KeyValuePair<String, String>(hash, value);
+                    //entries.Add(newEntry);
+                //}
+                //else
+                //{
+                //    var line = (entryElement as IXmlLineInfo).LineNumber;
+                //    var warning = String.Format(
+                //        "Entry at line: \"{0}\" was ignored. It doesn't contain a specified hash attribute.",
+                //        line);
+                //    Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
+                //}
+            }
+
+            return entries;
         }
 
         private IEnumerable<AddContentCmd> ReadAddContentCmds(XElement source)

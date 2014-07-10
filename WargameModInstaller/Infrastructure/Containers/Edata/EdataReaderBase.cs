@@ -35,12 +35,12 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         protected virtual Dictionary<ContentFileType, byte[]> CreateKnownContentFileTypes()
         {
             var knownTypes = new Dictionary<ContentFileType, byte[]>();
-            knownTypes.Add(ContentFileType.Ndfbin, ContentFileType.Ndfbin.MagicBytes);
             knownTypes.Add(ContentFileType.Edata, ContentFileType.Edata.MagicBytes);
+            knownTypes.Add(ContentFileType.Image, ContentFileType.Image.MagicBytes);
+            knownTypes.Add(ContentFileType.Ndfbin, ContentFileType.Ndfbin.MagicBytes);
+            knownTypes.Add(ContentFileType.Prxypcpc, ContentFileType.Prxypcpc.MagicBytes);
             knownTypes.Add(ContentFileType.Trad, ContentFileType.Trad.MagicBytes);
             knownTypes.Add(ContentFileType.Save, ContentFileType.Save.MagicBytes);
-            knownTypes.Add(ContentFileType.Prxypcpc, ContentFileType.Prxypcpc.MagicBytes);
-            knownTypes.Add(ContentFileType.Image, ContentFileType.Image.MagicBytes);
 
             return knownTypes;
         }
@@ -54,12 +54,10 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         {
             foreach (var knownType in KnownContentFileTypes)
             {
-                if (knownType.Value.Length < headerData.Length)
-                {
-                    headerData = headerData.Take(knownType.Value.Length).ToArray();
-                }
+                byte[] headerMagic = new byte[knownType.Value.Length];
+                Array.Copy(headerData, headerMagic, knownType.Value.Length);
 
-                if (MiscUtilities.ComparerByteArrays(headerData, knownType.Value))
+                if (MiscUtilities.ComparerByteArrays(headerMagic, knownType.Value))
                 {
                     return knownType.Key;
                 }

@@ -31,24 +31,90 @@ namespace WargameModInstaller.Services.Commands
             var entries = (new TradDictBinReader()).Read(contentFile.Content);
             var hashToEntriesMap = entries.ToDictionary(key => key.Hash, new ByteArrayComparer());
 
-            foreach (var alteredEntry in Command.AlteredEntries)
-            {
-                var hash = MiscUtilities.HexByteStringToByteArray(alteredEntry.Key);
+            RemoveEntries(hashToEntriesMap);
 
+            AddEntries(hashToEntriesMap);
+
+            RenameEntries(hashToEntriesMap);
+
+            var rawDictionaryData = (new TradDictBinWriter()).Write(hashToEntriesMap.Values);
+            contentFile.Content = rawDictionaryData;
+        }
+
+        private void AddEntries(Dictionary<byte[], TradDictEntry> dictionary)
+        {
+            foreach (var alteredEntry in Command.AddedEntries)
+            {
+                byte[] hash = null;
+                if (alteredEntry.Key != null)
+                {
+                    hash = MiscUtilities.HexByteStringToByteArray(alteredEntry.Key);
+                }
+                else
+                {
+                    do
+                    {
+                        hash = GenerateEntryHash();
+                    }
+                    while (dictionary.ContainsKey(hash));
+                }
+
+                //Alter if exists otherwise add a new one.
                 TradDictEntry entry;
-                if (hashToEntriesMap.TryGetValue(hash, out entry))
+                if (dictionary.TryGetValue(hash, out entry))
                 {
                     entry.Content = alteredEntry.Value;
                 }
                 else
                 {
-                    var warning = String.Format("The entry with the given hash \"{0}\" wasn't found.", alteredEntry.Key);
+                    entry = new TradDictEntry();
+                    entry.Content = alteredEntry.Value;
+                    entry.ContentLength = (uint)alteredEntry.Value.Length;
+                    entry.Hash = hash;
+
+                    dictionary.Add(hash, entry);
+                }
+            }
+        }
+
+        private void RemoveEntries(Dictionary<byte[], TradDictEntry> dictionary)
+        {
+            foreach (var entryHash in Command.RemovedEntries)
+            {
+                var hash = MiscUtilities.HexByteStringToByteArray(entryHash);
+
+                if (!dictionary.Remove(hash))
+                {
+                    var warning = String.Format("RemoveEntry operation failed " + 
+                        "because entry with the given hash \"{0}\" wasn't found.", entryHash);
                     Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
                 }
             }
+        }
 
-            var rawDictionaryData = (new TradDictBinWriter()).Write(entries);
-            contentFile.Content = rawDictionaryData;
+        private void RenameEntries(Dictionary<byte[], TradDictEntry> dictionary)
+        {           
+            foreach (var entryToRename in Command.RenamedEntries)
+            {
+                var hash = MiscUtilities.HexByteStringToByteArray(entryToRename.Key);
+
+                TradDictEntry entry;
+                if (dictionary.TryGetValue(hash, out entry))
+                {
+                    entry.Content = entryToRename.Value;
+                }
+                else
+                {
+                    var warning = String.Format("RenameEntry operation failed because " + 
+                        "entry with the given hash \"{0}\" wasn't found.", entryToRename.Key);
+                    Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
+                }
+            }
+        }
+
+        private byte[] GenerateEntryHash()
+        {
+            return MiscUtilities.CreateLocalisationHash(MiscUtilities.GenerateCoupon(8, new Random()));
         }
 
     }
