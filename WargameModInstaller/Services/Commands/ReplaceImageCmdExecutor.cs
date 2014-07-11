@@ -45,7 +45,8 @@ namespace WargameModInstaller.Services.Commands
             newtgv.SourceChecksum = oldTgv.SourceChecksum;
             newtgv.IsCompressed = oldTgv.IsCompressed;
 
-            contentFile.Content = TgvToBytes(newtgv, !Command.UseMipMaps);
+            var newContent = TgvToBytes(newtgv, !Command.UseMipMaps);
+            contentFile.LoadCustomContent(newContent);
         }
 
     }

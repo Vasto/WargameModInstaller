@@ -130,7 +130,7 @@ namespace WargameModInstaller.Services.Containers
             {
                 if (cf.IsContentLoaded)
                 {
-                    cf.Content = null;
+                    cf.UnloadContent();
                 }
             }
         }

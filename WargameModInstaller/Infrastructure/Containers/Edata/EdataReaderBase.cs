@@ -246,7 +246,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         {
             foreach (var file in contentFiles)
             {
-                file.Content = ReadContent(source, file.TotalOffset, file.Length);
+                var content = ReadContent(source, file.TotalOffset, file.Length);
+                file.LoadOrginalContent(content);
             }
         }
 

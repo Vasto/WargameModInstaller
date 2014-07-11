@@ -1,27 +1,20 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using WargameModInstaller.Model.Containers;
 
-namespace WargameModInstaller.Model.Containers.Edata
+namespace WargameModInstaller.Model.Containers.Proxy
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <remarks>
-    ///struct dictFileEntry {
-    ///     DWORD groupId;
-    ///     DWORD fileEntrySize;
-    ///     DWORD offset;
-    ///     DWORD chunk2;   
-    ///     DWORD fileSize;
-    ///     DWORD chunk4;
-    ///     blob checksum[16];
-    ///     zstring name;
-    /// };
-    /// </remarks>
-    public class EdataContentFile : IContentFile
+    public class ProxyContentFile : IContentFile
     {
+        public ProxyContentFile()
+        {
+            this.Hash = new byte[0];
+            this.FileType = ContentFileType.Image;
+        }
+
         /// <summary>
         /// Occurs when the content is loaded
         /// </summary>
@@ -41,13 +34,58 @@ namespace WargameModInstaller.Model.Containers.Edata
             set;
         }
 
+        public byte[] Hash
+        {
+            get;
+            set;
+        }
+
+        public uint Offset
+        {
+            get;
+            set;
+        }
+
+        public uint TotalOffset
+        {
+            get;
+            set;
+        }
+
+        public uint Length
+        {
+            get;
+            set;
+        }
+
+        public uint Unknown
+        {
+            get;
+            set;
+        }
+
+        public uint Padding
+        {
+            get;
+            set;
+        }
+
         /// <summary>
-        /// Gets or sets the path written in the edata dictionary. 
+        /// Gets or sets the path in the Proxy container 
         /// </summary>
         public String Path
         {
             get;
-            set; 
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the content file type.
+        /// </summary>
+        public ContentFileType FileType
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -93,58 +131,12 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
         /// <summary>
-        /// Gets the information wheather the file's content is loaded with file's orginal data.
+        /// Gets the information wheather the file's content is loaded with orginal data.
         /// </summary>
         public bool IsOriginalContentLoaded
         {
             get;
             private set;
-        }
-
-        /// <summary>
-        /// Gets or sets an offset of the content file 
-        /// from the begining of the content section of conatianer's file.
-        /// </summary>
-        public long Offset
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets an offset of the content file from the begining of the container file.
-        /// </summary>
-        public long TotalOffset
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets a length of the content file read from container file.
-        /// </summary>
-        public long Length
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the content file checksum.
-        /// </summary>
-        public byte[] Checksum
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the content file type.
-        /// </summary>
-        public ContentFileType FileType
-        {
-            get;
-            set;
         }
 
         /// <summary>
@@ -193,7 +185,7 @@ namespace WargameModInstaller.Model.Containers.Edata
 
         public override string ToString()
         {
-            return Path;
+            return String.Format("{0}: {1}", BitConverter.ToString(Hash), Path);
         }
 
         private void NotifyContentLoaded()
@@ -215,5 +207,4 @@ namespace WargameModInstaller.Model.Containers.Edata
         }
 
     }
-
 }

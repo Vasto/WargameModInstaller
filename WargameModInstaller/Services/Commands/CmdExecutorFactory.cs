@@ -50,7 +50,7 @@ namespace WargameModInstaller.Services.Commands
                 }
             }
 
-            throw new InvalidOperationException("Cannot create an executor for the provided command group");
+            throw new InvalidOperationException("Cannot create an executor for the provided commands group");
         }
 
         public virtual ICmdExecutor CreateForCommand(IInstallCmd command) 

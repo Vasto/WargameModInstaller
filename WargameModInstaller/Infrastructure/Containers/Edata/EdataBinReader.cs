@@ -30,7 +30,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 if (!CanReadHeaderFromBuffer(rawEdata))
                 {
                     throw new ArgumentException("Cannot read header from the buffer," + 
-                        "because header size exceeds size of the buffer", "rawEdata");
+                        " because header size exceeds size of the buffer", "rawEdata");
                 }
 
                 header = ReadHeader(stream);
@@ -38,7 +38,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 if(!CanReadDictionaryFromBuffer(rawEdata, header.DictOffset, header.DictLength))
                 {
                     throw new ArgumentException("Cannot read dictionary from the buffer," +
-                        "because dictionary size exceeds size of the buffer", "rawEdata");
+                        " because dictionary size exceeds size of the buffer", "rawEdata");
                 }
 
                 if (header.Version != 2)

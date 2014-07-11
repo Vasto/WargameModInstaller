@@ -164,7 +164,8 @@ namespace WargameModInstaller.Services.Commands
                 if (parentEntity != null)
                 {
                     var owner = parentEntity.ContainerFile.GetContentFileByPath(currentEntity.OwnerPath);
-                    owner.Content = contentFileReader.Read(currentEntity.ContainerFile.Path);
+                    var content = contentFileReader.Read(currentEntity.ContainerFile.Path);
+                    owner.LoadOrginalContent(content);
                 }
             }
         }

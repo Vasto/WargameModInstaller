@@ -27,14 +27,17 @@ namespace WargameModInstaller.Services.Commands
             {
                 var newContentFile = new EdataContentFile();
                 newContentFile.Path = data.ContentPath;
-                newContentFile.Content = (new ContentFileReader()).Read(data.ModificationSourcePath); ;
+
+                var content = (new ContentFileReader()).Read(data.ModificationSourcePath);
+                newContentFile.LoadCustomContent(content);
 
                 data.ContainerFile.AddContentFile(newContentFile);
             }
             else if (Command.OverwriteIfExist)
             {
                 var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
-                contentFile.Content = (new ContentFileReader()).Read(data.ModificationSourcePath);
+                var content = (new ContentFileReader()).Read(data.ModificationSourcePath);
+                contentFile.LoadCustomContent(content);
             }
         }
 

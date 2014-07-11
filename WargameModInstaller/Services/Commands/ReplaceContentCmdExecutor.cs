@@ -23,7 +23,8 @@ namespace WargameModInstaller.Services.Commands
         protected override void ExecuteCommandsLogic(CmdsExecutionData data)
         {
             var contentFile = data.ContainerFile.GetContentFileByPath(data.ContentPath);
-            contentFile.Content = (new ContentFileReader()).Read(data.ModificationSourcePath);
+            var content = (new ContentFileReader()).Read(data.ModificationSourcePath);
+            contentFile.LoadCustomContent(content);
         }
 
     }

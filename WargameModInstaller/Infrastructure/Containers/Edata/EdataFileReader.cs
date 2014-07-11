@@ -80,7 +80,8 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         /// <param name="file"></param>
         public void LoadContent(EdataContentFile file)
         {
-            file.Content = ReadContent(file);
+            var content = ReadContent(file);
+            file.LoadOrginalContent(content);
         }
 
         /// <summary>
@@ -96,14 +97,15 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                 var owner = fileGroup.Key;
                 if (owner == null)
                 {
-                    throw new ArgumentException("One of Edata content files is not assigned to any Edata container file.");
+                    throw new ArgumentException("One of the Edata content files is not assigned to any Edata container file.");
                 }
 
                 using (FileStream stream = File.OpenRead(owner.Path))
                 {
                     foreach (var cf in fileGroup)
                     {
-                        cf.Content = ReadContent(stream, cf.TotalOffset, cf.Length);
+                        var content = ReadContent(stream, cf.TotalOffset, cf.Length);
+                        cf.LoadOrginalContent(content);
                     }
                 }
             }

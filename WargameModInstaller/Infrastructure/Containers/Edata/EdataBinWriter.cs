@@ -93,16 +93,5 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             }
         }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="edataFile"></param>
-        ///// <param name="token"></param>
-        ///// <returns></returns>
-        //protected virtual byte[] WriteContentInternal(EdataFile edataFile, CancellationToken token)
-        //{
-
-        //}
-
     }
 }

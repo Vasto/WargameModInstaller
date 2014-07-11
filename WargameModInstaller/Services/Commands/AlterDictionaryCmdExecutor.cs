@@ -38,7 +38,7 @@ namespace WargameModInstaller.Services.Commands
             RenameEntries(hashToEntriesMap);
 
             var rawDictionaryData = (new TradDictBinWriter()).Write(hashToEntriesMap.Values);
-            contentFile.Content = rawDictionaryData;
+            contentFile.LoadCustomContent(rawDictionaryData);
         }
 
         private void AddEntries(Dictionary<byte[], TradDictEntry> dictionary)

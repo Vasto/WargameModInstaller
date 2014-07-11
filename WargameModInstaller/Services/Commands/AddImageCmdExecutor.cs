@@ -33,11 +33,9 @@ namespace WargameModInstaller.Services.Commands
                     : image.ComputeContentChecksum();
                 image.IsCompressed = Command.UseCompression;
 
-                var newContentFile = new EdataContentFile()
-                {
-                    Path = data.ContentPath,
-                    Content = TgvToBytes(image, !Command.UseMipMaps),
-                };
+                var newContentFile = new EdataContentFile();
+                newContentFile.Path = data.ContentPath;
+                newContentFile.LoadCustomContent(TgvToBytes(image, !Command.UseMipMaps));
 
                 data.ContainerFile.AddContentFile(newContentFile);
             }
@@ -65,7 +63,7 @@ namespace WargameModInstaller.Services.Commands
                     : image.ComputeContentChecksum();
                 image.IsCompressed = Command.UseCompression;
 
-                contentFile.Content = TgvToBytes(image, !Command.UseMipMaps);
+                contentFile.LoadCustomContent(TgvToBytes(image, !Command.UseMipMaps));
             }
         }
 

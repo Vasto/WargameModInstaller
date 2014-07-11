@@ -152,7 +152,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         }
 
         /// <summary>
-        /// 
+        /// To przenieśc do jakiego utilities i pomyśleć nad nazwa
         /// </summary>
         /// <returns></returns>
         protected String GetTemporaryEdataPathInCurrentLocation(String oldeEdataPath)
@@ -166,7 +166,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
         }
 
         /// <summary>
-        /// 
+        /// To przenieśc do jakiego utilities i pomyśleć nad nazwa
         /// </summary>
         /// <param name="oldEdataPath"></param>
         /// <returns></returns>

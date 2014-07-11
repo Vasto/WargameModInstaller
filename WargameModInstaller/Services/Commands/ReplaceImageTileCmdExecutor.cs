@@ -49,7 +49,8 @@ namespace WargameModInstaller.Services.Commands
                 (uint)Command.Column.Value, 
                 (uint)Command.Row.Value);
 
-            contentFile.Content = TgvToBytes(oldTgv, !Command.UseMipMaps);
+            var newContet = TgvToBytes(oldTgv, !Command.UseMipMaps);
+            contentFile.LoadCustomContent(newContet);
         }
 
     }
