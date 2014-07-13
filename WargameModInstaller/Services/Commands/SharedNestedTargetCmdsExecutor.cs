@@ -123,10 +123,10 @@ namespace WargameModInstaller.Services.Commands
 
             foreach (var containerPath in CommandGroup.NestedTargetPath.Parts)
             {
-                var edataFile = containersHierarchy.Peek().ContainerFile;
-                var contentFile = edataFile.GetContentFileByPath(containerPath);
-                if (contentFile.FileType == ContentFileType.Edata)
-                {
+                var containerFile = containersHierarchy.Peek().ContainerFile;
+                var contentFile = containerFile.GetContentFileByPath(containerPath);
+                //if (contentFile.FileType == ContentFileType.Edata)
+                //{
                     ContainerReaderService.LoadContent(contentFile);
                     byte[] content = contentFile.Content;
 
@@ -145,7 +145,7 @@ namespace WargameModInstaller.Services.Commands
                     containersHierarchy.Push(new ContainerHierarchyEntity(virtualContainer, containerPath));
 
                     tempContainers.Add(lastPath);
-                }
+                //}
             }
         }
 
@@ -165,7 +165,7 @@ namespace WargameModInstaller.Services.Commands
                 {
                     var owner = parentEntity.ContainerFile.GetContentFileByPath(currentEntity.OwnerPath);
                     var content = contentFileReader.Read(currentEntity.ContainerFile.Path);
-                    owner.LoadOrginalContent(content);
+                    owner.LoadOrginalContent(content); //Original or Custom?
                 }
             }
         }

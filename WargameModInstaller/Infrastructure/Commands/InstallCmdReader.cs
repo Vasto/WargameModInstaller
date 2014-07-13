@@ -577,20 +577,6 @@ namespace WargameModInstaller.Infrastructure.Commands
                 var hash = entryElement.Attribute("hash").ValueNullSafe();
                 var newEntry = new KeyValuePair<String, String>(hash, value);
                 entries.Add(newEntry);
-
-                //if (hash != null)
-                //{
-                    //var newEntry = new KeyValuePair<String, String>(hash, value);
-                    //entries.Add(newEntry);
-                //}
-                //else
-                //{
-                //    var line = (entryElement as IXmlLineInfo).LineNumber;
-                //    var warning = String.Format(
-                //        "Entry at line: \"{0}\" was ignored. It doesn't contain a specified hash attribute.",
-                //        line);
-                //    Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
-                //}
             }
 
             return entries;

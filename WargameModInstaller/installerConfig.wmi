@@ -6,6 +6,8 @@
   You can adjust it to your needs by removing comment tags surrounding elements which you want to use, 
   and by setting up appropriate values for them. You can also add more elements where needed, basing on the sample ones.-->
 
+  <!--It is highly advised to read the Wargame Mod Installers manual before proceeding.-->
+  
   <Settings>
     
     <General>
@@ -22,7 +24,13 @@
       
       <!--Enables or disables, automatic backup of altered files for the installation time. 
       It's highly recommended to not disable it for a release version of mod-->
-      <InstallationBackup Value="True"/>   
+      <InstallationBackup Value="True"/>
+
+      <!--Enables or disables, an automatic installation mode. 
+      In this mode the installer proceeds through all screens and prompts automatically without requiring any user's input. 
+      This mode might be usefull for mod developers as they don't have click through the installtion each time they want to check the result in game.
+      For release version of mod it is not reccomended to enable it.-->
+      <AutoInstall Value="False"/>
     </General>
     
     <UI>
@@ -95,7 +103,7 @@
         - targetPath - a relative path to a location, inside the Wargame Installation directory, where it has to be copied.
         - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
         - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
-                   For CopyModFile, set to 3 by default, and can be omitted.-->
+                   For CopyModFile, set to 4 by default, and can be omitted.-->
     <!--<CopyModFile 
             sourcePath="WRTG\2100001553\2100001570\ZZ_4.dat" 
             targetPath="Data\Wargame\PC\2100001553\2100001570\ZZ_4.dat"/>-->
@@ -107,10 +115,19 @@
         - targetPath - a relative path to a location, inside the Wargame Installation directory, where it has to be copied.
         - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
         - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
-                   For CopyGameFile, set to 4 by default, and can be omitted.-->
+                   For CopyGameFile, set to 5 by default, and can be omitted.-->
     <!--<CopyGameFile 
             sourcePath="Data\Wargame\PC\2100001553\2100001570\ZZ_4.dat" 
             targetPath="Backups\2100001553\2100001570\ZZ_4.dat"/>-->
+
+    <!--This is a RemoveFile command. It orders the installer to remove a file in user's Wargame installation directory.
+    Command arguments:
+        - sourcePath - a relative path to a file, inside the Wargame Installation directory, which has to be deleted.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                     For RemoveFile, set to 1 by default, and can be omitted.-->
+    <!--<RemoveFile 
+            sourcePath="Data\Wargame\PC\2100001553\2100001570\ZZ_4.dat"/>-->
 
     
     <!--This is a ReplaceContent command. It orders the installer to replace a specified content file inside a specifed dat file with a
@@ -133,6 +150,7 @@
         - sourcePath - a relative path to a DDS file which has to be used as a replacer.
         - targetPath - a relative path to a Wargame .dat file which holds the image to be replaced.
         - targetContentPath - a path pointing to an image inside the .dat file, which has to be replaced.
+        - useMipMaps - specifies if the source image MipMaps should be discarded or exported with the image. Can be set to "True" or "False". By default it's set to "False".        
         - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
         - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
                     For the ReplaceImage, set to 2 by default and can be omitted.-->
@@ -158,6 +176,7 @@
         - targetContentPath - a path pointing to an image inside the .dat file, which part has to be replaced.
         - xPos - an X coordinate of an image where the upper-left point of a replacer image has to be placed.
         - yPos - a Y coordinate of an image where the upper-left point of a replacer image has to be placed.
+        - useMipMaps - specifies if the source image MipMaps should be discarded or exported with the image. Can be set to "True" or "False". By default it's set to "False".       
         - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
         - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
                      For the ReplaceImagePart, set to 2 by default and can be omitted.-->
@@ -178,6 +197,7 @@
         - tileSize - a size of grid cells, which can be pointed as a replacement areas by specyfing the column and row indices. By default it's set to 256.
         - column - a zero based index of a grid column where the replacement area is located.
         - row - a zero based index of a grid row where the replacement area is located.
+        - useMipMaps - specifies if the source image MipMaps should be discarded or exported with the image. Can be set to "True" or "False". By default it's set to "False".
         - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
         - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
                      For the ReplaceImageTile, set to 2 by default and can be omitted.-->
@@ -188,6 +208,26 @@
             tileSize="256"
 			      column="5"
 			      row="4"/>-->
+
+    <!--This is a AlterDictionary command. It orders the installer to modify a dictionary file (.dic extension) accordingly to the
+    specified entry manipulation instrucions. There are following instructions for altering dictionary: AddEntry, RemoveEntry, RenameEntry.
+    Command arguments:
+        - targetPath - a relative path to a Wargame .dat file which holds the target dictionary.
+        - targetContentPath - a path pointing to an dictionary file (.dic) inside the .dat file, which has to be modified.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                     For the AlterDictionary it is set to 2 by default and can be omitted.-->
+    <!--<AlterDictionary 
+            targetPath="Data\WARGAME\PC\430000210\ZZ_Win.dat"
+            targetContentPath="pc\localisation\cz\localisation\unites.dic">
+            
+					  <RenameEntry hash="2AECDE79F7180204" value="F-15E STRIKE EAGLE"/>	
+            
+            <AddEntry value="My Phrase"/>	
+            
+            <RemoveEntry hash="DC02000000000000"/>	
+            
+				</AlterDictionary>	-->
     
   </InstallCommands>
   

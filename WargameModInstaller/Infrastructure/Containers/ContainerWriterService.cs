@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Infrastructure.Containers.Edata;
+using WargameModInstaller.Infrastructure.Containers.Proxy;
 using WargameModInstaller.Model.Containers;
 using WargameModInstaller.Model.Containers.Edata;
+using WargameModInstaller.Model.Containers.Proxy;
 
 namespace WargameModInstaller.Infrastructure.Containers
 {
@@ -93,8 +95,7 @@ namespace WargameModInstaller.Infrastructure.Containers
         {
             var result = new Dictionary<Type, ContentFileType>();
             result.Add(typeof(EdataFile), ContentFileType.Edata);
-            //result.Add(typeof(ProxyFile), ContentFileType2.Prxypcpc);
-            //result.Add(typeof(MeshFile), ContentFileType2.Mesh);
+            result.Add(typeof(ProxyFile), ContentFileType.Proxy);
 
             return result;
         }
@@ -107,6 +108,11 @@ namespace WargameModInstaller.Infrastructure.Containers
                 (new EdataFileWriter()).Write((EdataFile)container, token);
             });
 
+            map.Add(ContentFileType.Proxy, (container, token) =>
+            {
+                (new ProxyFileWriter()).Write((ProxyFile)container, token);
+            });
+
             return map;
         }
 
@@ -116,6 +122,11 @@ namespace WargameModInstaller.Infrastructure.Containers
             map.Add(ContentFileType.Edata, (container, token) =>
             {
                 return (new EdataBinWriter()).Write((EdataFile)container, token);
+            });
+
+            map.Add(ContentFileType.Proxy, (container, token) =>
+            {
+                return (new ProxyBinWriter()).Write((ProxyFile)container, token);
             });
 
             return map;

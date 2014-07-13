@@ -13,10 +13,16 @@ namespace WargameModInstaller.Common.Utilities
     /// </summary>
     public static class PathUtilities
     {
-        private static readonly char[] InvalidChars = 
+        private static readonly char[] InvalidLocalPathChars = 
             Path.GetInvalidPathChars()
             .Union(Path.GetInvalidFileNameChars())
             .Except(new[] { Path.DirectorySeparatorChar })
+            .ToArray();
+
+        private static readonly char[] InvalidContentPathChars =
+            Path.GetInvalidPathChars()
+            .Union(Path.GetInvalidFileNameChars())
+            .Except(new[] { '\\', '/' })
             .ToArray();
 
         /// <summary>
@@ -48,9 +54,10 @@ namespace WargameModInstaller.Common.Utilities
             }
 
             //Check the path without the root for invalid chars to avoid taking a ':' in the path root as an invalid char.
-            var pathWithoutRoot = path.Remove(0, Path.GetPathRoot(path).Length);
+            //var pathWithoutRoot = path.Remove(0, Path.GetPathRoot(path).Length);
+            var pathWithoutRoot = path.Substring(Path.GetPathRoot(path).Length);
             pathWithoutRoot = pathWithoutRoot.Replace(@"\\", ":"); // to cancel out c:\\\\test.txt
-            if (pathWithoutRoot.IndexOfAny(InvalidChars) != -1)
+            if (pathWithoutRoot.IndexOfAny(InvalidLocalPathChars) != -1)
             {
                 return false;
             }
@@ -71,7 +78,7 @@ namespace WargameModInstaller.Common.Utilities
             }
 
             path = path.Replace(@"\\", ":");
-            if (path.IndexOfAny(InvalidChars) != -1)
+            if (path.IndexOfAny(InvalidLocalPathChars) != -1)
             {
                 return false;
             }
@@ -82,6 +89,57 @@ namespace WargameModInstaller.Common.Utilities
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Returns whether the given string represents a valid wargame files content path
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool IsValidContentPath(String path)
+        {
+            if (String.IsNullOrWhiteSpace(path))
+            {
+                return false;
+            }
+
+            var pathWithoutRoot = path.Substring(GetContentPathRoot(path).Length);
+            pathWithoutRoot = pathWithoutRoot.Replace(@"\\", ":");
+
+            if (pathWithoutRoot.IndexOfAny(InvalidContentPathChars) != -1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static String GetContentPathRoot(String path)
+        {
+            if (path == null)
+            {
+                return null;
+            }
+
+            if (path.Length == 0)
+            {
+                return String.Empty;
+            }
+
+            var indexOfColon = path.IndexOf(':');
+            //znaczy że zaczyna się od : czyli błędna ścieżla tzn ":xxx" albo brak czyli relatywna
+            if (indexOfColon < 1)
+            {
+                return String.Empty;
+            }
+            else if (path.IndexOfAny(new char[] { '\\', '/' }, indexOfColon, 2) == -1)
+            {
+                return String.Empty;
+            }
+            else
+            {
+                return path.Substring(0, indexOfColon + 1);
+            }
         }
 
         /// <summary>
@@ -137,6 +195,20 @@ namespace WargameModInstaller.Common.Utilities
         {
             FileAttributes attrib = File.GetAttributes(path);
             return ((attrib & FileAttributes.Directory) == FileAttributes.Directory);
+        }
+
+        /// <summary>
+        /// Gets a temporary path and name for a given file 
+        /// </summary>
+        /// <returns></returns>
+        public static String GetTemporaryPath(String filePath)
+        {
+            var fileInfo = new FileInfo(filePath);
+            var temporaryEdataPath = Path.Combine(
+                fileInfo.DirectoryName,
+                Path.GetFileNameWithoutExtension(fileInfo.Name) + ".tmp");
+
+            return temporaryEdataPath;
         }
 
 

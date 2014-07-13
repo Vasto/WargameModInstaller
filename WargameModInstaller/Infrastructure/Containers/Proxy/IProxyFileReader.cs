@@ -7,7 +7,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Proxy
 {
     public interface IProxyFileReader
     {
-        ProxyFile Read(String path, bool loadContent = false);
+        ProxyFile Read(String path, bool loadContent = true);
         ProxyFile Read(String path, bool loadContent, CancellationToken token);
         void LoadContent(ProxyContentFile file);
         void LoadContent(IEnumerable<ProxyContentFile> files);

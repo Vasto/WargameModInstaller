@@ -31,7 +31,7 @@ namespace WargameModInstaller.Services.Commands.Base
             if (!File.Exists(sourceFullPath))
             {
                 throw new CmdExecutionFailedException(
-                    String.Format("Command's source file \"{0}\" doesn't exist.", Command.SourcePath),
+                    String.Format("One of the commands refers to a non-existing source file: \"{0}\" ", Command.SourcePath),
                     DefaultExecutionErrorMsg);
             }
 
@@ -39,7 +39,7 @@ namespace WargameModInstaller.Services.Commands.Base
             if (!File.Exists(targetfullPath))
             {
                 throw new CmdExecutionFailedException(
-                    String.Format("Command's target file \"{0}\" doesn't exist.", Command.TargetPath),
+                    String.Format("One of the commands refers to a non-existing target file: \"{0}\"", Command.TargetPath),
                     DefaultExecutionErrorMsg);
             }
 
@@ -47,7 +47,7 @@ namespace WargameModInstaller.Services.Commands.Base
             if (contentPath == null)
             {
                 throw new CmdExecutionFailedException(
-                    "Invalid command's TargetContentPath value.",
+                    "One of the commands has an invalid targetContentPath value.",
                     DefaultExecutionErrorMsg);
             }
 
@@ -95,7 +95,7 @@ namespace WargameModInstaller.Services.Commands.Base
             if (sharedContainerContext == null || 
                 sharedContainerContext.ContainerFile == null)
             {
-                throw new InvalidOperationException("Cannot obtain a container file from the given execution context");
+                throw new InvalidOperationException("Cannot obtain a container file from the given execution context.");
             }
 
             return sharedContainerContext.ContainerFile;

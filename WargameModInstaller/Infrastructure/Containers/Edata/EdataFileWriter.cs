@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Containers.Edata;
 
 namespace WargameModInstaller.Infrastructure.Containers.Edata
@@ -86,7 +87,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             else
             {
                 //Try in the current dir to avoid double file moving
-                String temporaryEdataPath = GetTemporaryEdataPathInCurrentLocation(edataFile.Path);
+                String temporaryEdataPath = PathUtilities.GetTemporaryPath(edataFile.Path);
                 if ((new FileInfo(edataFile.Path).Length > (new DriveInfo(temporaryEdataPath).AvailableFreeSpace)))
                 {
                     temporaryEdataPath = TryGetTemporaryEdataPathWhereFree(edataFile.Path);
@@ -149,20 +150,6 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// To przenieśc do jakiego utilities i pomyśleć nad nazwa
-        /// </summary>
-        /// <returns></returns>
-        protected String GetTemporaryEdataPathInCurrentLocation(String oldeEdataPath)
-        {
-            var oldEdataFileInfo = new FileInfo(oldeEdataPath);
-            var temporaryEdataPath = Path.Combine(
-                oldEdataFileInfo.DirectoryName,
-                Path.GetFileNameWithoutExtension(oldEdataFileInfo.Name) + ".tmp");
-
-            return temporaryEdataPath;
         }
 
         /// <summary>

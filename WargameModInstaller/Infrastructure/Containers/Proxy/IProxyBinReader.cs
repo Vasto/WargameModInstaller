@@ -10,7 +10,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Proxy
 {
     public interface IProxyBinReader
     {
-        ProxyFile Read(byte[] rawEdata, bool loadContent = true);
-        ProxyFile Read(byte[] rawEdata, bool loadContent, CancellationToken token);
+        ProxyFile Read(byte[] rawProxy, bool loadContent = true);
+        ProxyFile Read(byte[] rawProxy, bool loadContent, CancellationToken token);
     }
 }

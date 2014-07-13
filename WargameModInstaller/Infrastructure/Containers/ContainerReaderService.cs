@@ -7,8 +7,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Infrastructure.Containers.Edata;
+using WargameModInstaller.Infrastructure.Containers.Proxy;
 using WargameModInstaller.Model.Containers;
 using WargameModInstaller.Model.Containers.Edata;
+using WargameModInstaller.Model.Containers.Proxy;
 
 namespace WargameModInstaller.Infrastructure.Containers
 {
@@ -182,8 +184,7 @@ namespace WargameModInstaller.Infrastructure.Containers
         {
             var result = new HashSet<ContentFileType>();
             result.Add(ContentFileType.Edata);
-            //result.Add(ContentFileType2.Prxypcpc);
-            //result.Add(ContentFileType2.Mesh);
+            result.Add(ContentFileType.Proxy);
 
             return result;
         }
@@ -192,6 +193,7 @@ namespace WargameModInstaller.Infrastructure.Containers
         {
             var map = new Dictionary<Type, ContentFileType>();
             map.Add(typeof(EdataFile), ContentFileType.Edata);
+            map.Add(typeof(ProxyFile), ContentFileType.Proxy);
 
             return map;
         }
@@ -202,6 +204,13 @@ namespace WargameModInstaller.Infrastructure.Containers
             map.Add(ContentFileType.Edata, (path, loadContent, token) =>
             {
                 return (new EdataFileReader()).Read(path, loadContent, token);
+            });
+
+            //Może użyć domyślnej wartości parametry load, bo proxy sa małe, i mozna by załadować
+            //zreszta trzeba popatrzeć czy istnieje jakaś mozliwsoc kontreoli teog poza tym
+            map.Add(ContentFileType.Proxy, (path, loadContent, token) =>
+            {
+                return (new ProxyFileReader()).Read(path, loadContent, token);
             });
 
             return map;
@@ -215,6 +224,13 @@ namespace WargameModInstaller.Infrastructure.Containers
                 return (new EdataBinReader()).Read(data, loadContent, token);
             });
 
+            //Może użyć domyślnej wartości parametry load, bo proxy sa małe, i mozna by załadować
+            //zreszta trzeba popatrzeć czy istnieje jakaś mozliwsoc kontreoli teog poza tym
+            map.Add(ContentFileType.Proxy, (path, loadContent, token) =>
+            {
+                return (new ProxyBinReader()).Read(path, loadContent, token);
+            });
+
             return map;
         }
 
@@ -224,6 +240,11 @@ namespace WargameModInstaller.Infrastructure.Containers
             map.Add(ContentFileType.Edata, (contentFiles, token) =>
             {
                 (new EdataFileReader()).LoadContent(contentFiles.OfType<EdataContentFile>());
+            });
+
+            map.Add(ContentFileType.Proxy, (contentFiles, token) =>
+            {
+                (new ProxyFileReader()).LoadContent(contentFiles.OfType<ProxyContentFile>());
             });
 
             return map;

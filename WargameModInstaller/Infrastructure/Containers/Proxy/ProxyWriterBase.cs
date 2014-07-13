@@ -32,16 +32,11 @@ namespace WargameModInstaller.Infrastructure.Containers.Proxy
 
             target.Seek(contentOffset, SeekOrigin.Begin);
 
-            //Zrobić tu liste zapisanych plików gdzie bedzie można sprawdzić podając stary offset i dł czy
-            //plik się na niej znajduje
-            //Jeśli tak i badany plik nie ma custom contetnu wtedy nie ma potrzeby zapisywania go
-            //wystarczy tylko pobrać tylko ten plik z listy i wyciagnąc z niego offset i długoścć i przypisać badanemu plikowi.
-
             //Przydała by się jakaś funkcja haszujaca która potrafi zmiksować w hasz stary offset i długość
             //tyle trzeba uważać bo np przy dodawani które jest przeminne moze dosjc do powtózeń jesli offset i dł by sie zamieniły miejscami.
 
             //ProxyPCPC shares content between the files if content is the same. 
-            //So we're not writing each content uniquely but adjust values of file's offset to point to the same content spot.
+            //Therefore we're not writing each content uniquely but adjust values of file's offset to point to the same content spot.
             var uniqueContentEntries = new Dictionary<String, ProxyContentFile>();
 
             foreach (var file in contentFiles)

@@ -38,7 +38,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Edata
             knownTypes.Add(ContentFileType.Edata, ContentFileType.Edata.MagicBytes);
             knownTypes.Add(ContentFileType.Image, ContentFileType.Image.MagicBytes);
             knownTypes.Add(ContentFileType.Ndfbin, ContentFileType.Ndfbin.MagicBytes);
-            knownTypes.Add(ContentFileType.Prxypcpc, ContentFileType.Prxypcpc.MagicBytes);
+            knownTypes.Add(ContentFileType.Proxy, ContentFileType.Proxy.MagicBytes);
             knownTypes.Add(ContentFileType.Trad, ContentFileType.Trad.MagicBytes);
             knownTypes.Add(ContentFileType.Save, ContentFileType.Save.MagicBytes);
 

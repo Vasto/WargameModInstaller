@@ -110,7 +110,7 @@ namespace WargameModInstaller.Common.Entities
 
             foreach (var item in subPaths)
             {
-                if (!PathUtilities.IsValidRelativePath(item))
+                if (!PathUtilities.IsValidContentPath(item))
                 {
                     return false;
                 }
@@ -121,7 +121,7 @@ namespace WargameModInstaller.Common.Entities
 
         private bool NormalContentPathRule(String path)
         {
-            return PathUtilities.IsValidRelativePath(path);
+            return PathUtilities.IsValidContentPath(path);
         }
 
     }

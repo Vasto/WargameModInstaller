@@ -29,8 +29,8 @@ namespace WargameModInstaller.Model.Containers
             new ContentFileType(5, "Edata", new byte[] { 0x65, 0x64, 0x61, 0x74 });
         public static readonly ContentFileType Save = 
             new ContentFileType(6, "Save", new byte[] { 0x53, 0x41, 0x56, 0x30, 0x00, 0x00, 0x00, 0x00 });
-        public static readonly ContentFileType Prxypcpc = 
-            new ContentFileType(7, "Prxypcpc", new byte[] { 0x50, 0x52, 0x58, 0x59, 0x50, 0x43, 0x50, 0x43 });
+        public static readonly ContentFileType Proxy = 
+            new ContentFileType(7, "Proxy", new byte[] { 0x50, 0x52, 0x58, 0x59, 0x50, 0x43, 0x50, 0x43 });
         public static readonly ContentFileType Unknown = 
             new ContentFileType(8, "Unknown", new byte[] {});
 
@@ -44,7 +44,7 @@ namespace WargameModInstaller.Model.Containers
             knownTypes.Add(Image);
             knownTypes.Add(Edata);
             knownTypes.Add(Save);
-            knownTypes.Add(Prxypcpc);
+            knownTypes.Add(Proxy);
             knownTypes.Add(Unknown);
         }
 

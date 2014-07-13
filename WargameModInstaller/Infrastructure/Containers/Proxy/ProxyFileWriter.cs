@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Containers.Proxy;
 
 namespace WargameModInstaller.Infrastructure.Containers.Proxy
@@ -72,7 +73,7 @@ namespace WargameModInstaller.Infrastructure.Containers.Proxy
                         "edataFile");
                 }
 
-                String temporaryProxyPath = GetTemporaryPathInCurrentLocation(file.Path);
+                String temporaryProxyPath = PathUtilities.GetTemporaryPath(file.Path);
 
                 //To avoid too many nested try catches.
                 FileStream source = null;
@@ -109,6 +110,13 @@ namespace WargameModInstaller.Infrastructure.Containers.Proxy
                     header.PathTableEntriesCount = (uint)pathTableEntries.Count();
 
                     WriteHeader(target, header);
+
+                    //Free file handles before the file move and delete
+                    CloseStreams(source, target);
+
+                    //Replace temporary file
+                    File.Delete(file.Path);
+                    File.Move(temporaryProxyPath, file.Path);
                 }
                 finally
                 {
@@ -121,20 +129,6 @@ namespace WargameModInstaller.Infrastructure.Containers.Proxy
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// To przenieśc do jakiego utilities i pomyśleć nad nazwa
-        /// </summary>
-        /// <returns></returns>
-        protected String GetTemporaryPathInCurrentLocation(String oldeEdataPath)
-        {
-            var oldEdataFileInfo = new FileInfo(oldeEdataPath);
-            var temporaryEdataPath = Path.Combine(
-                oldEdataFileInfo.DirectoryName,
-                Path.GetFileNameWithoutExtension(oldEdataFileInfo.Name) + ".tmp");
-
-            return temporaryEdataPath;
         }
 
         //Zmienione z private na protected na razie
