@@ -55,6 +55,10 @@ namespace WargameModInstaller.Infrastructure.Image
                 ms.Read(buffer, 0, buffer.Length);
 
                 var header = MiscUtilities.ByteArrayToStructure<DDSFormat.Header>(buffer);
+
+                DDSHelper.ConversionFlags conversionFlags;
+                var format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags);
+
                 if (header.MipMapCount == 0)
                 {
                     header.MipMapCount = 1;
@@ -72,7 +76,8 @@ namespace WargameModInstaller.Infrastructure.Image
                     }
 
                     uint minMipByteLength = DDSMipMapUilities.GetMinimumMipMapSizeForFormat(header.PixelFormat);
-                    uint mipByteLength = Math.Max(minMipByteLength, mipWidth * mipHeight);
+                    uint mipByteLength = (uint)DDSMipMapUilities.GetMipMapBytesCount((int)mipWidth, (int)mipHeight, format);
+                    mipByteLength = Math.Max(minMipByteLength, mipByteLength);
 
                     buffer = new byte[mipByteLength];
                     ms.Read(buffer, 0, buffer.Length);
@@ -90,12 +95,10 @@ namespace WargameModInstaller.Infrastructure.Image
                 file.Height = header.Height;
                 file.ImageHeight = header.Height;
                 file.Width = header.Width;
-                file.ImageHeight = header.Width;
+                file.ImageWidth = header.Width;
                 file.MipMapCount = (ushort)file.MipMaps.Count;
-
-                DDSHelper.ConversionFlags conversionFlags;
-                file.Format = DDSHelper.GetDXGIFormat(ref header.PixelFormat, out conversionFlags);
-                file.PixelFormatString = TgvUtilities.GetTgvFromPixelFormat(file.Format);
+                file.Format = format;
+                file.PixelFormatString = TgvUtilities.GetTgvFromPixelFormat(format);
             }
 
             return file;
