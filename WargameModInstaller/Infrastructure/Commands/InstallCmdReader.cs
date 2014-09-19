@@ -138,7 +138,7 @@ namespace WargameModInstaller.Infrastructure.Commands
         }
 
         /// <summary>
-        /// Reads all install comand entries and groups them if possible.
+        /// Reads all install comand entries and groups them according to the group production rules if possible.
         /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
@@ -149,9 +149,9 @@ namespace WargameModInstaller.Infrastructure.Commands
 
             try
             {
-                cmdGroupsList = CreateCommandGroups(cmdsList);
-
-                cmdGroupsList.OrderByDescending(group => group.Priority);
+                cmdGroupsList = CreateCommandGroups(cmdsList)
+                    .OrderByDescending(group => group.Priority)
+                    .ToList();
             }
             catch (XmlException ex)
             {
@@ -165,7 +165,7 @@ namespace WargameModInstaller.Infrastructure.Commands
 
         /// <summary>
         /// Reads all install comand entires belonging to the given components entries collection
-        /// and groups them if possible.
+        /// and groups them according to the group production rules if possible.
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="components"></param>
@@ -177,9 +177,9 @@ namespace WargameModInstaller.Infrastructure.Commands
 
             try
             {
-                cmdGroupsList = CreateCommandGroups(cmdsList);
-
-                cmdGroupsList.OrderByDescending(group => group.Priority);
+                cmdGroupsList = CreateCommandGroups(cmdsList)
+                    .OrderByDescending(group => group.Priority)
+                    .ToList();
             }
             catch (XmlException ex)
             {
