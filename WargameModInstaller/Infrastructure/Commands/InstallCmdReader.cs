@@ -222,6 +222,8 @@ namespace WargameModInstaller.Infrastructure.Commands
             queries.Add(CmdEntryType.AlterDictionary, ReadAlterDictionaryCmds);
             queries.Add(CmdEntryType.AddContent, ReadAddContentCmds);
             queries.Add(CmdEntryType.AddImage, ReadAddImageCmds);
+            queries.Add(CmdEntryType.BackupProfile, ReadBackupProfileCmds);
+            queries.Add(CmdEntryType.RestoreProfile, ReadRestoreProfileCmds);
 
             return queries;
         }
@@ -246,7 +248,9 @@ namespace WargameModInstaller.Infrastructure.Commands
             var validCmds = cmds.Where(cmd =>
                 cmd is CopyGameFileCmd ||
                 cmd is CopyModFileCmd ||
-                cmd is RemoveFileCmd);
+                cmd is RemoveFileCmd ||
+                cmd is BackupProfileCmd || 
+                cmd is RestoreProfileCmd);
 
             var samePriorityGroups = validCmds.GroupBy(cmd => cmd.Priority);
 
@@ -635,6 +639,50 @@ namespace WargameModInstaller.Infrastructure.Commands
                 newCmd.UseMipMaps = useMipMaps;
                 newCmd.UseCompression = compress;
                 newCmd.Checksum = checksum;
+                newCmd.IsCritical = isCritical;
+                newCmd.Priority = priority;
+
+                result.Add(newCmd);
+            }
+
+            return result;
+        }
+
+        private IEnumerable<BackupProfileCmd> ReadBackupProfileCmds(XElement source)
+        {
+            var result = new List<BackupProfileCmd>();
+
+            var cmdElementsCollection = source.Elements(CmdEntryType.BackupProfile.Name);
+            foreach (var cmdElement in cmdElementsCollection)
+            {
+                var targetPath = cmdElement.Attribute("targetPath").ValueNullSafe();
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(criticalCmdsDefault);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(5);
+
+                var newCmd = new BackupProfileCmd();
+                newCmd.TargetPath = new InstallEntityPath(targetPath);
+                newCmd.IsCritical = isCritical;
+                newCmd.Priority = priority;
+
+                result.Add(newCmd);
+            }
+
+            return result;
+        }
+
+        private IEnumerable<RestoreProfileCmd> ReadRestoreProfileCmds(XElement source)
+        {
+            var result = new List<RestoreProfileCmd>();
+
+            var cmdElementsCollection = source.Elements(CmdEntryType.RestoreProfile.Name);
+            foreach (var cmdElement in cmdElementsCollection)
+            {
+                var sourcePath = cmdElement.Attribute("sourcePath").ValueNullSafe();
+                var isCritical = cmdElement.Attribute("isCritical").ValueOr<bool>(criticalCmdsDefault);
+                var priority = cmdElement.Attribute("priority").ValueOr<int>(5);
+
+                var newCmd = new RestoreProfileCmd();
+                newCmd.SourcePath = new InstallEntityPath(sourcePath);
                 newCmd.IsCritical = isCritical;
                 newCmd.Priority = priority;
 

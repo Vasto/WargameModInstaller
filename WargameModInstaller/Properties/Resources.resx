@@ -292,4 +292,16 @@ Click Next to continue.</value>
   <data name="CmdExecutionErrorParamMsg" xml:space="preserve">
     <value>Cannot execute the "{0}" command.</value>
   </data>
+  <data name="BackupSourceErrorMsg" xml:space="preserve">
+    <value>Cannot backup profile because a profile file was not found.</value>
+  </data>
+  <data name="BackupTargetErrorMsg" xml:space="preserve">
+    <value>Cannot backup profile because the backup destination path is not valid</value>
+  </data>
+  <data name="RestoreSourceErrorMsg" xml:space="preserve">
+    <value>Cannot restore a profile because no backuped profile file was found.</value>
+  </data>
+  <data name="RestoreTargetErrorMsg" xml:space="preserve">
+    <value>Cannot restore a profile because the destination profile directory was not located.</value>
+  </data>
 </root>

@@ -130,6 +130,25 @@
             sourcePath="Data\Wargame\PC\2100001553\2100001570\ZZ_4.dat"/>-->
 
     
+    <!--This is a BackupProfile command. It orders the installer to backup a Wargame profile directory into a given location.
+    Command arguments:
+        - targetPath - a relative path to a file, inside the Wargame Installation directory, where the profile folder will be copied.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                     For RemoveFile, set to 5 by default, and can be omitted.-->
+    <!--<BackupProfile 
+            targetPath="Backup\Profile"/>-->
+
+    <!--This is a RestoreProfile command. It orders the installer to restore a backuped Wargame profile.
+    Command arguments:
+        - sourcePath - a relative path to a directory, inside the Wargame Installation directory, where the profile was backuped.
+        - isCritical - marks an individual command as a critical. It is set to false by default and can be omitted.
+        - priority - sets a command priority. Commands with the higher priority are executed before the ones with the lower priority. 
+                     For RemoveFile, set to 5 by default, and can be omitted.-->
+    <!--<BackupProfile 
+            sourcePath="Backup\Profile"/>-->
+
+    
     <!--This is a ReplaceContent command. It orders the installer to replace a specified content file inside a specifed dat file with a
     provided source file. It just replaces a file without any extra processing or adjustments, so be sure that the provided file has a proper content.
     Command arguments:

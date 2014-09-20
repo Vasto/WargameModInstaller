@@ -13,7 +13,7 @@ namespace WargameModInstaller.Services.Commands
 {
     public class ReplaceImageTileCmdExecutor : ModImageBySourceCmdExecutor<ReplaceImageTileCmd>
     {
-        public ReplaceImageTileCmdExecutor(IImageComposerService imageComposer, ReplaceImageTileCmd command)
+        public ReplaceImageTileCmdExecutor(ReplaceImageTileCmd command, IImageComposerService imageComposer)
             : base(command)
         {
             this.ImageComposerService = imageComposer;

@@ -125,6 +125,24 @@ namespace WargameModInstaller.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot backup profile because a profile file was not found..
+        /// </summary>
+        internal static string BackupSourceErrorMsg {
+            get {
+                return ResourceManager.GetString("BackupSourceErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot backup profile because the backup destination path is not valid.
+        /// </summary>
+        internal static string BackupTargetErrorMsg {
+            get {
+                return ResourceManager.GetString("BackupTargetErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel Installation.
         /// </summary>
         internal static string CancelInstallationHeader {
@@ -527,6 +545,24 @@ namespace WargameModInstaller.Properties {
         internal static string Replacing {
             get {
                 return ResourceManager.GetString("Replacing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot restore a profile because no backuped profile file was found..
+        /// </summary>
+        internal static string RestoreSourceErrorMsg {
+            get {
+                return ResourceManager.GetString("RestoreSourceErrorMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot restore a profile because the destination profile directory was not located..
+        /// </summary>
+        internal static string RestoreTargetErrorMsg {
+            get {
+                return ResourceManager.GetString("RestoreTargetErrorMsg", resourceCulture);
             }
         }
         
