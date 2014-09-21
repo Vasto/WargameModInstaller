@@ -178,7 +178,7 @@ namespace WargameModInstaller.ViewModels
 
         private IEnumerable<String> GetComponentsToInstall(IEnumerable<ComponentViewModel> componentsVM)
         {
-            var componentsForInstall = new List<String>();
+            var componentsToInstall = new List<String>();
 
             foreach (var vm in componentsVM)
             {
@@ -197,12 +197,12 @@ namespace WargameModInstaller.ViewModels
                     var currentComponent = currentVM.WrappedComponent;
                     if (currentComponent.IsMarkedForInstall)
                     {
-                        componentsForInstall.Add(currentComponent.Name);
+                        componentsToInstall.Add(currentComponent.Name);
                     }
                 }
             }
 
-            return componentsForInstall;
+            return componentsToInstall;
         }
 
     }

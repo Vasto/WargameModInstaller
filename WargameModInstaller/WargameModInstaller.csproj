@@ -160,6 +160,7 @@
     <Compile Include="Model\Commands\RestoreProfileCmd.cs" />
     <Compile Include="Model\Commands\SharedNestedTargetCmdGroup.cs" />
     <Compile Include="Model\Commands\ReplaceContentCmd.cs" />
+    <Compile Include="Model\Config\SuccessfulInstallScreenSettings.cs" />
     <Compile Include="Model\Config\GeneralSettingEntryType.cs" />
     <Compile Include="Infrastructure\Config\GeneralSettingReader.cs" />
     <Compile Include="Infrastructure\Config\IGeneralSettingReader.cs" />

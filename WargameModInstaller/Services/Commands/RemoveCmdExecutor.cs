@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using WargameModInstaller.Common.Entities;
 using WargameModInstaller.Common.Extensions;
+using WargameModInstaller.Common.Utilities;
 using WargameModInstaller.Model.Commands;
 using WargameModInstaller.Services.Commands.Base;
 
@@ -30,9 +31,13 @@ namespace WargameModInstaller.Services.Commands
             token.ThrowIfCancellationRequested();
 
             String sourceFullPath = Path.Combine(context.InstallerTargetDirectory, Command.SourcePath);
-            if (File.Exists(sourceFullPath))
+            if (PathUtilities.IsFile(sourceFullPath) && File.Exists(sourceFullPath))
             {
                 File.Delete(sourceFullPath);
+            }
+            else if (PathUtilities.IsDirectory(sourceFullPath) && Directory.Exists(sourceFullPath))
+            {
+                Directory.Delete(sourceFullPath, true);
             }
 
             SetMaxProgress();

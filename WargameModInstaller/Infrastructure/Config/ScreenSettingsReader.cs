@@ -45,13 +45,21 @@ namespace WargameModInstaller.Infrastructure.Config
         protected override Dictionary<WMIEntryType, Func<XElement, ScreenSettings>> CreateReadingQueries()
         {
             var result = new Dictionary<WMIEntryType, Func<XElement, ScreenSettings>>();
-            result.Add(ScreenSettingsEntryType.WelcomeScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.WelcomeScreen));
-            result.Add(ScreenSettingsEntryType.LocationScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.LocationScreen));
-            result.Add(ScreenSettingsEntryType.ProgressScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.ProgressScreen));
-            result.Add(ScreenSettingsEntryType.InstallCompletedScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.InstallCompletedScreen));
-            result.Add(ScreenSettingsEntryType.InstallCanceledScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.InstallCanceledScreen));
-            result.Add(ScreenSettingsEntryType.InstallFailedScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.InstallFailedScreen));
-            result.Add(ScreenSettingsEntryType.ComponentSelectionScreen, (source) => ReadScreenSettings(source, ScreenSettingsEntryType.ComponentSelectionScreen));
+
+            result.Add(ScreenSettingsEntryType.WelcomeScreen, (source) => 
+                ReadScreenSettings(source, ScreenSettingsEntryType.WelcomeScreen));
+            result.Add(ScreenSettingsEntryType.LocationScreen, (source) =>
+                ReadScreenSettings(source, ScreenSettingsEntryType.LocationScreen));
+            result.Add(ScreenSettingsEntryType.ProgressScreen, (source) => 
+                ReadScreenSettings(source, ScreenSettingsEntryType.ProgressScreen));
+            result.Add(ScreenSettingsEntryType.InstallCompletedScreen, (source) =>
+                ReadScreenSettings(source, ScreenSettingsEntryType.InstallCompletedScreen));
+            result.Add(ScreenSettingsEntryType.InstallCanceledScreen, (source) =>
+                ReadScreenSettings(source, ScreenSettingsEntryType.InstallCanceledScreen));
+            result.Add(ScreenSettingsEntryType.InstallFailedScreen, (source) =>
+                ReadScreenSettings(source, ScreenSettingsEntryType.InstallFailedScreen));
+            result.Add(ScreenSettingsEntryType.ComponentSelectionScreen, (source) =>
+                ReadScreenSettings(source, ScreenSettingsEntryType.ComponentSelectionScreen));
 
             return result;
         }
@@ -90,6 +98,13 @@ namespace WargameModInstaller.Infrastructure.Config
                         null;
                 }
             }
+
+            return result;
+        }
+
+        private ScreenSettings ReadSuccessfulInstallScreenSettings(XElement source, ScreenSettingsEntryType entryType)
+        {
+            SuccessfulInstallScreenSettings result = null;
 
             return result;
         }

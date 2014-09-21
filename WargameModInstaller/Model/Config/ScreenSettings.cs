@@ -42,7 +42,7 @@ namespace WargameModInstaller.Model.Config
             set;
         }
 
-        public bool Equals(ScreenSettings other)
+        public virtual bool Equals(ScreenSettings other)
         {
             ScreenSettings otherSetting = other as ScreenSettings;
             if (otherSetting != null)
@@ -60,7 +60,7 @@ namespace WargameModInstaller.Model.Config
 
         public override bool Equals(object obj)
         {
-            GeneralSetting other = obj as GeneralSetting;
+            ScreenSettings other = obj as ScreenSettings;
             if (other != null)
             {
                 return Equals(other);

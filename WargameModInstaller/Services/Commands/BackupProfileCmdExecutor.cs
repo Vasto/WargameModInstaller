@@ -47,18 +47,18 @@ namespace WargameModInstaller.Services.Commands
             {
                 var profileRootDir = ProfileLocator.TryGetProfileRootDirectory();
                 var profileSubPath = profileDir.Substring(profileRootDir.Length + 1);
-                targetFullPath = Path.Combine(targetFullPath, profileSubPath);
+                var destinationPath = Path.Combine(targetFullPath, profileSubPath);
 
                 //Now Create all of the directories
                 foreach (String dirPath in Directory.GetDirectories(profileDir, "*", SearchOption.AllDirectories))
                 {
-                    Directory.CreateDirectory(dirPath.Replace(profileDir, targetFullPath));
+                    Directory.CreateDirectory(dirPath.Replace(profileDir, destinationPath));
                 }
 
                 //Copy all the files & Replaces any files with the same name
                 foreach (String filePath in Directory.GetFiles(profileDir, "*.*", SearchOption.AllDirectories))
                 {
-                    File.Copy(filePath, filePath.Replace(profileDir, targetFullPath), true);
+                    File.Copy(filePath, filePath.Replace(profileDir, destinationPath), true);
                 }
             }
 
