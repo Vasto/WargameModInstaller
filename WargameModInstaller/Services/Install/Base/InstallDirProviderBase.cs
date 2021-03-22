@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace WargameModInstaller.Services.Install
@@ -19,6 +20,7 @@ namespace WargameModInstaller.Services.Install
 
             var rdExecutableName = GetWargameName();
             var rdFolderName = GetWargameFolderName();
+            String epicRdFolderName = Regex.Replace(rdFolderName, @"\s+", ""); //Folder name using the Epic launcher is WargameRedDragon
             if (installDirPath.Contains(rdFolderName))
             {
                 var rdDirectoryPath = installDirPath.Substring(0, installDirPath.IndexOf(rdFolderName) + rdFolderName.Length);
@@ -28,7 +30,15 @@ namespace WargameModInstaller.Services.Install
                     return true;
                 }
             }
-
+            else if (installDirPath.Contains(epicRdFolderName))
+            {
+                var rdDirectoryPath = installDirPath.Substring(0, installDirPath.IndexOf(epicRdFolderName) + epicRdFolderName.Length);
+                var exeFiles = Directory.GetFiles(rdDirectoryPath, "*.exe", SearchOption.AllDirectories);
+                if (exeFiles.Any(file => file.Contains(rdExecutableName)))
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -60,6 +70,28 @@ namespace WargameModInstaller.Services.Install
                 }
             }
 
+            //Checking to see if installer shares directory or is in a subdirectory of the Wargame install location
+            var currentFolder = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            String steamName = GetWargameFolderName();
+            int steamInstallIndex = currentFolder.IndexOf(steamName);
+            if (steamInstallIndex >= 0)
+            {
+                String gameFolderPath = currentFolder.Remove(steamInstallIndex + steamName.Length);
+                if (IsCorrectInstallDirectory(gameFolderPath))
+                {
+                    return gameFolderPath;
+                }
+            }
+            String epicName = Regex.Replace(steamName, @"\s+", ""); //Folder name using the Epic launcher is WargameRedDragon
+            int epicInstallIndex = currentFolder.IndexOf(epicName);
+            if (epicInstallIndex >= 0)
+            {
+                String gameFolderPath = currentFolder.Remove(epicInstallIndex + epicName.Length);
+                if (IsCorrectInstallDirectory(gameFolderPath))
+                {
+                    return gameFolderPath;
+                }
+            }
             return String.Empty;
         }
 
