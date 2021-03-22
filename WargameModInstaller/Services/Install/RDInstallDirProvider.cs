@@ -32,6 +32,7 @@ namespace WargameModInstaller.Services.Install
             foreach (var drive in drives)
             {
                 results.Add(Path.Combine(drive, programFilesName, @"Steam\SteamApps\common\Wargame Red Dragon\"));
+                results.Add(Path.Combine(drive, programFilesName, @"Epic Games\WargameRedDragon\"));
             }
 
             return results;
