@@ -18,6 +18,8 @@ namespace WargameModInstaller.Services.Commands
 
     public class AlterDictionaryCmdExecutor : ModNestedTargetCmdExecutor<AlterDictionaryCmd>
     {
+        private const ulong GlyphHash = (ulong)0x1 << 63;
+
         public AlterDictionaryCmdExecutor(AlterDictionaryCmd command)
             : base(command)
         {
@@ -37,7 +39,9 @@ namespace WargameModInstaller.Services.Commands
 
             RenameEntries(hashToEntriesMap);
 
-            var rawDictionaryData = (new TradDictBinWriter()).Write(hashToEntriesMap.Values);
+            var sorted = SortEntries(hashToEntriesMap);
+
+            var rawDictionaryData = (new TradDictBinWriter()).Write(sorted);
             contentFile.LoadCustomContent(rawDictionaryData);
         }
 
@@ -110,6 +114,19 @@ namespace WargameModInstaller.Services.Commands
                     Common.Logging.LoggerFactory.Create(this.GetType()).Warn(warning);
                 }
             }
+        }
+
+        private IEnumerable<TradDictEntry> SortEntries(Dictionary<byte[], TradDictEntry> hashToEntriesMap)
+        {
+            var sorted = hashToEntriesMap.OrderBy(x => BitConverter.ToUInt64(x.Key, 0)).ToList();
+            var glyphEntry = sorted.FirstOrDefault(x => BitConverter.ToUInt64(x.Key, 0).Equals(GlyphHash));
+            if (glyphEntry.Value != null)
+            {
+                sorted.Remove(glyphEntry);
+                sorted.Add(glyphEntry);
+            }
+            return sorted.Select(x => x.Value);
+            
         }
 
         private byte[] GenerateEntryHash()
