@@ -12,6 +12,7 @@ namespace WargameModInstaller.Model.Config
         public static readonly WargameVersionType RedDragon = new WargameVersionType(1, "RD", "Wargame: Red Dragon");
         public static readonly WargameVersionType AirLandBattle = new WargameVersionType(2, "ALB", "Wargame: AirLand Battle");
         public static readonly WargameVersionType EuropeanEscalation = new WargameVersionType(3, "EE", "Wargame: European Escalation");
+        public static readonly WargameVersionType WARNO = new WargameVersionType(1, "WN", "WARNO");
 
         protected static HashSet<WargameVersionType> knownVersions;
 
@@ -21,6 +22,7 @@ namespace WargameModInstaller.Model.Config
             knownVersions.Add(RedDragon);
             knownVersions.Add(AirLandBattle);
             knownVersions.Add(EuropeanEscalation);
+            knownVersions.Add(WARNO);
         }
 
         public static bool IsKnownVersion(String versionName)

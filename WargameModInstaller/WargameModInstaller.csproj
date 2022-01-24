@@ -267,6 +267,8 @@
     <Compile Include="Services\Install\RDInstallDirProvider.cs" />
     <Compile Include="Services\Commands\SharedContainerCmdExecContext.cs" />
     <Compile Include="Services\Install\RedDragonProfileLocator.cs" />
+    <Compile Include="Services\Install\WARNOProfileLocator.cs" />
+    <Compile Include="Services\Install\WNInstallDirProvider.cs" />
     <Compile Include="Services\Utilities\DirectoryLocationService.cs" />
     <Compile Include="Services\Utilities\IDirectoryLocationService.cs" />
     <Compile Include="Services\Utilities\IMessageService.cs" />
