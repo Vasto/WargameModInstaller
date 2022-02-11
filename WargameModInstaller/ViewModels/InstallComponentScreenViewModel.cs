@@ -189,15 +189,15 @@ namespace WargameModInstaller.ViewModels
                 {
                     var currentVM = vmQueue.Dequeue();
 
-                    foreach (var childVM in currentVM.Children)
-                    {
-                        vmQueue.Enqueue(childVM);
-                    }
-
                     var currentComponent = currentVM.WrappedComponent;
                     if (currentComponent.IsMarkedForInstall)
                     {
                         componentsToInstall.Add(currentComponent.Name);
+
+                        foreach (var childVM in currentVM.Children)
+                        {
+                            vmQueue.Enqueue(childVM);
+                        }
                     }
                 }
             }
