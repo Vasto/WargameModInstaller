@@ -75,6 +75,10 @@ namespace WargameModInstaller
             {
                 ConfigureForRD(kernel);
             }
+            else if (versionName == WargameVersionType.WARNO.Name)
+            {
+                ConfigureForWN(kernel);
+            }
         }
 
         protected virtual void ConfigureForALB(IKernel kernel)
@@ -94,6 +98,17 @@ namespace WargameModInstaller
             kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
             kernel.Bind<IWargameInstallDirService>().To<RDInstallDirProvider>().InSingletonScope();
             kernel.Bind<IWargameProfileLocator>().To<RedDragonProfileLocator>().InSingletonScope();
+            kernel.Bind<IImageComposerService>().To<ImageComposerService>();
+            kernel.Bind<IContainerReaderService>().To<ContainerReaderService>().InSingletonScope();
+            kernel.Bind<IContainerWriterService>().To<ContainerWriterService>().InSingletonScope();
+        }
+
+        protected virtual void ConfigureForWN(IKernel kernel)
+        {
+            kernel.Bind<IInstallCmdReader>().To<InstallCmdReader>();
+            kernel.Bind<ICmdExecutorFactory>().To<CmdExecutorFactory>().InSingletonScope();
+            kernel.Bind<IWargameInstallDirService>().To<WNInstallDirProvider>().InSingletonScope();
+            kernel.Bind<IWargameProfileLocator>().To<WARNOProfileLocator>().InSingletonScope();
             kernel.Bind<IImageComposerService>().To<ImageComposerService>();
             kernel.Bind<IContainerReaderService>().To<ContainerReaderService>().InSingletonScope();
             kernel.Bind<IContainerWriterService>().To<ContainerWriterService>().InSingletonScope();
